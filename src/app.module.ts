@@ -18,7 +18,7 @@ import { SeedCommand } from './seed/seed.command';
       username: process.env.DB_USERMAME,
       password: process.env.DB_PASSWORD,
       autoLoadEntities: true,
-      synchronize: false,
+      synchronize: true,
     }),
     SeedModule,
     AuthModule,
