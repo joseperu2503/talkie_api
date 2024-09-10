@@ -2,7 +2,7 @@ import { Controller, Post, Body, Get, Put } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { LoginUserDto } from './dto/login-user-dto';
-import { Auth } from './decorators/auth.decorator';
+import { JwtAuth } from './decorators/jwt-auth.decorator';
 import { GetUser } from './decorators/get-user.decorator';
 import { User } from './entities/user.entity';
 import { UpdateAuthDto } from './dto/update-auth.dto';
@@ -22,13 +22,13 @@ export class AuthController {
   }
 
   @Put('update')
-  @Auth()
+  @JwtAuth()
   update(@GetUser() user: User, @Body() updateAuthDto: UpdateAuthDto) {
     return this.authService.update(user, updateAuthDto);
   }
 
   @Get('me')
-  @Auth()
+  @JwtAuth()
   me(@GetUser() user: User) {
     return this.authService.me(user);
   }
