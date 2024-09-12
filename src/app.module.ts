@@ -5,6 +5,7 @@ import { SeedModule } from './seed/seed.module';
 import { AuthModule } from './auth/auth.module';
 import { AppController } from './app.controller';
 import { SeedCommand } from './seed/seed.command';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
   controllers: [AppController],
@@ -22,6 +23,7 @@ import { SeedCommand } from './seed/seed.command';
     }),
     SeedModule,
     AuthModule,
+    ChatModule,
   ],
   providers: [SeedCommand],
 })

@@ -13,5 +13,12 @@ export const initialData: SeedData = {
       password: 'Abc123',
       phone: '993689145',
     },
+    {
+      email: 'test2@gmail.com',
+      name: 'Test2',
+      surname: 'User2',
+      password: 'Abc123',
+      phone: '993689145',
+    },
   ],
 };
