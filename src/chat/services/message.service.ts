@@ -7,6 +7,8 @@ import { Chat } from '../entities/chat.entity';
 import { SendMessageDto } from '../dto/send-message.dto';
 import { AuthService } from 'src/auth/auth.service';
 import { ChatUser } from '../entities/chat-user.entity';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { MessageSendedEvent } from '../events/message-sended.event';
 
 @Injectable()
 export class MessageService {
@@ -20,6 +22,7 @@ export class MessageService {
 
     @InjectRepository(ChatUser)
     private chatUserRepository: Repository<ChatUser>,
+    private eventEmitter: EventEmitter2,
   ) {}
 
   async sendMessageToChat(
@@ -44,6 +47,12 @@ export class MessageService {
     sendMessageDto: SendMessageDto,
     sender: User,
   ) {
+    // Verificar que el destinatario exista
+    const recipient = await this.userService.findOne(recipientId);
+    if (!recipient) {
+      throw new NotFoundException('Recipient user not found');
+    }
+
     let chat = await this.chatRepository
       .createQueryBuilder('chat')
       .leftJoinAndSelect('chat.chatUsers', 'chatUser')
@@ -64,12 +73,6 @@ export class MessageService {
 
     // Si no existe un chat, crear uno nuevo
     if (!chat) {
-      // Verificar que el destinatario exista
-      const recipient = await this.userService.findOne(recipientId);
-      if (!recipient) {
-        throw new NotFoundException('Recipient user not found');
-      }
-
       // Crear el nuevo chat
       chat = this.chatRepository.create();
       await this.chatRepository.save(chat);
@@ -80,6 +83,9 @@ export class MessageService {
         this.chatUserRepository.create({ chat, user: recipient }),
       ];
       await this.chatUserRepository.save(chatUsers);
+    } else {
+      const chatId = chat.id;
+      chat = await this.chatRepository.findOne({ where: { id: chatId } });
     }
 
     // Crear y guardar el mensaje
@@ -89,8 +95,15 @@ export class MessageService {
       chat,
     });
     await this.messageRepository.save(message);
-    chat.lastMessage = message;
-    await this.chatRepository.save(chat);
+    chat!.lastMessage = message;
+    await this.chatRepository.save(chat!);
+
+    const messageSendedEvent = new MessageSendedEvent();
+    messageSendedEvent.message = message;
+    messageSendedEvent.users = [recipient];
+
+    this.eventEmitter.emit('message.sended', messageSendedEvent);
+
     return message;
   }
 
