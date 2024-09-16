@@ -8,15 +8,15 @@ export const initialData: SeedData = {
   users: [
     {
       email: 'test1@gmail.com',
-      name: 'Test',
-      surname: 'User',
+      name: 'Junior',
+      surname: 'Perez',
       password: 'Abc123',
       phone: '993689145',
     },
     {
       email: 'test2@gmail.com',
-      name: 'Test2',
-      surname: 'User2',
+      name: 'Patricia',
+      surname: 'Campos',
       password: 'Abc123',
       phone: '993689145',
     },

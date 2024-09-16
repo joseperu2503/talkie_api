@@ -30,21 +30,11 @@ export class MessageController {
     );
   }
 
-  @Get(':chatId')
-  async getMessages(@Param('chatId', ParseIntPipe) chatId: number) {
-    return this.messageService.getMessages(chatId);
-  }
-
-  @Post('/recipient/:recipientId')
+  @Post('/recipient')
   async sendMessageToUser(
-    @Param('recipientId', ParseIntPipe) recipientId: number,
     @Body() sendMessageDto: SendMessageDto,
     @GetUser() sender: User,
   ) {
-    return this.messageService.sendMessageToUser(
-      recipientId,
-      sendMessageDto,
-      sender,
-    );
+    return this.messageService.sendMessageToUser(sendMessageDto, sender);
   }
 }

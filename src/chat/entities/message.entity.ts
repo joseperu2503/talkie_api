@@ -1,4 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
 import { Chat } from './chat.entity';
 import { User } from 'src/auth/entities/user.entity';
 
@@ -11,9 +17,11 @@ export class Message {
   content: string;
 
   @ManyToOne(() => User, (user) => user.messages)
+  @JoinColumn({ name: 'sender_id' })
   sender: User;
 
   @ManyToOne(() => Chat, (chat) => chat.messages)
+  @JoinColumn({ name: 'chat_id' })
   chat: Chat;
 
   @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })

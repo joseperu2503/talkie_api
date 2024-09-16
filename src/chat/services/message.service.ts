@@ -1,6 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { User } from 'src/auth/entities/user.entity';
 import { Message } from '../entities/message.entity';
 import { Chat } from '../entities/chat.entity';
@@ -42,15 +46,17 @@ export class MessageService {
     return this.messageRepository.save(message);
   }
 
-  async sendMessageToUser(
-    recipientId: number,
-    sendMessageDto: SendMessageDto,
-    sender: User,
-  ) {
+  async sendMessageToUser(sendMessageDto: SendMessageDto, sender: User) {
     // Verificar que el destinatario exista
-    const recipient = await this.userService.findOne(recipientId);
+    const recipient = await this.userService.findOne(
+      sendMessageDto.recipientId,
+    );
     if (!recipient) {
       throw new NotFoundException('Recipient user not found');
+    }
+
+    if (sendMessageDto.recipientId === sender.id) {
+      throw new BadRequestException('Sender and recipient cannot be the same');
     }
 
     let chat = await this.chatRepository
@@ -68,7 +74,10 @@ export class MessageService {
       .andHaving(
         'array_agg(user.id) <@ ARRAY[CAST(:senderId AS integer), CAST(:recipientId AS integer)]',
       )
-      .setParameters({ senderId: sender.id, recipientId: recipientId })
+      .setParameters({
+        senderId: sender.id,
+        recipientId: sendMessageDto.recipientId,
+      })
       .getRawOne(); // Usamos getRawOne para obtener un solo chat
 
     // Si no existe un chat, crear uno nuevo
@@ -95,7 +104,7 @@ export class MessageService {
       chat,
     });
     await this.messageRepository.save(message);
-    chat!.lastMessage = message;
+    chat.lastMessage = message;
     await this.chatRepository.save(chat!);
 
     const messageSendedEvent = new MessageSendedEvent();
@@ -105,13 +114,5 @@ export class MessageService {
     this.eventEmitter.emit('message.sended', messageSendedEvent);
 
     return message;
-  }
-
-  async getMessages(chatId: number): Promise<Message[]> {
-    return this.messageRepository.find({
-      where: { chat: { id: chatId } },
-      relations: ['user', 'chat'],
-      order: { timestamp: 'ASC' },
-    });
   }
 }

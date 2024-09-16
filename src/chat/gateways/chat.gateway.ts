@@ -3,6 +3,7 @@ import {
   OnGatewayDisconnect,
   WebSocketGateway,
   WebSocketServer,
+  SubscribeMessage,
 } from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -13,6 +14,11 @@ import { JwtPayload } from 'src/auth/interfaces/jwt-payload.interfaces';
 import { ChatService } from '../services/chat.service';
 import { OnEvent } from '@nestjs/event-emitter';
 import { MessageSendedEvent } from '../events/message-sended.event';
+import { MessageService } from '../services/message.service';
+import { SendMessageDto } from '../dto/send-message.dto';
+import { MessageResponseDto } from '../dto/message-response.dto';
+import { UseGuards } from '@nestjs/common';
+import { WsJwtGuard } from 'src/auth/guards/ws-jwt.guard';
 
 @WebSocketGateway({ cors: true, namespace: '/chats' })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -21,6 +27,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   constructor(
     private readonly chatService: ChatService,
+
+    private readonly messageService: MessageService,
 
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
@@ -58,13 +66,37 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     // console.log('Client disconnected:', client.id);
   }
 
-  //** Método para emitir el estado de la orden a todos los clientes en el canal */
   async emitMessageReceived(event: MessageSendedEvent) {
-    // console.log(`emit orden ${order.id} actualizada ${order.orderStatus.name}`);
-
     for (let user of event.users) {
       const room = `user-${user.id}`;
-      this.server.to(room).emit('emitMessageReceived', event.message);
+
+      const data: {
+        message: MessageResponseDto;
+        chatId: number;
+      } = {
+        message: {
+          id: event.message.id,
+          content: event.message.content,
+          timestamp: event.message.timestamp,
+          sender: {
+            id: event.message.sender.id,
+            name: event.message.sender.name,
+          },
+          isSender: false,
+        },
+        chatId: event.message.chat.id,
+      };
+
+      this.server.to(room).emit('messageReceived', data);
     }
+  }
+
+  @UseGuards(WsJwtGuard)
+  @SubscribeMessage('sendMessage')
+  async handleMessage(client: Socket, payload: SendMessageDto) {
+    console.log(`Received message:`, payload);
+    console.log(client['user']);
+    const user = client['user'];
+    return await this.messageService.sendMessageToUser(payload, user);
   }
 }

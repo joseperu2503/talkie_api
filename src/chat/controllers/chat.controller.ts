@@ -5,6 +5,8 @@ import {
   Body,
   Param,
   ParseIntPipe,
+  Query,
+  DefaultValuePipe,
 } from '@nestjs/common';
 import { User } from 'src/auth/entities/user.entity';
 import { GetUser } from 'src/auth/decorators/get-user.decorator';
@@ -25,10 +27,15 @@ export class ChatController {
     return this.chatService.createChat(createChatDto, user);
   }
 
-  @Get(':chatId')
+  @Get(':chatId/messages')
   @JwtAuth()
-  async getChatById(@Param('chatId', ParseIntPipe) chatId: number) {
-    return this.chatService.getChatById(chatId);
+  async getChatById(
+    @GetUser() sender: User,
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number = 1,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number = 10,
+    @Param('chatId', ParseIntPipe) chatId: number,
+  ) {
+    return this.chatService.getMessagesByChat(chatId, page, limit, sender);
   }
 
   @Get()

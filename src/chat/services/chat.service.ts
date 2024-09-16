@@ -6,6 +6,7 @@ import { Chat } from '../entities/chat.entity';
 import { CreateChatDto } from '../dto/create-chat.dto';
 import { ChatUser } from '../entities/chat-user.entity';
 import { Message } from '../entities/message.entity';
+import { Pagination, paginate } from 'nestjs-typeorm-paginate';
 
 @Injectable()
 export class ChatService {
@@ -57,16 +58,33 @@ export class ChatService {
     });
   }
 
-  async getChatById(id: number): Promise<Chat> {
-    const chat = await this.chatRepository.findOne({
-      where: { id },
-      relations: ['chatUsers', 'messages'],
-    });
+  async getMessagesByChat(
+    chatId: number,
+    page: number,
+    limit: number,
+    sender: User,
+  ) {
+    const queryBuilder = this.messageRepository
+      .createQueryBuilder('message')
+      .leftJoinAndSelect('message.sender', 'sender') // Incluir la relación con el sender
+      .where('message.chat_id = :id', { id: chatId })
+      .orderBy('message.timestamp', 'DESC');
 
-    if (!chat) {
-      throw new NotFoundException();
-    }
-    return chat;
+    const messages = await paginate<Message>(queryBuilder, { page, limit });
+
+    return new Pagination(
+      messages.items.map((message) => {
+        return {
+          ...message,
+          sender: {
+            id: message.sender.id,
+            name: message.sender.name,
+          },
+          isSender: message.sender.id === sender.id,
+        };
+      }),
+      messages.meta,
+    );
   }
 
   async getAllChats(user: User) {
@@ -111,14 +129,7 @@ export class ChatService {
             name: chat.lastMessage.sender.name,
           },
         },
-        users: chat.chatUsers
-          .filter((chatUser) => chatUser.user.id !== user.id)
-          .map((chatUser) => {
-            return {
-              id: chatUser.user.id,
-              name: chatUser.user.name,
-            };
-          }),
+        users: users,
       };
     });
   }
