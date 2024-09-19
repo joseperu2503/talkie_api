@@ -1,11 +1,4 @@
-import {
-  Controller,
-  Post,
-  Get,
-  Body,
-  Param,
-  ParseIntPipe,
-} from '@nestjs/common';
+import { Controller, Post, Body, Param, ParseIntPipe } from '@nestjs/common';
 import { User } from 'src/auth/entities/user.entity';
 import { SendMessageDto } from '../dto/send-message.dto';
 import { GetUser } from 'src/auth/decorators/get-user.decorator';

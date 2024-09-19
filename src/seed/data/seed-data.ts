@@ -18,7 +18,7 @@ export const initialData: SeedData = {
       name: 'Patricia',
       surname: 'Campos',
       password: 'Abc123',
-      phone: '993689145',
+      phone: '993689144',
     },
   ],
 };

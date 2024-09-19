@@ -7,6 +7,7 @@ import { AppController } from './app.controller';
 import { SeedCommand } from './seed/seed.command';
 import { ChatModule } from './chat/chat.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { ContactsModule } from './contacts/contacts.module';
 
 @Module({
   controllers: [AppController],
@@ -26,6 +27,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
     AuthModule,
     ChatModule,
     EventEmitterModule.forRoot(),
+    ContactsModule,
   ],
   providers: [SeedCommand],
 })

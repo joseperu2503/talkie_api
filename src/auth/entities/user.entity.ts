@@ -1,5 +1,6 @@
 import { ChatUser } from 'src/chat/entities/chat-user.entity';
 import { Message } from 'src/chat/entities/message.entity';
+import { Contact } from 'src/contacts/entities/contact.entity';
 import {
   Column,
   CreateDateColumn,
@@ -28,7 +29,9 @@ export class User {
   @Column('text')
   surname: string;
 
-  @Column('text')
+  @Column('text', {
+    unique: true,
+  })
   phone: string;
 
   @CreateDateColumn({ type: 'timestamptz', name: 'created_at' })
@@ -42,4 +45,7 @@ export class User {
 
   @OneToMany(() => ChatUser, (chatUser) => chatUser.user)
   chatUsers: ChatUser[];
+
+  @OneToMany(() => Contact, (contact) => contact.user)
+  contacts: Contact[];
 }
