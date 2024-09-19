@@ -12,6 +12,7 @@ export const initialData: SeedData = {
       surname: 'Perez',
       password: 'Abc123',
       phone: '993689145',
+      username: 'joseperu2503',
     },
     {
       email: 'test2@gmail.com',
@@ -19,6 +20,7 @@ export const initialData: SeedData = {
       surname: 'Campos',
       password: 'Abc123',
       phone: '993689144',
+      username: 'patricia05',
     },
   ],
 };

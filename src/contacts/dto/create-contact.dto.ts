@@ -7,5 +7,5 @@ export class CreateContactDto {
 
   @IsString()
   @IsNotEmpty()
-  name: string;
+  alias: string;
 }

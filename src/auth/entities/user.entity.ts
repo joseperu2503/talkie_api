@@ -34,6 +34,11 @@ export class User {
   })
   phone: string;
 
+  @Column('text', {
+    unique: true,
+  })
+  username: string;
+
   @CreateDateColumn({ type: 'timestamptz', name: 'created_at' })
   createdAt: Date;
 

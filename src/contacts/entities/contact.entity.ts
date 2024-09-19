@@ -14,8 +14,10 @@ export class Contact {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column('text')
-  name: string;
+  @Column('text', {
+    nullable: true,
+  })
+  alias: string;
 
   @OneToOne(() => User)
   @JoinColumn({ name: 'user_id' })
