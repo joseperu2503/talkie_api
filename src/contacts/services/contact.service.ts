@@ -138,6 +138,8 @@ export class ContactService {
         photo: contact.targetContact.photo,
         phone: contact.targetContact.phone,
         eamil: contact.targetContact.email,
+        isOnline: true,
+        lastConnection: new Date(),
       };
     });
   }
