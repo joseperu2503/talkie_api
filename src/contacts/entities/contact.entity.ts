@@ -2,7 +2,6 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  OneToOne,
   JoinColumn,
   ManyToOne,
 } from 'typeorm';
@@ -19,11 +18,13 @@ export class Contact {
   })
   alias: string;
 
-  @OneToOne(() => User)
+  // El usuario que está iniciando/agregando el contacto
+  @ManyToOne(() => User, (user) => user.initiatedContacts)
   @JoinColumn({ name: 'user_id' })
-  user: User;
+  ownerUser: User;
 
-  @ManyToOne(() => User, (contact) => contact.contacts)
+  // El usuario que está siendo agregado como contacto
+  @ManyToOne(() => User, (user) => user.receivedContacts)
   @JoinColumn({ name: 'contact_id' })
-  contact: User;
+  targetContact: User;
 }

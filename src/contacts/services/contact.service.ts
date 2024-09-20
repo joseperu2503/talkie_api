@@ -4,11 +4,10 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { User } from 'src/auth/entities/user.entity';
-import { In, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Contact } from '../entities/contact.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateContactsDto } from '../dto/create-contacts.dto';
-import { CreateContactDto } from '../dto/create-contact.dto';
 import { AddContactDto } from '../dto/add-contact.dto';
 
 @Injectable()
@@ -45,10 +44,10 @@ export class ContactService {
 
       const existContact = await this.contactRepository.findOne({
         where: {
-          user: {
+          ownerUser: {
             id: user.id,
           },
-          contact: {
+          targetContact: {
             id: contactDto.contactId,
           },
         },
@@ -59,8 +58,8 @@ export class ContactService {
         newContacts.push(existContact);
       } else {
         const contact = this.contactRepository.create(contactDto);
-        contact.user = user;
-        contact.contact = contactUser;
+        contact.ownerUser = user;
+        contact.targetContact = contactUser;
 
         newContacts.push(contact);
       }
@@ -94,10 +93,10 @@ export class ContactService {
     // Verificar si ya existe el contacto
     const existContact = await this.contactRepository.findOne({
       where: {
-        user: {
+        ownerUser: {
           id: user.id,
         },
-        contact: {
+        targetContact: {
           id: contactUser.id,
         },
       },
@@ -110,12 +109,36 @@ export class ContactService {
 
     // Crear el nuevo contacto
     const newContact = this.contactRepository.create();
-    newContact.user = user;
-    newContact.contact = contactUser;
+    newContact.ownerUser = user;
+    newContact.targetContact = contactUser;
 
     // Guardar el nuevo contacto
     await this.contactRepository.save(newContact);
 
     return { message: 'Contact added successfully' };
+  }
+
+  async getContacts(user: User) {
+    const contacts = await this.contactRepository.find({
+      where: {
+        ownerUser: {
+          id: user.id,
+        },
+      },
+      relations: {
+        targetContact: true,
+      },
+    });
+
+    return contacts.map((contact) => {
+      return {
+        id: contact.targetContact.id,
+        name: contact.targetContact.name,
+        surname: contact.targetContact.surname,
+        photo: contact.targetContact.photo,
+        phone: contact.targetContact.phone,
+        eamil: contact.targetContact.email,
+      };
+    });
   }
 }

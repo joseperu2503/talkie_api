@@ -1,4 +1,4 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, Get } from '@nestjs/common';
 import { User } from 'src/auth/entities/user.entity';
 import { GetUser } from 'src/auth/decorators/get-user.decorator';
 import { JwtAuth } from 'src/auth/decorators/jwt-auth.decorator';
@@ -25,5 +25,10 @@ export class ContactController {
     @GetUser() sender: User,
   ) {
     return this.contactService.addContact(addContactDto, sender);
+  }
+
+  @Get('/')
+  async getContacts(@GetUser() user: User) {
+    return this.contactService.getContacts(user);
   }
 }

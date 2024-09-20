@@ -1,7 +1,9 @@
 import {
   IsEmail,
   IsNotEmpty,
+  IsOptional,
   IsString,
+  IsUrl,
   Matches,
   MaxLength,
   MinLength,
@@ -36,4 +38,8 @@ export class RegisterUserDto {
   @IsString()
   @IsNotEmpty()
   username: string;
+
+  @IsOptional()
+  @IsUrl()
+  photo?: string;
 }

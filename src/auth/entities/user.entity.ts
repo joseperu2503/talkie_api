@@ -39,6 +39,9 @@ export class User {
   })
   username: string;
 
+  @Column('text', { nullable: true })
+  photo: string;
+
   @CreateDateColumn({ type: 'timestamptz', name: 'created_at' })
   createdAt: Date;
 
@@ -51,6 +54,9 @@ export class User {
   @OneToMany(() => ChatUser, (chatUser) => chatUser.user)
   chatUsers: ChatUser[];
 
-  @OneToMany(() => Contact, (contact) => contact.user)
-  contacts: Contact[];
+  @OneToMany(() => Contact, (contact) => contact.ownerUser)
+  initiatedContacts: Contact[];
+
+  @OneToMany(() => Contact, (contact) => contact.targetContact)
+  receivedContacts: Contact[];
 }
