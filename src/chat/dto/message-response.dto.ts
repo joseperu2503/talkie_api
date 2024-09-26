@@ -1,5 +1,5 @@
 export class MessageResponseDto {
-  id: number;
+  id: string;
 
   content: string;
 

@@ -18,15 +18,6 @@ import { ChatService } from '../services/chat.service';
 export class ChatController {
   constructor(private readonly chatService: ChatService) {}
 
-  @Post()
-  @JwtAuth()
-  async createChat(
-    @Body() createChatDto: CreateChatDto,
-    @GetUser() user: User,
-  ) {
-    return this.chatService.createChat(createChatDto, user);
-  }
-
   @Get(':chatId/messages')
   @JwtAuth()
   async getChatById(

@@ -30,7 +30,7 @@ export class MessageService {
   ) {}
 
   async sendMessageToChat(
-    chatId: number,
+    chatId: string,
     sendMessageDto: SendMessageDto,
     sender: User,
   ): Promise<Message> {

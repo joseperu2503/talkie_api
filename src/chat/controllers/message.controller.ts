@@ -12,7 +12,7 @@ export class MessageController {
 
   @Post('/chat/:chatId')
   async sendMessage(
-    @Param('chatId', ParseIntPipe) chatId: number,
+    @Param('chatId') chatId: string,
     @Body() sendMessageDto: SendMessageDto,
     @GetUser() sender: User,
   ) {

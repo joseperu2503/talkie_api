@@ -137,7 +137,7 @@ export class ContactService {
         surname: contact.targetContact.surname,
         photo: contact.targetContact.photo,
         phone: contact.targetContact.phone,
-        eamil: contact.targetContact.email,
+        email: contact.targetContact.email,
         isOnline: true,
         lastConnection: new Date(),
       };

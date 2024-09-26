@@ -1,7 +1,6 @@
 import {
   Entity,
   PrimaryGeneratedColumn,
-  Column,
   OneToMany,
   OneToOne,
   JoinColumn,
@@ -11,11 +10,8 @@ import { ChatUser } from './chat-user.entity';
 
 @Entity('chats')
 export class Chat {
-  @PrimaryGeneratedColumn()
-  id: number;
-
-  @Column('text', { nullable: true })
-  name: string;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @OneToMany(() => Message, (message) => message.chat)
   messages: Message[];

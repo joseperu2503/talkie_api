@@ -72,7 +72,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
       const data: {
         message: MessageResponseDto;
-        chatId: number;
+        chatId: string;
       } = {
         message: {
           id: event.message.id,

@@ -10,8 +10,8 @@ import { User } from 'src/auth/entities/user.entity';
 
 @Entity('chat_users')
 export class ChatUser {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @ManyToOne(() => Chat, (chat) => chat.chatUsers)
   @JoinColumn({ name: 'chat_id' })

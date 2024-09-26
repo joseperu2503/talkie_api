@@ -7,6 +7,7 @@ import { CreateChatDto } from '../dto/create-chat.dto';
 import { ChatUser } from '../entities/chat-user.entity';
 import { Message } from '../entities/message.entity';
 import { Pagination, paginate } from 'nestjs-typeorm-paginate';
+import { timestamp } from 'rxjs';
 
 @Injectable()
 export class ChatService {
@@ -20,43 +21,6 @@ export class ChatService {
     @InjectRepository(Message)
     private readonly messageRepository: Repository<Message>,
   ) {}
-
-  async createChat(
-    createChatDto: CreateChatDto,
-    user: User,
-  ): Promise<Chat | null> {
-    // Crea el chat sin los participantes inicialmente
-    const chat = this.chatRepository.create({
-      name: createChatDto.name,
-    });
-
-    // Guarda el chat en la base de datos para obtener el ID
-    const savedChat = await this.chatRepository.save(chat);
-
-    // Recupera los participantes desde la base de datos
-    const participants = await this.userRepository.findByIds(
-      createChatDto.participantIds,
-    );
-
-    // Incluye el creador del chat en la lista de participantes
-    const chatUsers = [user, ...participants].map((participant) => {
-      const chatUser = this.chatUserRepository.create({
-        chat: savedChat,
-        user: participant,
-        isActive: true,
-      });
-      return chatUser;
-    });
-
-    // Guarda los registros en la tabla `chat_users`
-    await this.chatUserRepository.save(chatUsers);
-
-    // Devuelve el chat completo con los participantes
-    return this.chatRepository.findOne({
-      where: { id: savedChat.id },
-      relations: ['chatUsers', 'chatUsers.user'],
-    });
-  }
 
   async getMessagesByChat(
     chatId: number,
@@ -110,26 +74,45 @@ export class ChatService {
       .getMany();
 
     return chats.map((chat) => {
-      const users = chat.chatUsers
+      const receiver = chat.chatUsers
         .filter((chatUser) => chatUser.user.id !== user.id)
         .map((chatUser) => {
           return {
             id: chatUser.user.id,
             name: chatUser.user.name,
+            surname: chatUser.user.surname,
+            email: chatUser.user.email,
           };
-        });
+        })[0];
 
       return {
         id: chat.id,
-        name: chat.name ?? users[0].name,
         lastMessage: {
           ...chat.lastMessage,
+          isSender: chat.lastMessage.sender.id === user.id,
           sender: {
             id: chat.lastMessage.sender.id,
             name: chat.lastMessage.sender.name,
+            surname: chat.lastMessage.sender.surname,
+            email: chat.lastMessage.sender.email,
           },
         },
-        users: users,
+        messages: chat.messages.map((message) => {
+          const { id, content, timestamp, sender } = message;
+          return {
+            id,
+            content,
+            timestamp,
+            isSender: sender.id === user.id,
+            sender: {
+              id: sender.id,
+              name: sender.name,
+              surname: sender.surname,
+              email: sender.email,
+            },
+          };
+        }),
+        receiver: receiver,
       };
     });
   }
