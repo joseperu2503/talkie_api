@@ -8,6 +8,8 @@ export class MessageResponseDto {
   sender: {
     id: number;
     name: string;
+    surname: string;
+    email: string;
   };
 
   isSender: boolean;

@@ -67,8 +67,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   async emitMessageReceived(event: MessageSendedEvent) {
-    for (let user of event.users) {
-      const room = `user-${user.id}`;
+    for (let userId of event.usersId) {
+      const room = `user-${userId}`;
 
       const data: {
         message: MessageResponseDto;
@@ -81,8 +81,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
           sender: {
             id: event.message.sender.id,
             name: event.message.sender.name,
+            surname: event.message.sender.surname,
+            email: event.message.sender.email,
           },
-          isSender: false,
+          isSender: event.message.sender.id == userId,
         },
         chatId: event.message.chat.id,
       };
@@ -96,6 +98,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   async handleMessage(client: Socket, payload: SendMessageDto) {
     console.log(`Received message:`, payload);
     const sender = client['user'];
-    return await this.messageService.sendMessageToUser(payload, sender);
+    return await this.messageService.sendMessage(payload, sender);
   }
 }

@@ -3,5 +3,5 @@ import { Message } from '../entities/message.entity';
 
 export class MessageSendedEvent {
   message: Message;
-  users: User[];
+  usersId: number[];
 }

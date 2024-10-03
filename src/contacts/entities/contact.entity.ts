@@ -4,9 +4,11 @@ import {
   Column,
   JoinColumn,
   ManyToOne,
+  OneToOne,
 } from 'typeorm';
 
 import { User } from 'src/auth/entities/user.entity';
+import { Chat } from 'src/chat/entities/chat.entity';
 
 @Entity('contacts')
 export class Contact {
@@ -27,4 +29,8 @@ export class Contact {
   @ManyToOne(() => User, (user) => user.receivedContacts)
   @JoinColumn({ name: 'contact_id' })
   targetContact: User;
+
+  @ManyToOne(() => Chat, (chat) => chat.contacts)
+  @JoinColumn({ name: 'chat_id' })
+  chat: Chat;
 }

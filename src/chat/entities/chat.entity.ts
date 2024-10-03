@@ -4,9 +4,10 @@ import {
   OneToMany,
   OneToOne,
   JoinColumn,
+  Column,
 } from 'typeorm';
 import { Message } from './message.entity';
-import { ChatUser } from './chat-user.entity';
+import { Contact } from 'src/contacts/entities/contact.entity';
 
 @Entity('chats')
 export class Chat {
@@ -16,10 +17,13 @@ export class Chat {
   @OneToMany(() => Message, (message) => message.chat)
   messages: Message[];
 
-  @OneToOne(() => Message)
+  @OneToOne(() => Message, { nullable: true })
   @JoinColumn({ name: 'last_message' })
   lastMessage: Message;
 
-  @OneToMany(() => ChatUser, (chatUser) => chatUser.chat)
-  chatUsers: ChatUser[];
+  @Column('int', { array: true })
+  usersId: number[];
+
+  @OneToMany(() => Contact, (contact) => contact.chat)
+  contacts: Contact[];
 }

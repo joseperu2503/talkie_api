@@ -9,12 +9,16 @@ import { Contact } from '../entities/contact.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateContactsDto } from '../dto/create-contacts.dto';
 import { AddContactDto } from '../dto/add-contact.dto';
+import { Chat } from 'src/chat/entities/chat.entity';
 
 @Injectable()
 export class ContactService {
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
+
+    @InjectRepository(Chat)
+    private chatRepository: Repository<Chat>,
 
     @InjectRepository(Contact)
     private contactRepository: Repository<Contact>,
@@ -25,6 +29,7 @@ export class ContactService {
     const invalidContactDtos = createContactsDto.contacts.filter(
       (contactDto) => contactDto.contactId === user.id,
     );
+
     if (invalidContactDtos.length > 0) {
       throw new ConflictException(`Cannot add yourself as a contact.`);
     }
@@ -107,10 +112,18 @@ export class ContactService {
       throw new ConflictException(`Contact already exists.`);
     }
 
+    // Crear el nuevo chat
+    const newChat = this.chatRepository.create();
+    newChat.usersId = [user.id, contactUser.id]; // Guardar los IDs de los usuarios en el array
+
+    // Guardar el nuevo chat
+    await this.chatRepository.save(newChat);
+
     // Crear el nuevo contacto
     const newContact = this.contactRepository.create();
     newContact.ownerUser = user;
     newContact.targetContact = contactUser;
+    newContact.chat = newChat; // Vincular el chat al contacto
 
     // Guardar el nuevo contacto
     await this.contactRepository.save(newContact);
@@ -127,6 +140,7 @@ export class ContactService {
       },
       relations: {
         targetContact: true,
+        chat: true,
       },
     });
 
@@ -140,6 +154,7 @@ export class ContactService {
         email: contact.targetContact.email,
         isOnline: true,
         lastConnection: new Date(),
+        chatId: contact.chat.id,
       };
     });
   }

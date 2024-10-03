@@ -1,4 +1,3 @@
-import { ChatUser } from 'src/chat/entities/chat-user.entity';
 import { Message } from 'src/chat/entities/message.entity';
 import { Contact } from 'src/contacts/entities/contact.entity';
 import {
@@ -50,9 +49,6 @@ export class User {
 
   @OneToMany(() => Message, (message) => message.sender)
   messages: Message[];
-
-  @OneToMany(() => ChatUser, (chatUser) => chatUser.user)
-  chatUsers: ChatUser[];
 
   @OneToMany(() => Contact, (contact) => contact.ownerUser)
   initiatedContacts: Contact[];
