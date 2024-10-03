@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { User } from 'src/auth/entities/user.entity';
-import { Repository } from 'typeorm';
+import { ArrayContains, In, Repository } from 'typeorm';
 import { Contact } from '../entities/contact.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateContactsDto } from '../dto/create-contacts.dto';
@@ -112,18 +112,30 @@ export class ContactService {
       throw new ConflictException(`Contact already exists.`);
     }
 
-    // Crear el nuevo chat
-    const newChat = this.chatRepository.create();
-    newChat.usersId = [user.id, contactUser.id]; // Guardar los IDs de los usuarios en el array
+    // Verificar si ya existe un chat entre ambos usuarios
+    let chat = await this.chatRepository.findOne({
+      where: {
+        usersId: ArrayContains([user.id, contactUser.id]),
+      },
+    });
+
+    // Si no existe el chat, crearlo
+    if (!chat) {
+      chat = this.chatRepository.create();
+      chat.usersId = [user.id, contactUser.id]; // Guardar los IDs de los usuarios en el array
+
+      // Guardar el nuevo chat
+      await this.chatRepository.save(chat);
+    }
 
     // Guardar el nuevo chat
-    await this.chatRepository.save(newChat);
+    await this.chatRepository.save(chat);
 
     // Crear el nuevo contacto
     const newContact = this.contactRepository.create();
     newContact.ownerUser = user;
     newContact.targetContact = contactUser;
-    newContact.chat = newChat; // Vincular el chat al contacto
+    newContact.chat = chat; // Vincular el chat al contacto
 
     // Guardar el nuevo contacto
     await this.contactRepository.save(newContact);

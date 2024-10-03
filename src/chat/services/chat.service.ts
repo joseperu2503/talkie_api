@@ -1,11 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ArrayContains, Repository } from 'typeorm';
 import { User } from 'src/auth/entities/user.entity';
 import { Chat } from '../entities/chat.entity';
 import { Message } from '../entities/message.entity';
 import { Pagination, paginate } from 'nestjs-typeorm-paginate';
-import { timestamp } from 'rxjs';
 
 @Injectable()
 export class ChatService {
@@ -104,6 +103,7 @@ export class ChatService {
               name: sender.name,
               surname: sender.surname,
               email: sender.email,
+              photo: sender.photo,
             },
           };
         }),
