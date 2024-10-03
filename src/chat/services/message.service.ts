@@ -49,13 +49,13 @@ export class MessageService {
   async sendMessageToUser(sendMessageDto: SendMessageDto, sender: User) {
     // Verificar que el destinatario exista
     const recipient = await this.userService.findOne(
-      sendMessageDto.recipientId,
+      sendMessageDto.receiverId,
     );
     if (!recipient) {
       throw new NotFoundException('Recipient user not found');
     }
 
-    if (sendMessageDto.recipientId === sender.id) {
+    if (sendMessageDto.receiverId === sender.id) {
       throw new BadRequestException('Sender and recipient cannot be the same');
     }
 
@@ -76,7 +76,7 @@ export class MessageService {
       )
       .setParameters({
         senderId: sender.id,
-        recipientId: sendMessageDto.recipientId,
+        recipientId: sendMessageDto.receiverId,
       })
       .getRawOne(); // Usamos getRawOne para obtener un solo chat
 

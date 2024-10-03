@@ -1,4 +1,10 @@
-import { IsInt, IsNotEmpty, IsPositive, IsString } from 'class-validator';
+import {
+  IsInt,
+  IsNotEmpty,
+  IsOptional,
+  IsPositive,
+  IsString,
+} from 'class-validator';
 
 export class SendMessageDto {
   @IsString()
@@ -7,5 +13,9 @@ export class SendMessageDto {
 
   @IsPositive()
   @IsInt()
-  readonly recipientId: number;
+  readonly receiverId: number;
+
+  @IsString()
+  @IsOptional()
+  readonly temporalChatId?: string;
 }
