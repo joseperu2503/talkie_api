@@ -7,6 +7,7 @@ import { Chat } from '../entities/chat.entity';
 import { SendMessageDto } from '../dto/send-message.dto';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { MessageSendedEvent } from '../events/message-sended.event';
+import { ChatUser } from '../entities/chat-user.entity';
 
 @Injectable()
 export class MessageService {
@@ -18,12 +19,20 @@ export class MessageService {
     private chatRepository: Repository<Chat>,
 
     private eventEmitter: EventEmitter2,
+
+    @InjectRepository(ChatUser)
+    private chatUserRepository: Repository<ChatUser>,
   ) {}
 
   async sendMessage(sendMessageDto: SendMessageDto, sender: User) {
     const chat = await this.chatRepository.findOne({
       where: {
         id: sendMessageDto.chatId,
+      },
+      relations: {
+        chatUsers: {
+          user: true,
+        },
       },
     });
 
@@ -43,6 +52,16 @@ export class MessageService {
     await this.messageRepository.save(message);
     chat.lastMessage = message;
     await this.chatRepository.save(chat!);
+
+    // Incrementar los mensajes no leídos en los chatUsers (excepto para el remitente)
+    const chatUsersToUpdate = chat.chatUsers.filter(
+      (chatUser) => chatUser.user.id !== sender.id,
+    );
+
+    for (const chatUser of chatUsersToUpdate) {
+      chatUser.unreadMessagesCount += 1;
+      await this.chatUserRepository.save(chatUser);
+    }
 
     const messageSendedEvent = new MessageSendedEvent();
     messageSendedEvent.message = message;

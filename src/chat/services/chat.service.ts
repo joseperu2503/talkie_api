@@ -67,6 +67,9 @@ export class ChatService {
         contacts: {
           targetContact: true,
         },
+        chatUsers: {
+          user: true,
+        },
       },
     });
 
@@ -82,6 +85,13 @@ export class ChatService {
             photo: contact.targetContact.photo,
           };
         })[0];
+
+      console.log(chat.chatUsers);
+
+      // Encontrar el ChatUser correspondiente al usuario actual
+      const currentChatUser = chat.chatUsers.find(
+        (chatUser) => chatUser.user.id === user.id,
+      );
 
       return {
         id: chat.id,
@@ -115,6 +125,9 @@ export class ChatService {
           };
         }),
         receiver: receiver,
+        unreadMessagesCount: currentChatUser
+          ? currentChatUser.unreadMessagesCount
+          : 0,
       };
     });
   }

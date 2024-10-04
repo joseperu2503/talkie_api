@@ -10,6 +10,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CreateContactsDto } from '../dto/create-contacts.dto';
 import { AddContactDto } from '../dto/add-contact.dto';
 import { Chat } from 'src/chat/entities/chat.entity';
+import { ChatUser } from 'src/chat/entities/chat-user.entity';
 
 @Injectable()
 export class ContactService {
@@ -22,6 +23,9 @@ export class ContactService {
 
     @InjectRepository(Contact)
     private contactRepository: Repository<Contact>,
+
+    @InjectRepository(ChatUser)
+    private chatUserRepository: Repository<ChatUser>,
   ) {}
 
   async addContacts(createContactsDto: CreateContactsDto, user: User) {
@@ -131,11 +135,22 @@ export class ContactService {
     // Guardar el nuevo chat
     await this.chatRepository.save(chat);
 
+    // Crear los ChatUser
+    const chatUser1 = this.chatUserRepository.create();
+    chatUser1.chat = chat;
+    chatUser1.user = contactUser;
+
+    const chatUser2 = this.chatUserRepository.create();
+    chatUser2.chat = chat;
+    chatUser2.user = user;
+
+    await this.chatUserRepository.save([chatUser1, chatUser2]);
+
     // Crear el nuevo contacto
     const newContact = this.contactRepository.create();
     newContact.ownerUser = user;
     newContact.targetContact = contactUser;
-    newContact.chat = chat; // Vincular el chat al contacto
+    newContact.chat = chat;
 
     // Guardar el nuevo contacto
     await this.contactRepository.save(newContact);
