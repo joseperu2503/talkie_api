@@ -52,6 +52,11 @@ export class ChatService {
       where: {
         usersId: ArrayContains([user.id]), // Verifica si el ID del usuario está contenido en el arreglo de usersId
       },
+      order: {
+        lastMessage: {
+          timestamp: 'DESC',
+        },
+      },
       relations: {
         lastMessage: {
           sender: true,
@@ -74,6 +79,7 @@ export class ChatService {
             name: contact.targetContact.name,
             surname: contact.targetContact.surname,
             email: contact.targetContact.email,
+            photo: contact.targetContact.photo,
           };
         })[0];
 
@@ -88,6 +94,7 @@ export class ChatService {
                 name: chat.lastMessage.sender.name,
                 surname: chat.lastMessage.sender.surname,
                 email: chat.lastMessage.sender.email,
+                photo: chat.lastMessage.sender.photo,
               },
             }
           : null,
