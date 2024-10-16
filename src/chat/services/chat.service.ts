@@ -74,61 +74,63 @@ export class ChatService {
     });
 
     return chats.map((chat) => {
-      const receiver = chat.contacts
-        .filter((contact) => contact.targetContact.id !== user.id)
-        .map((contact) => {
-          return {
-            id: contact.targetContact.id,
-            name: contact.targetContact.name,
-            surname: contact.targetContact.surname,
-            email: contact.targetContact.email,
-            photo: contact.targetContact.photo,
-          };
-        })[0];
-
-      console.log(chat.chatUsers);
-
-      // Encontrar el ChatUser correspondiente al usuario actual
-      const currentChatUser = chat.chatUsers.find(
-        (chatUser) => chatUser.user.id === user.id,
-      );
-
-      return {
-        id: chat.id,
-        lastMessage: chat.lastMessage
-          ? {
-              ...chat.lastMessage,
-              isSender: chat.lastMessage.sender.id === user.id,
-              sender: {
-                id: chat.lastMessage.sender.id,
-                name: chat.lastMessage.sender.name,
-                surname: chat.lastMessage.sender.surname,
-                email: chat.lastMessage.sender.email,
-                photo: chat.lastMessage.sender.photo,
-              },
-            }
-          : null,
-        messages: chat.messages.map((message) => {
-          const { id, content, timestamp, sender } = message;
-          return {
-            id,
-            content,
-            timestamp,
-            isSender: sender.id === user.id,
-            sender: {
-              id: sender.id,
-              name: sender.name,
-              surname: sender.surname,
-              email: sender.email,
-              photo: sender.photo,
-            },
-          };
-        }),
-        receiver: receiver,
-        unreadMessagesCount: currentChatUser
-          ? currentChatUser.unreadMessagesCount
-          : 0,
-      };
+      return chatResource(chat, user.id);
     });
   }
 }
+
+export const chatResource = (chat: Chat, userId: number) => {
+  const receiver = chat.contacts
+    .filter((contact) => contact.targetContact.id !== userId)
+    .map((contact) => {
+      return {
+        id: contact.targetContact.id,
+        name: contact.targetContact.name,
+        surname: contact.targetContact.surname,
+        email: contact.targetContact.email,
+        photo: contact.targetContact.photo,
+      };
+    })[0];
+
+  // Encontrar el ChatUser correspondiente al usuario actual
+  const currentChatUser = chat.chatUsers.find(
+    (chatUser) => chatUser.user.id === userId,
+  );
+
+  return {
+    id: chat.id,
+    lastMessage: chat.lastMessage
+      ? {
+          ...chat.lastMessage,
+          isSender: chat.lastMessage.sender.id === userId,
+          sender: {
+            id: chat.lastMessage.sender.id,
+            name: chat.lastMessage.sender.name,
+            surname: chat.lastMessage.sender.surname,
+            email: chat.lastMessage.sender.email,
+            photo: chat.lastMessage.sender.photo,
+          },
+        }
+      : null,
+    messages: chat.messages.reverse().map((message) => {
+      const { id, content, timestamp, sender } = message;
+      return {
+        id,
+        content,
+        timestamp,
+        isSender: sender.id === userId,
+        sender: {
+          id: sender.id,
+          name: sender.name,
+          surname: sender.surname,
+          email: sender.email,
+          photo: sender.photo,
+        },
+      };
+    }),
+    receiver: receiver,
+    unreadMessagesCount: currentChatUser
+      ? currentChatUser.unreadMessagesCount
+      : 0,
+  };
+};

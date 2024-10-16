@@ -11,7 +11,7 @@ import { Repository } from 'typeorm';
 import { User } from 'src/auth/entities/user.entity';
 import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from 'src/auth/interfaces/jwt-payload.interfaces';
-import { ChatService } from '../services/chat.service';
+import { ChatService, chatResource } from '../services/chat.service';
 import { OnEvent } from '@nestjs/event-emitter';
 import { MessageSendedEvent } from '../events/message-sended.event';
 import { MessageService } from '../services/message.service';
@@ -19,6 +19,8 @@ import { SendMessageDto } from '../dto/send-message.dto';
 import { MessageResponseDto } from '../dto/message-response.dto';
 import { UseGuards } from '@nestjs/common';
 import { WsJwtGuard } from 'src/auth/guards/ws-jwt.guard';
+import { ReadChatDto } from '../dto/read-chat.dto';
+import { ChatUpdatedEvent } from '../events/chat-updated.event';
 
 @WebSocketGateway({ cors: true, namespace: '/chats' })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -39,6 +41,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @OnEvent('message.sended')
   handleMessageSendedEvent(event: MessageSendedEvent) {
     this.emitMessageReceived(event);
+  }
+
+  @OnEvent('chat.updated')
+  handleChatUpdatedEvent(event: ChatUpdatedEvent) {
+    this.emitChatUpdated(event);
   }
 
   async handleConnection(client: Socket) {
@@ -67,7 +74,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   async emitMessageReceived(event: MessageSendedEvent) {
-    for (let userId of event.usersId) {
+    const chat = event.chat;
+
+    for (let userId of chat.usersId) {
       const room = `user-${userId}`;
 
       const data: {
@@ -93,11 +102,30 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
 
+  async emitChatUpdated(event: ChatUpdatedEvent) {
+    const chat = event.chat;
+
+    for (let userId of chat.usersId) {
+      const room = `user-${userId}`;
+
+      const chatUpdated = chatResource(chat, userId);
+
+      this.server.to(room).emit('chatUpdated', chatUpdated);
+    }
+  }
+
   @UseGuards(WsJwtGuard)
   @SubscribeMessage('sendMessage')
-  async handleMessage(client: Socket, payload: SendMessageDto) {
+  async handleSendMessage(client: Socket, payload: SendMessageDto) {
     console.log(`Received message:`, payload);
     const sender = client['user'];
     return await this.messageService.sendMessage(payload, sender);
+  }
+
+  @UseGuards(WsJwtGuard)
+  @SubscribeMessage('markChatAsRead')
+  async handleMarkChatAsRead(client: Socket, payload: ReadChatDto) {
+    const sender = client['user'];
+    return await this.messageService.readChat(payload, sender);
   }
 }
