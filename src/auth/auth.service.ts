@@ -12,6 +12,9 @@ import { LoginUserDto } from './dto/login-user-dto';
 import { JwtPayload } from './interfaces/jwt-payload.interfaces';
 import { JwtService } from '@nestjs/jwt';
 import { UpdateAuthDto } from './dto/update-auth.dto';
+import { UpdateUserStatusDto } from 'src/chat/dto/update-user-status.dto';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { ContactUpdatedEvent } from 'src/chat/events/contact-updated.event';
 
 @Injectable()
 export class AuthService {
@@ -19,6 +22,7 @@ export class AuthService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     private readonly jwtService: JwtService,
+    private eventEmitter: EventEmitter2,
   ) {}
 
   async register(registerUserDto: RegisterUserDto) {
@@ -85,5 +89,34 @@ export class AuthService {
   async findOne(userId: number): Promise<User | null> {
     const user = await this.userRepository.findOneBy({ id: userId });
     return user;
+  }
+
+  async updateStatus(user: User, updateUserStatusDto: UpdateUserStatusDto) {
+    // Actualizar el estado de conexión del usuario
+    user.isConnected = updateUserStatusDto.isConnected;
+    await this.userRepository.save(user);
+
+    const contacts = await this.getContacts(user.id);
+    if (!contacts) return;
+
+    const chatUpdatedEvent = new ContactUpdatedEvent();
+    chatUpdatedEvent.contacts = contacts;
+    chatUpdatedEvent.user = user;
+
+    this.eventEmitter.emit('contact.updated', chatUpdatedEvent);
+  }
+
+  async getContacts(userId: number) {
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      relations: {
+        initiatedContacts: {
+          chat: true,
+          targetContact: true,
+        },
+      },
+    });
+
+    return user?.initiatedContacts;
   }
 }

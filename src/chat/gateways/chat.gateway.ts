@@ -11,7 +11,7 @@ import { Repository } from 'typeorm';
 import { User } from 'src/auth/entities/user.entity';
 import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from 'src/auth/interfaces/jwt-payload.interfaces';
-import { ChatService, chatResource } from '../services/chat.service';
+import { chatResource } from '../services/chat.service';
 import { OnEvent } from '@nestjs/event-emitter';
 import { MessageSendedEvent } from '../events/message-sended.event';
 import { MessageService } from '../services/message.service';
@@ -19,8 +19,12 @@ import { SendMessageDto } from '../dto/send-message.dto';
 import { MessageResponseDto } from '../dto/message-response.dto';
 import { UseGuards } from '@nestjs/common';
 import { WsJwtGuard } from 'src/auth/guards/ws-jwt.guard';
-import { ReadChatDto } from '../dto/read-chat.dto';
+import { MarkChatAsReadDto } from '../dto/mark-chat-as-read.dto';
 import { ChatUpdatedEvent } from '../events/chat-updated.event';
+import { AuthService } from 'src/auth/auth.service';
+import { UpdateUserStatusDto } from '../dto/update-user-status.dto';
+import { ContactUpdatedEvent } from '../events/contact-updated.event';
+import { ContactResourceDto } from 'src/contacts/dto/contact-resource.dto';
 
 @WebSocketGateway({ cors: true, namespace: '/chats' })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -28,7 +32,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   server: Server;
 
   constructor(
-    private readonly chatService: ChatService,
+    private readonly authService: AuthService,
 
     private readonly messageService: MessageService,
 
@@ -46,6 +50,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @OnEvent('chat.updated')
   handleChatUpdatedEvent(event: ChatUpdatedEvent) {
     this.emitChatUpdated(event);
+  }
+
+  @OnEvent('contact.updated')
+  handleContactUpdate(event: ContactUpdatedEvent) {
+    this.emitContactUpdated(event);
   }
 
   async handleConnection(client: Socket) {
@@ -114,6 +123,28 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
 
+  async emitContactUpdated(event: ContactUpdatedEvent) {
+    const user = event.user;
+    console.log('contactUpdated');
+    for (let contact of event.contacts) {
+      const room = `user-${contact.targetContact.id}`;
+
+      const contactUpdated: ContactResourceDto = {
+        id: user.id,
+        name: user.name,
+        surname: user.surname,
+        email: user.email,
+        photo: user.photo,
+        phone: user.phone,
+        isConnected: user.isConnected,
+        lastConnection: new Date(),
+        chatId: contact.chat.id,
+      };
+
+      this.server.to(room).emit('contactUpdated', contactUpdated);
+    }
+  }
+
   @UseGuards(WsJwtGuard)
   @SubscribeMessage('sendMessage')
   async handleSendMessage(client: Socket, payload: SendMessageDto) {
@@ -124,8 +155,15 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @UseGuards(WsJwtGuard)
   @SubscribeMessage('markChatAsRead')
-  async handleMarkChatAsRead(client: Socket, payload: ReadChatDto) {
+  async handleMarkChatAsRead(client: Socket, payload: MarkChatAsReadDto) {
     const sender = client['user'];
-    return await this.messageService.readChat(payload, sender);
+    return await this.messageService.markChatAsReadDto(payload, sender);
+  }
+
+  @UseGuards(WsJwtGuard)
+  @SubscribeMessage('updateUserStatus')
+  async updateUserStatus(client: Socket, payload: UpdateUserStatusDto) {
+    const user = client['user'];
+    return await this.authService.updateStatus(user, payload);
   }
 }

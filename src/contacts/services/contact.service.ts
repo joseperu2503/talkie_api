@@ -11,6 +11,7 @@ import { CreateContactsDto } from '../dto/create-contacts.dto';
 import { AddContactDto } from '../dto/add-contact.dto';
 import { Chat } from 'src/chat/entities/chat.entity';
 import { ChatUser } from 'src/chat/entities/chat-user.entity';
+import { ContactResourceDto } from '../dto/contact-resource.dto';
 
 @Injectable()
 export class ContactService {
@@ -147,18 +148,23 @@ export class ContactService {
     await this.chatUserRepository.save([chatUser1, chatUser2]);
 
     // Crear el nuevo contacto
-    const newContact = this.contactRepository.create();
-    newContact.ownerUser = user;
-    newContact.targetContact = contactUser;
-    newContact.chat = chat;
+    const contact1 = this.contactRepository.create();
+    contact1.ownerUser = user;
+    contact1.targetContact = contactUser;
+    contact1.chat = chat;
+
+    const contact2 = this.contactRepository.create();
+    contact2.ownerUser = contactUser;
+    contact2.targetContact = user;
+    contact2.chat = chat;
 
     // Guardar el nuevo contacto
-    await this.contactRepository.save(newContact);
+    await this.contactRepository.save([contact1, contact2]);
 
     return { message: 'Contact added successfully' };
   }
 
-  async getContacts(user: User) {
+  async getContacts(user: User): Promise<ContactResourceDto[]> {
     const contacts = await this.contactRepository.find({
       where: {
         ownerUser: {
@@ -179,7 +185,7 @@ export class ContactService {
         photo: contact.targetContact.photo,
         phone: contact.targetContact.phone,
         email: contact.targetContact.email,
-        isOnline: true,
+        isConnected: contact.targetContact.isConnected,
         lastConnection: new Date(),
         chatId: contact.chat.id,
       };

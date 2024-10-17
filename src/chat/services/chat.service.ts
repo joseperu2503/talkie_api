@@ -5,6 +5,7 @@ import { User } from 'src/auth/entities/user.entity';
 import { Chat } from '../entities/chat.entity';
 import { Message } from '../entities/message.entity';
 import { Pagination, paginate } from 'nestjs-typeorm-paginate';
+import { ContactResourceDto } from 'src/contacts/dto/contact-resource.dto';
 
 @Injectable()
 export class ChatService {
@@ -80,7 +81,7 @@ export class ChatService {
 }
 
 export const chatResource = (chat: Chat, userId: number) => {
-  const receiver = chat.contacts
+  const receiver: ContactResourceDto = chat.contacts
     .filter((contact) => contact.targetContact.id !== userId)
     .map((contact) => {
       return {
@@ -89,6 +90,10 @@ export const chatResource = (chat: Chat, userId: number) => {
         surname: contact.targetContact.surname,
         email: contact.targetContact.email,
         photo: contact.targetContact.photo,
+        phone: contact.targetContact.phone,
+        isConnected: contact.targetContact.isConnected,
+        lastConnection: new Date(),
+        chatId: chat.id,
       };
     })[0];
 

@@ -59,4 +59,7 @@ export class User {
 
   @OneToMany(() => ChatUser, (chatUser) => chatUser.user)
   chatUsers: ChatUser[];
+
+  @Column('boolean', { default: false, name: 'is_connected' })
+  isConnected: boolean;
 }

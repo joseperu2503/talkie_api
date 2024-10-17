@@ -12,7 +12,7 @@ import { SendMessageDto } from '../dto/send-message.dto';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { MessageSendedEvent } from '../events/message-sended.event';
 import { ChatUser } from '../entities/chat-user.entity';
-import { ReadChatDto } from '../dto/read-chat.dto';
+import { MarkChatAsReadDto } from '../dto/mark-chat-as-read.dto';
 import { ChatUpdatedEvent } from '../events/chat-updated.event';
 
 @Injectable()
@@ -103,7 +103,7 @@ export class MessageService {
     return message;
   }
 
-  async readChat(readChatDto: ReadChatDto, user: User) {
+  async markChatAsReadDto(readChatDto: MarkChatAsReadDto, user: User) {
     // Obtener el chat con las relaciones necesarias
     const chat = await this.chatRepository.findOne({
       where: {
@@ -148,9 +148,5 @@ export class MessageService {
     const chatUpdatedEvent = new ChatUpdatedEvent();
     chatUpdatedEvent.chat = chat;
     this.eventEmitter.emit('chat.updated', chatUpdatedEvent);
-
-    return {
-      message: 'Chat marked as read',
-    };
   }
 }
