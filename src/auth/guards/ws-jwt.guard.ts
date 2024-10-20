@@ -21,7 +21,7 @@ export class WsJwtGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext) {
     const client: Socket = context.switchToWs().getClient<Socket>();
-    const token = this.extractTokenFromHeader(client);
+    const token = this.extractTokenFromQuery(client);
 
     if (!token) {
       throw new UnauthorizedException('Token not found');
@@ -39,6 +39,12 @@ export class WsJwtGuard implements CanActivate {
 
   private extractTokenFromHeader(client: Socket): string {
     const token = client.handshake.headers.authorization as string;
+    return token;
+  }
+
+  // Cambiar para extraer el token desde la query string
+  private extractTokenFromQuery(client: Socket): string {
+    const token = client.handshake.query.token as string;
     return token;
   }
 }

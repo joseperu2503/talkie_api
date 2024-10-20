@@ -58,9 +58,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   async handleConnection(client: Socket) {
-    // console.log('Client connected:', client.id);
-    const token = client.handshake.headers.authorization as string;
+    console.log('Client connected:', client.id);
+    const token = client.handshake.query.token as string;
     let payload: JwtPayload;
+    console.log('token:', token);
 
     try {
       payload = this.jwtService.verify(token);
@@ -79,7 +80,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   handleDisconnect(client: Socket) {
-    // console.log('Client disconnected:', client.id);
+    console.log('Client disconnected:', client.id);
   }
 
   async emitMessageReceived(event: MessageSendedEvent) {
