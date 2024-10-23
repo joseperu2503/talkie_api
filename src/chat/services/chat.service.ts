@@ -13,8 +13,6 @@ export class ChatService {
     @InjectRepository(Chat)
     private readonly chatRepository: Repository<Chat>,
 
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
     @InjectRepository(Message)
     private readonly messageRepository: Repository<Message>,
   ) {}

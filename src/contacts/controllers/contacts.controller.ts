@@ -19,7 +19,7 @@ export class ContactController {
     return this.contactService.addContacts(addContactsDto, sender);
   }
 
-  @Post('/add')
+  @Post('/')
   async addContact(
     @Body() addContactDto: AddContactDto,
     @GetUser() sender: User,

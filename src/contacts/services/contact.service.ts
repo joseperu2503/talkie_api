@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { User } from 'src/auth/entities/user.entity';
-import { ArrayContains, In, Repository } from 'typeorm';
+import { ArrayContains, Repository } from 'typeorm';
 import { Contact } from '../entities/contact.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateContactsDto } from '../dto/create-contacts.dto';
@@ -12,6 +12,9 @@ import { AddContactDto } from '../dto/add-contact.dto';
 import { Chat } from 'src/chat/entities/chat.entity';
 import { ChatUser } from 'src/chat/entities/chat-user.entity';
 import { ContactResourceDto } from '../dto/contact-resource.dto';
+import { ContactUpdatedEvent } from 'src/chat/events/contact-updated.event';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { ChatUpdatedEvent } from 'src/chat/events/chat-updated.event';
 
 @Injectable()
 export class ContactService {
@@ -27,6 +30,8 @@ export class ContactService {
 
     @InjectRepository(ChatUser)
     private chatUserRepository: Repository<ChatUser>,
+
+    private eventEmitter: EventEmitter2,
   ) {}
 
   async addContacts(createContactsDto: CreateContactsDto, user: User) {
@@ -160,6 +165,30 @@ export class ContactService {
 
     // Guardar el nuevo contacto
     await this.contactRepository.save([contact1, contact2]);
+
+    chat = await this.chatRepository.findOne({
+      where: {
+        usersId: ArrayContains([user.id, contactUser.id]),
+      },
+      relations: {
+        chatUsers: {
+          user: true,
+        },
+        lastMessage: {
+          sender: true,
+        },
+        messages: {
+          sender: true,
+        },
+        contacts: {
+          targetContact: true,
+        },
+      },
+    });
+
+    const chatUpdatedEvent = new ChatUpdatedEvent();
+    chatUpdatedEvent.chat = chat!;
+    this.eventEmitter.emit('chat.updated', chatUpdatedEvent);
 
     return { message: 'Contact added successfully' };
   }

@@ -112,6 +112,15 @@ export const initialData: SeedData = {
       phone: '993689134',
       username: 'daniela_reyes17',
     },
+    {
+      email: 'joseperu2503@gmail.com',
+      name: 'Junior',
+      surname: 'Perez',
+      password: 'Abc123',
+      phone: '983689145',
+      username: 'junior25023',
+      photo: 'https://randomuser.me/api/portraits/men/1.jpg',
+    },
   ],
   contacts: [
     {

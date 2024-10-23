@@ -99,11 +99,11 @@ export class AuthService {
     const contacts = await this.getContacts(user.id);
     if (!contacts) return;
 
-    const chatUpdatedEvent = new ContactUpdatedEvent();
-    chatUpdatedEvent.contacts = contacts;
-    chatUpdatedEvent.user = user;
+    const contactUpdatedEvent = new ContactUpdatedEvent();
+    contactUpdatedEvent.contacts = contacts;
+    contactUpdatedEvent.user = user;
 
-    this.eventEmitter.emit('contact.updated', chatUpdatedEvent);
+    this.eventEmitter.emit('contact.updated', contactUpdatedEvent);
   }
 
   async getContacts(userId: number) {
