@@ -13,8 +13,8 @@ export class Message {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column('text')
-  content: string;
+  @Column('text', { nullable: true })
+  content: string | null;
 
   @ManyToOne(() => User, (user) => user.messages)
   @JoinColumn({ name: 'sender_id' })
@@ -26,4 +26,7 @@ export class Message {
 
   @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
   timestamp: Date;
+
+  @Column({ type: 'text', name: 'file_url', nullable: true })
+  fileUrl: string | null;
 }

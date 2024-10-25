@@ -1,18 +1,21 @@
 import {
   Controller,
-  Post,
   Get,
-  Body,
   Param,
   ParseIntPipe,
   Query,
   DefaultValuePipe,
+  Post,
+  UploadedFile,
+  UseInterceptors,
+  Body,
 } from '@nestjs/common';
 import { User } from 'src/auth/entities/user.entity';
 import { GetUser } from 'src/auth/decorators/get-user.decorator';
 import { JwtAuth } from 'src/auth/decorators/jwt-auth.decorator';
-import { CreateChatDto } from '../dto/create-chat.dto';
 import { ChatService } from '../services/chat.service';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { SendMessageDto } from '../dto/send-message.dto';
 
 @Controller('chats')
 export class ChatController {
@@ -33,5 +36,24 @@ export class ChatController {
   @JwtAuth()
   async getAllChats(@GetUser() user: User) {
     return this.chatService.getAllChats(user);
+  }
+
+  @Post('/send/message')
+  async sendMessage(
+    @Body() sendMessageDto: SendMessageDto,
+    @GetUser() sender: User,
+  ) {
+    return this.chatService.sendMessage(sendMessageDto, sender);
+  }
+
+  @Post('/send/file')
+  @UseInterceptors(FileInterceptor('file'))
+  @JwtAuth()
+  async uploadFile(
+    @GetUser() sender: User,
+    @UploadedFile() file: Express.Multer.File,
+    @Body('chatId') chatId: string,
+  ) {
+    return this.chatService.sendFile(sender, file, chatId);
   }
 }

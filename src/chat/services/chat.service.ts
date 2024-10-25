@@ -1,11 +1,25 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ArrayContains, Repository } from 'typeorm';
 import { User } from 'src/auth/entities/user.entity';
 import { Chat } from '../entities/chat.entity';
 import { Message } from '../entities/message.entity';
 import { Pagination, paginate } from 'nestjs-typeorm-paginate';
-import { ContactResourceDto } from 'src/contacts/dto/contact-resource.dto';
+import { chatResource } from '../resources/chat.resource';
+import { Storage } from '@google-cloud/storage';
+import { v4 as uuidv4 } from 'uuid';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { ChatUser } from '../entities/chat-user.entity';
+import { SendMessageDto } from '../dto/send-message.dto';
+import { MessageSendedEvent } from '../events/message-sended.event';
+import { ChatUpdatedEvent } from '../events/chat-updated.event';
+import { MarkChatAsReadDto } from '../dto/mark-chat-as-read.dto';
+import { extname } from 'path';
 
 @Injectable()
 export class ChatService {
@@ -15,7 +29,22 @@ export class ChatService {
 
     @InjectRepository(Message)
     private readonly messageRepository: Repository<Message>,
-  ) {}
+
+    private eventEmitter: EventEmitter2,
+
+    @InjectRepository(ChatUser)
+    private chatUserRepository: Repository<ChatUser>,
+  ) {
+    const GCP_PROJECT_ID = process.env.GCP_PROJECT_ID;
+    const GCP_KEY_FILE_PATH = 'google-cloud-key.json';
+
+    this.storage = new Storage({
+      projectId: GCP_PROJECT_ID,
+      keyFilename: GCP_KEY_FILE_PATH,
+    });
+  }
+
+  private readonly storage: Storage;
 
   async getMessagesByChat(
     chatId: number,
@@ -76,69 +105,181 @@ export class ChatService {
       return chatResource(chat, user.id);
     });
   }
-}
 
-export const chatResource = (chat: Chat, userId: number) => {
-  const receiver: ContactResourceDto = chat.contacts
-    .filter((contact) => contact.targetContact.id !== userId)
-    .map((contact) => {
-      return {
-        id: contact.targetContact.id,
-        name: contact.targetContact.name,
-        surname: contact.targetContact.surname,
-        email: contact.targetContact.email,
-        photo: contact.targetContact.photo,
-        phone: contact.targetContact.phone,
-        isConnected: contact.targetContact.isConnected,
-        lastConnection: new Date(),
-        chatId: chat.id,
-      };
-    })[0];
+  async uploadFile(file: Express.Multer.File) {
+    if (!file) {
+      throw new BadRequestException('No file uploaded');
+    }
 
-  // Encontrar el ChatUser correspondiente al usuario actual
-  const currentChatUser = chat.chatUsers.find(
-    (chatUser) => chatUser.user.id === userId,
-  );
+    const GCP_BUCKET = process.env.GCP_BUCKET ?? '';
+    const fileExtension = extname(file.originalname);
+    const blobName = `${uuidv4()}${fileExtension}`;
+    const blob = this.storage.bucket(GCP_BUCKET).file(blobName);
 
-  // Ordenar los mensajes por timestamp de manera descendente
-  const sortedMessages = chat.messages.sort((a, b) => {
-    return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
-  });
+    const blobStream = blob.createWriteStream({
+      resumable: false,
+      gzip: true,
+    });
 
-  return {
-    id: chat.id,
-    lastMessage: chat.lastMessage
-      ? {
-          ...chat.lastMessage,
-          isSender: chat.lastMessage.sender.id === userId,
-          sender: {
-            id: chat.lastMessage.sender.id,
-            name: chat.lastMessage.sender.name,
-            surname: chat.lastMessage.sender.surname,
-            email: chat.lastMessage.sender.email,
-            photo: chat.lastMessage.sender.photo,
-          },
-        }
-      : null,
-    messages: sortedMessages.map((message) => {
-      const { id, content, timestamp, sender } = message;
-      return {
-        id,
-        content,
-        timestamp,
-        isSender: sender.id === userId,
-        sender: {
-          id: sender.id,
-          name: sender.name,
-          surname: sender.surname,
-          email: sender.email,
-          photo: sender.photo,
+    blobStream.on('error', (err) => {
+      throw new BadRequestException('Error uploading file');
+    });
+
+    // Espera a que el archivo esté completamente subido
+    await new Promise<void>((resolve, reject) => {
+      blobStream.on('finish', async () => {
+        resolve();
+      });
+
+      // Envía el archivo al bucket
+      blobStream.end(file.buffer);
+    });
+
+    // Devuelve la URL pública
+    const publicUrl = `https://storage.googleapis.com/${GCP_BUCKET}/${blob.name}`;
+    return publicUrl;
+  }
+
+  async sendFile(sender: User, file: Express.Multer.File, chatId: string) {
+    if (!chatId) {
+      throw new BadRequestException('No chatId');
+    }
+
+    const fileUrl = await this.uploadFile(file);
+
+    return await this.sendMessageService(sender, chatId, null, fileUrl);
+  }
+
+  async sendMessage(sendMessageDto: SendMessageDto, sender: User) {
+    return await this.sendMessageService(
+      sender,
+      sendMessageDto.chatId,
+      sendMessageDto.content,
+      null,
+    );
+  }
+
+  async sendMessageService(
+    sender: User,
+    chatId: string,
+    content: string | null,
+    fileUrl: string | null,
+  ) {
+    let chat = await this.chatRepository.findOne({
+      where: {
+        id: chatId,
+      },
+      relations: {
+        chatUsers: {
+          user: true,
         },
-      };
-    }),
-    receiver: receiver,
-    unreadMessagesCount: currentChatUser
-      ? currentChatUser.unreadMessagesCount
-      : 0,
-  };
-};
+      },
+    });
+
+    if (!chat) {
+      throw new NotFoundException(`Chat with ID ${chatId} not found.`);
+    }
+
+    // Crear y guardar el mensaje
+    const message = this.messageRepository.create({
+      content,
+      sender,
+      chat,
+      fileUrl,
+    });
+
+    await this.messageRepository.save(message);
+
+    chat.lastMessage = message;
+    await this.chatRepository.save(chat);
+
+    // Incrementar los mensajes no leídos en los chatUsers (excepto para el remitente)
+    const chatUsersToUpdate = chat.chatUsers.filter(
+      (chatUser) => chatUser.user.id !== sender.id,
+    );
+
+    for (const chatUser of chatUsersToUpdate) {
+      chatUser.unreadMessagesCount += 1;
+      await this.chatUserRepository.save(chatUser);
+    }
+
+    chat = await this.chatRepository.findOne({
+      where: {
+        id: chatId,
+      },
+      relations: {
+        chatUsers: {
+          user: true,
+        },
+        lastMessage: {
+          sender: true,
+        },
+        messages: {
+          sender: true,
+        },
+        contacts: {
+          targetContact: true,
+        },
+      },
+    });
+
+    const messageSendedEvent = new MessageSendedEvent();
+    messageSendedEvent.message = message;
+    messageSendedEvent.chat = chat!;
+
+    this.eventEmitter.emit('message.sended', messageSendedEvent);
+
+    const chatUpdatedEvent = new ChatUpdatedEvent();
+    chatUpdatedEvent.chat = chat!;
+    this.eventEmitter.emit('chat.updated', chatUpdatedEvent);
+
+    return message;
+  }
+
+  async markChatAsReadDto(readChatDto: MarkChatAsReadDto, user: User) {
+    // Obtener el chat con las relaciones necesarias
+    const chat = await this.chatRepository.findOne({
+      where: {
+        id: readChatDto.chatId,
+      },
+      relations: {
+        chatUsers: {
+          user: true,
+        },
+        lastMessage: {
+          sender: true,
+        },
+        messages: {
+          sender: true,
+        },
+        contacts: {
+          targetContact: true,
+        },
+      },
+    });
+
+    if (!chat) {
+      throw new NotFoundException(
+        `Chat with ID ${readChatDto.chatId} not found.`,
+      );
+    }
+
+    // Encontrar el chatUser correspondiente al usuario que está leyendo el chat
+    const chatUser = chat.chatUsers.find((cu) => cu.user.id === user.id);
+
+    if (!chatUser) {
+      throw new UnauthorizedException(
+        'You are not a participant in this chat.',
+      );
+    }
+
+    // Marcar como leídos los mensajes no leídos
+    chatUser.unreadMessagesCount = 0;
+    await this.chatUserRepository.save(chatUser);
+
+    // Emitir evento
+    const chatUpdatedEvent = new ChatUpdatedEvent();
+    chatUpdatedEvent.chat = chat;
+    this.eventEmitter.emit('chat.updated', chatUpdatedEvent);
+  }
+}

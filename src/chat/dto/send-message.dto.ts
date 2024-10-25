@@ -7,9 +7,5 @@ export class SendMessageDto {
 
   @IsString()
   @IsNotEmpty()
-  readonly temporalMessageId: string;
-
-  @IsString()
-  @IsNotEmpty()
   readonly chatId: string;
 }

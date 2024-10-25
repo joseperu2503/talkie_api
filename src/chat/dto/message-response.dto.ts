@@ -1,7 +1,7 @@
 export class MessageResponseDto {
   id: string;
 
-  content: string;
+  content: string | null;
 
   timestamp: Date;
 
@@ -13,4 +13,5 @@ export class MessageResponseDto {
   };
 
   isSender: boolean;
+  isImage: boolean;
 }

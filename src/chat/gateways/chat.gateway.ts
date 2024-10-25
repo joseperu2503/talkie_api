@@ -11,10 +11,8 @@ import { Repository } from 'typeorm';
 import { User } from 'src/auth/entities/user.entity';
 import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from 'src/auth/interfaces/jwt-payload.interfaces';
-import { chatResource } from '../services/chat.service';
 import { OnEvent } from '@nestjs/event-emitter';
 import { MessageSendedEvent } from '../events/message-sended.event';
-import { MessageService } from '../services/message.service';
 import { SendMessageDto } from '../dto/send-message.dto';
 import { MessageResponseDto } from '../dto/message-response.dto';
 import { UseGuards } from '@nestjs/common';
@@ -25,6 +23,8 @@ import { AuthService } from 'src/auth/auth.service';
 import { UpdateUserStatusDto } from '../dto/update-user-status.dto';
 import { ContactUpdatedEvent } from '../events/contact-updated.event';
 import { ContactResourceDto } from 'src/contacts/dto/contact-resource.dto';
+import { chatResource, isImageUrl } from '../resources/chat.resource';
+import { ChatService } from '../services/chat.service';
 
 @WebSocketGateway({ cors: true, namespace: '/chats' })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -34,7 +34,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(
     private readonly authService: AuthService,
 
-    private readonly messageService: MessageService,
+    private readonly chatService: ChatService,
 
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
@@ -104,6 +104,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
             email: event.message.sender.email,
           },
           isSender: event.message.sender.id == userId,
+          isImage: isImageUrl(event.message.fileUrl),
         },
         chatId: event.message.chat.id,
       };
@@ -151,14 +152,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   async handleSendMessage(client: Socket, payload: SendMessageDto) {
     console.log(`Received message:`, payload);
     const sender = client['user'];
-    return await this.messageService.sendMessage(payload, sender);
+    return await this.chatService.sendMessage(payload, sender);
   }
 
   @UseGuards(WsJwtGuard)
   @SubscribeMessage('markChatAsRead')
   async handleMarkChatAsRead(client: Socket, payload: MarkChatAsReadDto) {
     const sender = client['user'];
-    return await this.messageService.markChatAsReadDto(payload, sender);
+    return await this.chatService.markChatAsReadDto(payload, sender);
   }
 
   @UseGuards(WsJwtGuard)

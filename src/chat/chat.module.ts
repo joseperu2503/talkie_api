@@ -3,17 +3,23 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Chat } from './entities/chat.entity';
 import { Message } from './entities/message.entity';
 import { AuthModule } from 'src/auth/auth.module';
-import { MessageController } from './controllers/message.controller';
-import { MessageService } from './services/message.service';
 import { ChatService } from './services/chat.service';
 import { ChatController } from './controllers/chat.controller';
 import { ChatGateway } from './gateways/chat.gateway';
 import { ChatUser } from './entities/chat-user.entity';
+import { MulterModule } from '@nestjs/platform-express';
+import * as multer from 'multer';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Chat, Message, ChatUser]), AuthModule],
-  controllers: [ChatController, MessageController],
-  providers: [ChatService, MessageService, ChatGateway],
-  exports: [ChatService, MessageService],
+  imports: [
+    TypeOrmModule.forFeature([Chat, Message, ChatUser]),
+    AuthModule,
+    MulterModule.register({
+      storage: multer.memoryStorage(),
+    }),
+  ],
+  controllers: [ChatController],
+  providers: [ChatService, ChatGateway],
+  exports: [ChatService],
 })
 export class ChatModule {}
