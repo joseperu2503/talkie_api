@@ -39,6 +39,7 @@ export class ChatController {
   }
 
   @Post('/send/message')
+  @JwtAuth()
   async sendMessage(
     @Body() sendMessageDto: SendMessageDto,
     @GetUser() sender: User,

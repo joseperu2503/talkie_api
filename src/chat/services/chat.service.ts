@@ -150,8 +150,8 @@ export class ChatService {
     return await this.sendMessageService(sender, chatId, null, fileUrl);
   }
 
-  async sendMessage(sendMessageDto: SendMessageDto, sender: User) {
-    return await this.sendMessageService(
+  sendMessage(sendMessageDto: SendMessageDto, sender: User) {
+    return this.sendMessageService(
       sender,
       sendMessageDto.chatId,
       sendMessageDto.content,
