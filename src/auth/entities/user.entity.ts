@@ -1,6 +1,7 @@
 import { ChatUser } from 'src/chat/entities/chat-user.entity';
 import { Message } from 'src/chat/entities/message.entity';
 import { Contact } from 'src/contacts/entities/contact.entity';
+import { FcmToken } from 'src/notifications/entities/fcm-token';
 import {
   Column,
   CreateDateColumn,
@@ -62,4 +63,7 @@ export class User {
 
   @Column('boolean', { default: false, name: 'is_connected' })
   isConnected: boolean;
+
+  @OneToMany(() => FcmToken, (fcmToken) => fcmToken.user)
+  fcmTokens: FcmToken[];
 }
