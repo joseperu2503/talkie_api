@@ -38,11 +38,9 @@ export class ChatService {
 
     private notificationsService: NotificationsService,
   ) {
-    const GCP_PROJECT_ID = process.env.GCP_PROJECT_ID;
-    const GCP_KEY_FILE_PATH = 'google-cloud-key.json';
+    const GCP_KEY_FILE_PATH = 'firebase-admin.json';
 
     this.storage = new Storage({
-      projectId: GCP_PROJECT_ID,
       keyFilename: GCP_KEY_FILE_PATH,
     });
   }
