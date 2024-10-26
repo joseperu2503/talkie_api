@@ -20,6 +20,7 @@ import { MessageSendedEvent } from '../events/message-sended.event';
 import { ChatUpdatedEvent } from '../events/chat-updated.event';
 import { MarkChatAsReadDto } from '../dto/mark-chat-as-read.dto';
 import { extname } from 'path';
+import { NotificationsService } from 'src/notifications/services/notifications.service';
 
 @Injectable()
 export class ChatService {
@@ -34,6 +35,8 @@ export class ChatService {
 
     @InjectRepository(ChatUser)
     private chatUserRepository: Repository<ChatUser>,
+
+    private notificationsService: NotificationsService,
   ) {
     const GCP_PROJECT_ID = process.env.GCP_PROJECT_ID;
     const GCP_KEY_FILE_PATH = 'google-cloud-key.json';
@@ -171,7 +174,9 @@ export class ChatService {
       },
       relations: {
         chatUsers: {
-          user: true,
+          user: {
+            fcmTokens: true,
+          },
         },
       },
     });
@@ -202,6 +207,12 @@ export class ChatService {
       chatUser.unreadMessagesCount += 1;
       await this.chatUserRepository.save(chatUser);
     }
+
+    this.notificationsService.sendMessage({
+      users: chatUsersToUpdate.map((chatUser) => chatUser.user),
+      title: `${sender.name} ${sender.surname}`,
+      body: content ?? 'foto',
+    });
 
     chat = await this.chatRepository.findOne({
       where: {

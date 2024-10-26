@@ -9,6 +9,7 @@ import { ChatGateway } from './gateways/chat.gateway';
 import { ChatUser } from './entities/chat-user.entity';
 import { MulterModule } from '@nestjs/platform-express';
 import * as multer from 'multer';
+import { NotificationsModule } from 'src/notifications/notifications.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import * as multer from 'multer';
     MulterModule.register({
       storage: multer.memoryStorage(),
     }),
+    NotificationsModule,
   ],
   controllers: [ChatController],
   providers: [ChatService, ChatGateway],
