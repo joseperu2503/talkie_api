@@ -58,12 +58,23 @@ export class NotificationsService {
             body,
           },
           data,
+          webpush: {
+            fcmOptions: {
+              link: '/',
+            },
+            notification: {
+              title,
+              body,
+            },
+          },
         };
 
         try {
           const response = await admin.messaging().send(message);
-          return response;
-        } catch (error) {}
+          // console.log('notificacion enviada', fcmToken);
+        } catch (error) {
+          // console.log('notificacion fallida', fcmToken);
+        }
       }
     }
   }
