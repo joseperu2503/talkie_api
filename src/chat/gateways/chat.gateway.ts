@@ -58,10 +58,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   async handleConnection(client: Socket) {
-    console.log('Client connected:', client.id);
+    // console.log('Client connected:', client.id);
     const token = client.handshake.query.token as string;
     let payload: JwtPayload;
-    console.log('token:', token);
+    // console.log('token:', token);
 
     try {
       payload = this.jwtService.verify(token);
@@ -72,22 +72,45 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         return;
       }
 
-      client.join(`user-${user.id}`);
-      console.log(`Client ${client.id} joined user-${user.id} channel`);
+      console.log(
+        `Usuario ${user.id} - ${user.name} ${user.surname} conectado al socket`,
+      );
+
+      await client.join(`user-${user.id}-connected`);
+      await this.verifyClientsInRoom(user);
     } catch (error) {
       client.disconnect();
     }
   }
 
-  handleDisconnect(client: Socket) {
+  async handleDisconnect(client: Socket) {
     console.log('Client disconnected:', client.id);
+
+    // Obtener el token de la conexión del cliente
+    const token = client.handshake.query.token as string;
+
+    // Verificar y obtener el payload del token
+    let payload: JwtPayload;
+    try {
+      payload = this.jwtService.verify(token);
+    } catch (error) {
+      console.error('Error verifying token on disconnect:', error);
+      return; // Si el token no es válido, simplemente salimos
+    }
+
+    // Buscar al usuario en la base de datos
+    const user = await this.userRepository.findOneBy({ id: payload.id });
+    if (user) {
+      // Verificar clientes en la sala después de la desconexión
+      await this.verifyClientsInRoom(user);
+    }
   }
 
   async emitMessageReceived(event: MessageSendedEvent) {
     const chat = event.chat;
 
     for (let userId of chat.usersId) {
-      const room = `user-${userId}`;
+      const room = `user-${userId}-connected`;
 
       const data: {
         message: MessageResponseDto;
@@ -117,7 +140,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const chat = event.chat;
 
     for (let userId of chat.usersId) {
-      const room = `user-${userId}`;
+      const room = `user-${userId}-connected`;
 
       const chatUpdated = chatResource(chat, userId);
 
@@ -129,7 +152,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const user = event.user;
     console.log('contactUpdated');
     for (let contact of event.contacts) {
-      const room = `user-${contact.targetContact.id}`;
+      const room = `user-${contact.targetContact.id}-connected`;
 
       const contactUpdated: ContactResourceDto = {
         id: user.id,
@@ -150,8 +173,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @UseGuards(WsJwtGuard)
   @SubscribeMessage('sendMessage')
   async handleSendMessage(client: Socket, payload: SendMessageDto) {
-    console.log(`Received message:`, payload);
     const sender = client['user'];
+    console.log(`${sender} send message:`, payload);
+
     return await this.chatService.sendMessage(payload, sender);
   }
 
@@ -163,9 +187,41 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @UseGuards(WsJwtGuard)
-  @SubscribeMessage('updateUserStatus')
-  async updateUserStatus(client: Socket, payload: UpdateUserStatusDto) {
+  @SubscribeMessage('updateDeviceConnectionStatus')
+  async updateDeviceConnectionStatus(
+    client: Socket,
+    payload: UpdateUserStatusDto,
+  ) {
     const user = client['user'];
-    return await this.authService.updateStatus(user, payload);
+    // Unirse a diferentes canales según el estado de conexión
+    if (payload.isConnected) {
+      client.join(`user-${user.id}-connected`);
+      // También puedes asegurarte de que el usuario no esté en el canal de desconectados
+      client.leave(`user-${user.id}-disconnected`);
+    } else {
+      client.join(`user-${user.id}-disconnected`);
+      // También puedes asegurarte de que el usuario no esté en el canal de conectados
+      client.leave(`user-${user.id}-connected`);
+    }
+
+    await this.verifyClientsInRoom(user);
+  }
+
+  async verifyClientsInRoom(user: User) {
+    const room = `user-${user.id}-connected`;
+
+    // Verificar si hay clientes en el canal de conectados
+    const clientsInRoom = await this.server.in(room).fetchSockets();
+    const isConnected = clientsInRoom.length > 0;
+
+    console.log(`${user.name} ${user.surname} is connected: ${isConnected}`);
+
+    const updateUserStatusDto: UpdateUserStatusDto = {
+      isConnected: isConnected,
+    };
+
+    if (isConnected != user.isConnected) {
+      await this.authService.updateStatus(user, updateUserStatusDto);
+    }
   }
 }
