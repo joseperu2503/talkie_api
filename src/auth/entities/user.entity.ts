@@ -78,7 +78,6 @@ export class User {
 
   @Column('timestamptz', {
     name: 'last_connection',
-    nullable: true,
     default: () => 'CURRENT_TIMESTAMP',
   })
   lastConnection: Date;

@@ -5,7 +5,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { FcmToken } from '../entities/fcm-token.entity';
 import { Repository } from 'typeorm';
 import * as admin from 'firebase-admin';
-import * as serviceAccount from '../../../firebase-admin.json';
 import { Message } from 'firebase-admin/lib/messaging/messaging-api';
 
 @Injectable()
@@ -13,11 +12,7 @@ export class NotificationsService {
   constructor(
     @InjectRepository(FcmToken)
     private fcmTokenRepository: Repository<FcmToken>,
-  ) {
-    admin.initializeApp({
-      credential: admin.credential.cert(serviceAccount as admin.ServiceAccount),
-    });
-  }
+  ) { }
 
   async createFcmToken(createFcmTokenDto: CreateFcmTokenDto, user: User) {
     // Verificar si el token ya existe
