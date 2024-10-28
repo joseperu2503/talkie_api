@@ -186,6 +186,7 @@ export class ContactService {
       },
     });
 
+    //notificar por sockets
     const chatUpdatedEvent = new ChatUpdatedEvent();
     chatUpdatedEvent.chat = chat!;
     this.eventEmitter.emit('chat.updated', chatUpdatedEvent);
