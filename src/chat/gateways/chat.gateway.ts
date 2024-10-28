@@ -162,7 +162,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         photo: user.photo,
         phone: user.phone,
         isConnected: user.isConnected,
-        lastConnection: new Date(),
+        lastConnection: user.lastConnection,
         chatId: contact.chat.id,
       };
 

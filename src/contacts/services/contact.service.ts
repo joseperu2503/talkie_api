@@ -215,7 +215,7 @@ export class ContactService {
         phone: contact.targetContact.phone,
         email: contact.targetContact.email,
         isConnected: contact.targetContact.isConnected,
-        lastConnection: new Date(),
+        lastConnection: contact.targetContact.lastConnection,
         chatId: contact.chat.id,
       };
     });

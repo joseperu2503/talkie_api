@@ -94,6 +94,9 @@ export class AuthService {
   async updateStatus(user: User, updateUserStatusDto: UpdateUserStatusDto) {
     // Actualizar el estado de conexión del usuario
     user.isConnected = updateUserStatusDto.isConnected;
+    if (!updateUserStatusDto.isConnected) {
+      user.lastConnection = new Date();
+    }
     await this.userRepository.save(user);
 
     const contacts = await this.getContacts(user.id);

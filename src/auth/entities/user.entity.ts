@@ -1,7 +1,7 @@
 import { ChatUser } from 'src/chat/entities/chat-user.entity';
 import { Message } from 'src/chat/entities/message.entity';
 import { Contact } from 'src/contacts/entities/contact.entity';
-import { FcmToken } from 'src/notifications/entities/fcm-token';
+import { FcmToken } from 'src/notifications/entities/fcm-token.entity';
 import {
   Column,
   CreateDateColumn,
@@ -43,10 +43,19 @@ export class User {
   @Column('text', { nullable: true })
   photo: string;
 
-  @CreateDateColumn({ type: 'timestamptz', name: 'created_at' })
+  @CreateDateColumn({
+    type: 'timestamptz',
+    name: 'created_at',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
   createdAt: Date;
 
-  @UpdateDateColumn({ type: 'timestamptz', name: 'updated_at' })
+  @UpdateDateColumn({
+    type: 'timestamptz',
+    name: 'updated_at',
+    default: () => 'CURRENT_TIMESTAMP',
+    onUpdate: 'CURRENT_TIMESTAMP',
+  })
   updatedAt: Date;
 
   @OneToMany(() => Message, (message) => message.sender)
@@ -63,6 +72,9 @@ export class User {
 
   @Column('boolean', { default: false, name: 'is_connected' })
   isConnected: boolean;
+
+  @Column('timestamptz', { nullable: true, name: 'last_connection' })
+  lastConnection: Date;
 
   @OneToMany(() => FcmToken, (fcmToken) => fcmToken.user)
   fcmTokens: FcmToken[];

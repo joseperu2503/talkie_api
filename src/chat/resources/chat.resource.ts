@@ -13,7 +13,7 @@ export const chatResource = (chat: Chat, userId: number) => {
         photo: contact.targetContact.photo,
         phone: contact.targetContact.phone,
         isConnected: contact.targetContact.isConnected,
-        lastConnection: new Date(),
+        lastConnection: contact.targetContact.lastConnection,
         chatId: chat.id,
       };
     })[0];
