@@ -1,37 +1,35 @@
 # Talkie API
 
-## Installation
-
-### Variables de entorno
+## Variables de entorno
 
 ```bash
-cp .env.example .env
+cp .env.example .env.dev
+cp .env.example .env.prod
+cp .env.example .env.staging
 ```
 
 ```bash
-nano .env
+nano .env.dev
+nano .env.prod
+nano .env.staging
 ```
 
-## Para desarrollo
+## Desarrollo
 
 ```bash
-docker compose -f docker-compose.yml up -d
+docker compose -f docker-compose.dev.yml --env-file .env.dev -p talkie_api_dev up -d --build
 ```
 
+## Produccion
+
 ```bash
-docker compose -f docker-compose.yml up -d --build
+docker compose -f docker-compose.prod.yml --env-file .env.prod -p talkie_api_prod up -d --build
 ```
 
-## Para produccion
+## Staging
 
 ```bash
-docker compose -f docker-compose.prod.yml up -d
-```
-
-para detectar cambios en el codigo fuente, como cuando se baja cambios remotos:
-
-```bash
-docker compose -f docker-compose.prod.yml up -d --build
+docker compose -f docker-compose.staging.yml --env-file .env.staging -p talkie_api_staging up -d --build
 ```
 
 # Migraciones
@@ -39,7 +37,9 @@ docker compose -f docker-compose.prod.yml up -d --build
 1. Entrar al contenedor:
 
 ```bash
-docker exec -it talkie_api sh
+docker exec -it talkie_api_dev sh
+docker exec -it talkie_api_prod sh
+docker exec -it talkie_api_staging sh
 ```
 
 2. Ejecutar el comando dentro del contenedor:

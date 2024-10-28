@@ -11,4 +11,12 @@ COPY package*.json ./
 RUN npm ci && npm cache clean --force
 COPY . .
 RUN npm run build
-CMD ["npm", "run", "start"]
+CMD ["npm", "run", "start:prod"]
+
+FROM node:18-alpine3.15 AS staging
+WORKDIR /usr/src/app
+COPY package*.json ./
+RUN npm ci && npm cache clean --force
+COPY . .
+RUN npm run build
+CMD ["npm", "run", "start:staging"]

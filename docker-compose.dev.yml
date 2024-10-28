@@ -1,6 +1,6 @@
 services:
   api:
-    container_name: talkie_api
+    container_name: talkie_api_dev
     build:
       context: .
       target: development
@@ -12,26 +12,27 @@ services:
       - '${SERVER_PORT}:${SERVER_PORT}'
     depends_on:
       - db
-    image: talkie_api
+    image: talkie_api_dev
     networks:
       - talkie_net
     restart: always
     env_file:
-      - .env
+      - .env.dev
 
   db:
     container_name: ${DB_HOST}
     image: postgres:14.3
     restart: always
-    ports:
-      - '${DB_EXPOSED_PORT}:5432'
     networks:
       - talkie_net
     environment:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME}
+    ports:
+      - '${DB_EXPOSED_PORT}:5432'
+
     volumes:
-      - ./postgres:/var/lib/postgresql/data
+      - ./postgres/dev:/var/lib/postgresql/data
 
 networks:
   talkie_net:
