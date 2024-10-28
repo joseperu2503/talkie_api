@@ -70,10 +70,17 @@ export class User {
   @OneToMany(() => ChatUser, (chatUser) => chatUser.user)
   chatUsers: ChatUser[];
 
-  @Column('boolean', { default: false, name: 'is_connected' })
+  @Column('boolean', {
+    default: false,
+    name: 'is_connected',
+  })
   isConnected: boolean;
 
-  @Column('timestamptz', { nullable: true, name: 'last_connection' })
+  @Column('timestamptz', {
+    name: 'last_connection',
+    nullable: true,
+    default: () => 'CURRENT_TIMESTAMP',
+  })
   lastConnection: Date;
 
   @OneToMany(() => FcmToken, (fcmToken) => fcmToken.user)
