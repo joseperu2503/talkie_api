@@ -173,8 +173,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @UseGuards(WsJwtGuard)
   @SubscribeMessage('sendMessage')
   async handleSendMessage(client: Socket, payload: SendMessageDto) {
-    const sender = client['user'];
-    console.log(`${sender} send message:`, payload);
+    const sender: User = client['user'];
+    console.log(`${sender.name} ${sender.surname} send message:`, payload);
 
     return await this.chatService.sendMessage(payload, sender);
   }
@@ -182,7 +182,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @UseGuards(WsJwtGuard)
   @SubscribeMessage('markChatAsRead')
   async handleMarkChatAsRead(client: Socket, payload: MarkChatAsReadDto) {
-    const sender = client['user'];
+    const sender: User = client['user'];
     return await this.chatService.markChatAsReadDto(payload, sender);
   }
 
@@ -192,7 +192,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     client: Socket,
     payload: UpdateUserStatusDto,
   ) {
-    const user = client['user'];
+    const user: User = client['user'];
     // Unirse a diferentes canales según el estado de conexión
     if (payload.isConnected) {
       client.join(`user-${user.id}-connected`);
