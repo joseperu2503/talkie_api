@@ -31,7 +31,7 @@ export class SeedService {
     const user: User | null = await this.authService.findOne(1);
     if (!user) return;
     for (const contact of contacts) {
-      await this.contactService.addContact(contact, user);
+      await this.contactService.addContact(contact, user, false);
     }
   }
 

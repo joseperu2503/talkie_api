@@ -7,12 +7,10 @@ import { User } from 'src/auth/entities/user.entity';
 import { ArrayContains, Repository } from 'typeorm';
 import { Contact } from '../entities/contact.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CreateContactsDto } from '../dto/create-contacts.dto';
 import { AddContactDto } from '../dto/add-contact.dto';
 import { Chat } from 'src/chat/entities/chat.entity';
 import { ChatUser } from 'src/chat/entities/chat-user.entity';
 import { ContactResourceDto } from '../dto/contact-resource.dto';
-import { ContactUpdatedEvent } from 'src/chat/events/contact-updated.event';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { ChatUpdatedEvent } from 'src/chat/events/chat-updated.event';
 
@@ -34,58 +32,11 @@ export class ContactService {
     private eventEmitter: EventEmitter2,
   ) {}
 
-  async addContacts(createContactsDto: CreateContactsDto, user: User) {
-    // Verificar que ningún contactId sea igual al id del usuario actual
-    const invalidContactDtos = createContactsDto.contacts.filter(
-      (contactDto) => contactDto.contactId === user.id,
-    );
-
-    if (invalidContactDtos.length > 0) {
-      throw new ConflictException(`Cannot add yourself as a contact.`);
-    }
-
-    const newContacts: Contact[] = [];
-
-    for (const contactDto of createContactsDto.contacts) {
-      const contactUser = await this.userRepository.findOne({
-        where: {
-          id: contactDto.contactId,
-        },
-      });
-
-      if (!contactUser) {
-        throw new NotFoundException('One or more contact IDs are invalid.');
-      }
-
-      const existContact = await this.contactRepository.findOne({
-        where: {
-          ownerUser: {
-            id: user.id,
-          },
-          targetContact: {
-            id: contactDto.contactId,
-          },
-        },
-      });
-
-      if (existContact) {
-        existContact.alias = contactDto.alias;
-        newContacts.push(existContact);
-      } else {
-        const contact = this.contactRepository.create(contactDto);
-        contact.ownerUser = user;
-        contact.targetContact = contactUser;
-
-        newContacts.push(contact);
-      }
-    }
-
-    await this.contactRepository.save(newContacts);
-
-    return { message: 'Contacts added successfully' };
-  }
-
-  async addContact(addContactDto: AddContactDto, user: User) {
+  async addContact(
+    addContactDto: AddContactDto,
+    user: User,
+    withSocket: boolean = true,
+  ) {
     // Verificar que el username no sea el del usuario actual
     if (addContactDto.username === user.username) {
       throw new ConflictException(`Cannot add yourself as a contact.`);
@@ -166,30 +117,32 @@ export class ContactService {
     // Guardar el nuevo contacto
     await this.contactRepository.save([contact1, contact2]);
 
-    chat = await this.chatRepository.findOne({
-      where: {
-        usersId: ArrayContains([user.id, contactUser.id]),
-      },
-      relations: {
-        chatUsers: {
-          user: true,
+    if (withSocket) {
+      chat = await this.chatRepository.findOne({
+        where: {
+          usersId: ArrayContains([user.id, contactUser.id]),
         },
-        lastMessage: {
-          sender: true,
+        relations: {
+          chatUsers: {
+            user: true,
+          },
+          lastMessage: {
+            sender: true,
+          },
+          messages: {
+            sender: true,
+          },
+          contacts: {
+            targetContact: true,
+          },
         },
-        messages: {
-          sender: true,
-        },
-        contacts: {
-          targetContact: true,
-        },
-      },
-    });
+      });
 
-    //notificar por sockets
-    // const chatUpdatedEvent = new ChatUpdatedEvent();
-    // chatUpdatedEvent.chat = chat!;
-    // this.eventEmitter.emit('chat.updated', chatUpdatedEvent);
+      //notificar por sockets
+      const chatUpdatedEvent = new ChatUpdatedEvent();
+      chatUpdatedEvent.chat = chat!;
+      this.eventEmitter.emit('chat.updated', chatUpdatedEvent);
+    }
 
     return { message: 'Contact added successfully' };
   }
