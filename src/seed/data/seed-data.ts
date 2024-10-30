@@ -113,7 +113,7 @@ export const initialData: SeedData = {
       username: 'ava_lewis12',
     },
     {
-      email: 'joseperu2503@gmail.com',
+      email: 'test13@gmail.com',
       name: 'Benjamin',
       surname: 'Hall',
       password: 'Abc123',
