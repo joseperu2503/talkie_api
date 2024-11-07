@@ -36,7 +36,7 @@ CMD ["npm", "run", "start:dev"]
 FROM base AS build
 COPY . .
 # Ajustar la memoria disponible para Node.js durante la construcción
-RUN npm run build
+RUN NODE_OPTIONS="--max-old-space-size=4096" npm run build
 
 # Etapa de producción
 FROM node:18-alpine3.15 AS production
