@@ -71,3 +71,20 @@ docker image prune -f
 ```bash
 npm run migrations:generate database/migrations/init
 ```
+
+
+## Configuracion Ngnix
+
+server {
+        server_name talkie-api.joseperezgil.com www.talkie-api.joseperezgil.com;
+        location / {
+                proxy_pass http://localhost:3007;
+                proxy_http_version 1.1;
+                proxy_set_header Upgrade $http_upgrade;
+                proxy_set_header Connection "upgrade";
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Proto $scheme;
+        }
+}
