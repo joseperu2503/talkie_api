@@ -1,7 +1,11 @@
+import { MessageResponseDto } from '../dto/message-response.dto';
 import { Message } from '../entities/message.entity';
 
-export const messageResource = (message: Message, userId: number) => {
-  const { id, content, timestamp, sender, fileUrl } = message;
+export const messageResource = (
+  message: Message,
+  userId: number,
+): MessageResponseDto => {
+  const { id, content, timestamp, sender, fileUrl, chat } = message;
 
   return {
     id,
@@ -17,6 +21,7 @@ export const messageResource = (message: Message, userId: number) => {
       email: sender.email,
       photo: sender.photo,
     },
+    chatId: chat.id,
   };
 };
 

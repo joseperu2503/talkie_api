@@ -24,20 +24,11 @@ export const chatResource = (chat: Chat, userId: number) => {
     (chatUser) => chatUser.user.id === userId,
   );
 
-  // Ordenar los mensajes por timestamp de manera descendente
-  const sortedMessages = chat.messages.sort((a, b) => {
-    return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
-  });
-
   return {
     id: chat.id,
     lastMessage: chat.lastMessage
       ? messageResource(chat.lastMessage, userId)
       : null,
-    // messages: sortedMessages.map((message) => {
-    //   return messageResource(message, userId);
-    // }),
-    messages: [],
     receiver: receiver,
     unreadMessagesCount: currentChatUser
       ? currentChatUser.unreadMessagesCount

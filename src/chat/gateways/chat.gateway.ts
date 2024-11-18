@@ -25,7 +25,7 @@ import { ContactUpdatedEvent } from '../events/contact-updated.event';
 import { ContactResourceDto } from 'src/contacts/dto/contact-resource.dto';
 import { chatResource } from '../resources/chat.resource';
 import { ChatService } from '../services/chat.service';
-import { isImageUrl } from '../resources/message.resource';
+import { isImageUrl, messageResource } from '../resources/message.resource';
 
 @WebSocketGateway({ cors: true, namespace: '/chats' })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -115,22 +115,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
       const data: {
         message: MessageResponseDto;
-        chatId: string;
       } = {
-        message: {
-          id: event.message.id,
-          content: event.message.content,
-          timestamp: event.message.timestamp,
-          sender: {
-            id: event.message.sender.id,
-            name: event.message.sender.name,
-            surname: event.message.sender.surname,
-            email: event.message.sender.email,
-          },
-          isSender: event.message.sender.id == userId,
-          isImage: isImageUrl(event.message.fileUrl),
-        },
-        chatId: event.message.chat.id,
+        message: messageResource(event.message, userId),
       };
 
       this.server.to(room).emit('messageReceived', data);

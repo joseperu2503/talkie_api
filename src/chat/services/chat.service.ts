@@ -9,7 +9,6 @@ import { ArrayContains, Repository } from 'typeorm';
 import { User } from 'src/auth/entities/user.entity';
 import { Chat } from '../entities/chat.entity';
 import { Message } from '../entities/message.entity';
-import { Pagination, paginate } from 'nestjs-typeorm-paginate';
 import { chatResource } from '../resources/chat.resource';
 import { Storage } from '@google-cloud/storage';
 import { v4 as uuidv4 } from 'uuid';
@@ -61,9 +60,7 @@ export class ChatService {
       relations: {
         lastMessage: {
           sender: true,
-        },
-        messages: {
-          sender: true,
+          chat: true,
         },
         contacts: {
           targetContact: true,
@@ -194,9 +191,7 @@ export class ChatService {
         },
         lastMessage: {
           sender: true,
-        },
-        messages: {
-          sender: true,
+          chat: true,
         },
         contacts: {
           targetContact: true,
@@ -229,9 +224,7 @@ export class ChatService {
         },
         lastMessage: {
           sender: true,
-        },
-        messages: {
-          sender: true,
+          chat: true,
         },
         contacts: {
           targetContact: true,
@@ -264,35 +257,6 @@ export class ChatService {
     this.eventEmitter.emit('chat.updated', chatUpdatedEvent);
   }
 
-  async getMessagesByChat(
-    chatId: string,
-    page: number,
-    limit: number,
-    sender: User,
-  ) {
-    const queryBuilder = this.messageRepository
-      .createQueryBuilder('message')
-      .leftJoinAndSelect('message.sender', 'sender') // Incluir la relación con el sender
-      .where('message.chat_id = :id', { id: chatId })
-      .orderBy('message.timestamp', 'DESC');
-
-    const messages = await paginate<Message>(queryBuilder, { page, limit });
-
-    return new Pagination(
-      messages.items.map((message) => {
-        return {
-          ...message,
-          sender: {
-            id: message.sender.id,
-            name: message.sender.name,
-          },
-          isSender: message.sender.id === sender.id,
-        };
-      }),
-      messages.meta,
-    );
-  }
-
   async getMessages(
     chatId: string,
     user: User,
@@ -302,6 +266,7 @@ export class ChatService {
     const query = this.messageRepository
       .createQueryBuilder('message')
       .leftJoinAndSelect('message.sender', 'sender') // Incluir la relación con el sender
+      .leftJoinAndSelect('message.chat', 'chat') // Incluir la relación con el chat
       .where('message.chat_id = :id', { id: chatId })
       .orderBy('message.timestamp', 'DESC')
       .limit(limit);

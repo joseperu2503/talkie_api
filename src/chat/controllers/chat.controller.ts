@@ -19,17 +19,6 @@ import { SendMessageDto } from '../dto/send-message.dto';
 export class ChatController {
   constructor(private readonly chatService: ChatService) {}
 
-  // @Get(':chatId/messages')
-  // @JwtAuth()
-  // async getChatById(
-  //   @GetUser() sender: User,
-  //   @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number = 1,
-  //   @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number = 10,
-  //   @Param('chatId') chatId: string,
-  // ) {
-  //   return this.chatService.getMessagesByChat(chatId, page, limit, sender);
-  // }
-
   @Get()
   @JwtAuth()
   async getAllChats(@GetUser() user: User) {

@@ -5,13 +5,18 @@ export class MessageResponseDto {
 
   timestamp: Date;
 
+  fileUrl: string | null;
+
   sender: {
     id: number;
     name: string;
     surname: string;
     email: string;
+    photo: string;
   };
 
   isSender: boolean;
   isImage: boolean;
+
+  chatId: string;
 }
