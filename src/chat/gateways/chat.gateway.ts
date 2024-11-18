@@ -23,8 +23,9 @@ import { AuthService } from 'src/auth/auth.service';
 import { UpdateUserStatusDto } from '../dto/update-user-status.dto';
 import { ContactUpdatedEvent } from '../events/contact-updated.event';
 import { ContactResourceDto } from 'src/contacts/dto/contact-resource.dto';
-import { chatResource, isImageUrl } from '../resources/chat.resource';
+import { chatResource } from '../resources/chat.resource';
 import { ChatService } from '../services/chat.service';
+import { isImageUrl } from '../resources/message.resource';
 
 @WebSocketGateway({ cors: true, namespace: '/chats' })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {

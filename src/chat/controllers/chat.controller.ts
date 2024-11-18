@@ -2,9 +2,7 @@ import {
   Controller,
   Get,
   Param,
-  ParseIntPipe,
   Query,
-  DefaultValuePipe,
   Post,
   UploadedFile,
   UseInterceptors,
@@ -21,16 +19,16 @@ import { SendMessageDto } from '../dto/send-message.dto';
 export class ChatController {
   constructor(private readonly chatService: ChatService) {}
 
-  @Get(':chatId/messages')
-  @JwtAuth()
-  async getChatById(
-    @GetUser() sender: User,
-    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number = 1,
-    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number = 10,
-    @Param('chatId', ParseIntPipe) chatId: number,
-  ) {
-    return this.chatService.getMessagesByChat(chatId, page, limit, sender);
-  }
+  // @Get(':chatId/messages')
+  // @JwtAuth()
+  // async getChatById(
+  //   @GetUser() sender: User,
+  //   @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number = 1,
+  //   @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number = 10,
+  //   @Param('chatId') chatId: string,
+  // ) {
+  //   return this.chatService.getMessagesByChat(chatId, page, limit, sender);
+  // }
 
   @Get()
   @JwtAuth()
@@ -56,5 +54,16 @@ export class ChatController {
     @Body('chatId') chatId: string,
   ) {
     return this.chatService.sendFile(sender, file, chatId);
+  }
+
+  @Get(':chatId/messages')
+  @JwtAuth()
+  async getMessages(
+    @GetUser() user: User,
+    @Param('chatId') chatId: string,
+    @Query('limit') limit: number = 20, // Cantidad de mensajes por página
+    @Query('lastMessageId') lastMessageId?: string, // ID del último mensaje cargado
+  ) {
+    return this.chatService.getMessages(chatId, user, limit, lastMessageId);
   }
 }

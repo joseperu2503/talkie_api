@@ -21,6 +21,7 @@ import { ChatUpdatedEvent } from '../events/chat-updated.event';
 import { MarkChatAsReadDto } from '../dto/mark-chat-as-read.dto';
 import { extname } from 'path';
 import { NotificationsService } from 'src/notifications/services/notifications.service';
+import { messageResource } from '../resources/message.resource';
 
 @Injectable()
 export class ChatService {
@@ -46,35 +47,6 @@ export class ChatService {
   }
 
   private readonly storage: Storage;
-
-  async getMessagesByChat(
-    chatId: number,
-    page: number,
-    limit: number,
-    sender: User,
-  ) {
-    const queryBuilder = this.messageRepository
-      .createQueryBuilder('message')
-      .leftJoinAndSelect('message.sender', 'sender') // Incluir la relación con el sender
-      .where('message.chat_id = :id', { id: chatId })
-      .orderBy('message.timestamp', 'DESC');
-
-    const messages = await paginate<Message>(queryBuilder, { page, limit });
-
-    return new Pagination(
-      messages.items.map((message) => {
-        return {
-          ...message,
-          sender: {
-            id: message.sender.id,
-            name: message.sender.name,
-          },
-          isSender: message.sender.id === sender.id,
-        };
-      }),
-      messages.meta,
-    );
-  }
 
   async getAllChats(user: User) {
     const chats = await this.chatRepository.find({
@@ -290,5 +262,72 @@ export class ChatService {
     const chatUpdatedEvent = new ChatUpdatedEvent();
     chatUpdatedEvent.chat = chat;
     this.eventEmitter.emit('chat.updated', chatUpdatedEvent);
+  }
+
+  async getMessagesByChat(
+    chatId: string,
+    page: number,
+    limit: number,
+    sender: User,
+  ) {
+    const queryBuilder = this.messageRepository
+      .createQueryBuilder('message')
+      .leftJoinAndSelect('message.sender', 'sender') // Incluir la relación con el sender
+      .where('message.chat_id = :id', { id: chatId })
+      .orderBy('message.timestamp', 'DESC');
+
+    const messages = await paginate<Message>(queryBuilder, { page, limit });
+
+    return new Pagination(
+      messages.items.map((message) => {
+        return {
+          ...message,
+          sender: {
+            id: message.sender.id,
+            name: message.sender.name,
+          },
+          isSender: message.sender.id === sender.id,
+        };
+      }),
+      messages.meta,
+    );
+  }
+
+  async getMessages(
+    chatId: string,
+    user: User,
+    limit: number,
+    lastMessageId?: string,
+  ) {
+    const query = this.messageRepository
+      .createQueryBuilder('message')
+      .leftJoinAndSelect('message.sender', 'sender') // Incluir la relación con el sender
+      .where('message.chat_id = :id', { id: chatId })
+      .orderBy('message.timestamp', 'DESC')
+      .limit(limit);
+
+    if (lastMessageId) {
+      // Filtrar mensajes más antiguos que el último cargado
+      const lastMessage = await this.messageRepository.findOne({
+        where: {
+          id: lastMessageId,
+        },
+      });
+
+      if (!lastMessage) {
+        throw new NotFoundException(
+          `Message with ID ${lastMessageId} not found.`,
+        );
+      }
+
+      query.andWhere('message.createdAt < :createdAt', {
+        createdAt: lastMessage.createdAt,
+      });
+    }
+
+    const messages = await query.getMany();
+    return messages.map((message) => {
+      return messageResource(message, user.id);
+    });
   }
 }
