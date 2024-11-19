@@ -10,10 +10,11 @@ import { ChatUser } from './entities/chat-user.entity';
 import { MulterModule } from '@nestjs/platform-express';
 import * as multer from 'multer';
 import { NotificationsModule } from 'src/notifications/notifications.module';
+import { MessageUser } from './entities/message-user.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Chat, Message, ChatUser]),
+    TypeOrmModule.forFeature([Chat, Message, ChatUser, MessageUser]),
     AuthModule,
     MulterModule.register({
       storage: multer.memoryStorage(),

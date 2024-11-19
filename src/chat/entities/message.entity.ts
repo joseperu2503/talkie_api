@@ -6,9 +6,11 @@ import {
   JoinColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
 import { Chat } from './chat.entity';
 import { User } from 'src/auth/entities/user.entity';
+import { MessageUser } from './message-user.entity';
 
 @Entity('messages')
 export class Message {
@@ -46,4 +48,7 @@ export class Message {
     onUpdate: 'CURRENT_TIMESTAMP',
   })
   updatedAt: Date;
+
+  @OneToMany(() => MessageUser, (messageUser) => messageUser.message)
+  messageUsers: MessageUser[];
 }

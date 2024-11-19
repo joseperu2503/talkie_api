@@ -20,6 +20,7 @@ import { MarkChatAsReadDto } from '../dto/mark-chat-as-read.dto';
 import { extname } from 'path';
 import { NotificationsService } from 'src/notifications/services/notifications.service';
 import { MessageResource } from '../resources/message.resource';
+import { MessageUser } from '../entities/message-user.entity';
 
 @Injectable()
 export class ChatService {
@@ -36,6 +37,9 @@ export class ChatService {
     private chatUserRepository: Repository<ChatUser>,
 
     private notificationsService: NotificationsService,
+
+    @InjectRepository(MessageUser)
+    private messageUserRepository: Repository<MessageUser>,
   ) {
     const GCP_KEY_FILE_PATH = 'firebase-admin.json';
 
@@ -59,6 +63,7 @@ export class ChatService {
       relations: {
         lastMessage: {
           sender: true,
+          messageUsers: true,
           chat: true,
         },
         contacts: {
@@ -154,6 +159,7 @@ export class ChatService {
         },
         lastMessage: {
           sender: true,
+          messageUsers: true,
           chat: true,
         },
         contacts: {
@@ -172,6 +178,7 @@ export class ChatService {
       sender,
       chat,
       fileUrl,
+      messageUsers: [],
     });
 
     await this.messageRepository.save(message);
@@ -187,6 +194,15 @@ export class ChatService {
     for (const chatUser of chatUsersToUpdate) {
       chatUser.unreadMessagesCount += 1;
       await this.chatUserRepository.save(chatUser);
+
+      // Crear el MessageUser
+      const messageUser = this.messageUserRepository.create();
+      messageUser.message = message;
+      messageUser.user = chatUser.user;
+
+      await this.messageUserRepository.save(messageUser);
+
+      message.messageUsers.push(messageUser);
     }
 
     this.notificationsService.sendMessage({
@@ -202,7 +218,7 @@ export class ChatService {
     }
 
     const chatUpdatedEvent = new ChatUpdatedEvent();
-    chatUpdatedEvent.chat = chat!;
+    chatUpdatedEvent.chat = chat;
     this.eventEmitter.emit('chat.updated', chatUpdatedEvent);
 
     return new MessageResource(message, sender.id, temporalId).response;
@@ -220,6 +236,7 @@ export class ChatService {
         },
         lastMessage: {
           sender: true,
+          messageUsers: true,
           chat: true,
         },
         contacts: {
@@ -263,6 +280,7 @@ export class ChatService {
       .createQueryBuilder('message')
       .leftJoinAndSelect('message.sender', 'sender') // Incluir la relación con el sender
       .leftJoinAndSelect('message.chat', 'chat') // Incluir la relación con el chat
+      .leftJoinAndSelect('message.messageUsers', 'messageUser') // Incluir la relación con MessageUser
       .where('message.chat_id = :id', { id: chatId })
       .orderBy('message.timestamp', 'DESC')
       .limit(limit);
