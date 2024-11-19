@@ -58,7 +58,7 @@ export class ChatService {
       },
       order: {
         lastMessage: {
-          timestamp: 'DESC',
+          sentAt: 'DESC',
         },
       },
       relations: {
@@ -321,7 +321,7 @@ export class ChatService {
       .leftJoinAndSelect('message.chat', 'chat') // Incluir la relación con el chat
       .leftJoinAndSelect('message.messageUsers', 'messageUser') // Incluir la relación con MessageUser
       .where('message.chat_id = :id', { id: chatId })
-      .orderBy('message.timestamp', 'DESC')
+      .orderBy('message.sentAt', 'DESC')
       .limit(limit);
 
     if (lastMessageId) {

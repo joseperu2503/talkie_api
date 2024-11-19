@@ -5,7 +5,7 @@ export class MessageResponseDto {
 
   content: string | null;
 
-  timestamp: Date;
+  sentAt: Date;
 
   fileUrl: string | null;
 

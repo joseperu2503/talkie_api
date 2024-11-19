@@ -13,12 +13,12 @@ export class MessageResource {
   }
 
   get response(): MessageResponseDto {
-    const { id, content, timestamp, sender, fileUrl, chat } = this.message;
+    const { id, content, sentAt, sender, fileUrl, chat } = this.message;
 
     return {
       id,
       content,
-      timestamp,
+      sentAt,
       fileUrl,
       isSender: sender.id === this.userId,
       isImage: isImageUrl(fileUrl),

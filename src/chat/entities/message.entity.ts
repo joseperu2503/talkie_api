@@ -28,8 +28,12 @@ export class Message {
   @JoinColumn({ name: 'chat_id' })
   chat: Chat;
 
-  @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
-  timestamp: Date;
+  @Column({
+    type: 'timestamptz',
+    default: () => 'CURRENT_TIMESTAMP',
+    name: 'sent_at',
+  })
+  sentAt: Date;
 
   @Column({ type: 'text', name: 'file_url', nullable: true })
   fileUrl: string | null;
