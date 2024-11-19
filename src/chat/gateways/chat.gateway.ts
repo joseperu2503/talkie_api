@@ -46,6 +46,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.emitMessageReceived(event);
   }
 
+  @OnEvent('message.delivered')
+  handleMessageDeliveredEvent(event: MessageResource) {
+    this.emitMessageDelivered(event);
+  }
+
   @OnEvent('chat.updated')
   handleChatUpdatedEvent(event: ChatUpdatedEvent) {
     this.emitChatUpdated(event);
@@ -76,7 +81,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       );
 
       await client.join(`user-${user.id}-connected`);
-      await this.verifyClientsInRoom(user);
+      await this.updateUserStatus(user);
     } catch (error) {
       client.disconnect();
     }
@@ -101,14 +106,33 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const user = await this.userRepository.findOneBy({ id: payload.id });
     if (user) {
       // Verificar clientes en la sala después de la desconexión
-      await this.verifyClientsInRoom(user);
+      await this.updateUserStatus(user);
     }
   }
 
+  //** Emitir al usuario de un nuevo mensaje */
   async emitMessageReceived(messageResource: MessageResource) {
     const room = `user-${messageResource.userId}-connected`;
+    let newMessageResource = messageResource;
+    if (messageResource.message.sender.id != messageResource.userId) {
+      //** Verificar si el mensaje fue entregado */
+      const isConnected = await this.verifyClientsInRoom(
+        messageResource.userId,
+      );
+      if (isConnected) {
+        newMessageResource =
+          await this.chatService.messageDelivered(messageResource);
+      }
+    }
 
-    this.server.to(room).emit('messageReceived', messageResource.response);
+    this.server.to(room).emit('messageReceived', newMessageResource.response);
+  }
+
+  async emitMessageDelivered(messageResource: MessageResource) {
+    console.log('emit delivered', messageResource);
+    const room = `user-${messageResource.userId}-connected`;
+
+    this.server.to(room).emit('messageDelivered', messageResource.response);
   }
 
   async emitChatUpdated(event: ChatUpdatedEvent) {
@@ -179,16 +203,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       client.leave(`user-${user.id}-connected`);
     }
 
-    await this.verifyClientsInRoom(user);
+    await this.updateUserStatus(user);
   }
 
-  async verifyClientsInRoom(user: User) {
-    const room = `user-${user.id}-connected`;
-
-    // Verificar si hay clientes en el canal de conectados
-    const clientsInRoom = await this.server.in(room).fetchSockets();
-    const isConnected = clientsInRoom.length > 0;
-
+  async updateUserStatus(user: User) {
+    const isConnected = await this.verifyClientsInRoom(user.id);
     console.log(`${user.name} ${user.surname} is connected: ${isConnected}`);
 
     const updateUserStatusDto: UpdateUserStatusDto = {
@@ -198,5 +217,15 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (isConnected != user.isConnected) {
       await this.authService.updateStatus(user, updateUserStatusDto);
     }
+  }
+
+  async verifyClientsInRoom(userId: number) {
+    const room = `user-${userId}-connected`;
+
+    // Verificar si hay clientes en el canal de conectados
+    const clientsInRoom = await this.server.in(room).fetchSockets();
+    const isConnected = clientsInRoom.length > 0;
+
+    return isConnected;
   }
 }

@@ -21,6 +21,7 @@ import { extname } from 'path';
 import { NotificationsService } from 'src/notifications/services/notifications.service';
 import { MessageResource } from '../resources/message.resource';
 import { MessageUser } from '../entities/message-user.entity';
+import { MessageResponseDto } from '../dto/message-response.dto';
 
 @Injectable()
 export class ChatService {
@@ -308,5 +309,40 @@ export class ChatService {
     return messages.map((message) => {
       return new MessageResource(message, user.id).response;
     });
+  }
+
+  async messageDelivered(messageResource: MessageResource) {
+    const userId = messageResource.userId;
+
+    const messageUser = await this.messageUserRepository.findOne({
+      where: {
+        message: {
+          id: messageResource.message.id,
+        },
+        user: {
+          id: userId,
+        },
+      },
+    });
+
+    messageUser!.delivered_at = new Date();
+
+    await this.messageUserRepository.save(messageUser!);
+
+    const message = await this.messageRepository
+      .createQueryBuilder('message')
+      .leftJoinAndSelect('message.sender', 'sender')
+      .leftJoinAndSelect('message.chat', 'chat')
+      .leftJoinAndSelect('message.messageUsers', 'messageUser')
+      .where('message.chat_id = :id', { id: messageResource.response.chatId })
+      .orderBy('message.timestamp', 'DESC')
+      .getOne();
+
+    this.eventEmitter.emit(
+      'message.delivered',
+      new MessageResource(message!, messageResource.message.sender.id),
+    );
+
+    return new MessageResource(message!, userId);
   }
 }

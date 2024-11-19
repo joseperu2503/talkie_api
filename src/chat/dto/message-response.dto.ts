@@ -13,7 +13,7 @@ export class MessageResponseDto {
     id: number;
     name: string;
     surname: string;
-    email: string; 
+    email: string;
     photo: string;
   };
 
@@ -23,8 +23,6 @@ export class MessageResponseDto {
   chatId: string;
 
   temporalId?: string | null;
-
-  statusId: number;
 
   receivers: {
     delivered_at: Date | null;
