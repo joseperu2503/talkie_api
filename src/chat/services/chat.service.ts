@@ -209,7 +209,7 @@ export class ChatService {
     chatUpdatedEvent.chat = chat!;
     this.eventEmitter.emit('chat.updated', chatUpdatedEvent);
 
-    return message;
+    return messageResource(message, sender.id);
   }
 
   async markChatAsReadDto(readChatDto: MarkChatAsReadDto, user: User) {
