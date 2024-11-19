@@ -12,9 +12,7 @@ import { User } from 'src/auth/entities/user.entity';
 import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from 'src/auth/interfaces/jwt-payload.interfaces';
 import { OnEvent } from '@nestjs/event-emitter';
-import { MessageSendedEvent } from '../events/message-sended.event';
 import { SendMessageDto } from '../dto/send-message.dto';
-import { MessageResponseDto } from '../dto/message-response.dto';
 import { UseGuards } from '@nestjs/common';
 import { WsJwtGuard } from 'src/auth/guards/ws-jwt.guard';
 import { MarkChatAsReadDto } from '../dto/mark-chat-as-read.dto';
@@ -25,7 +23,7 @@ import { ContactUpdatedEvent } from '../events/contact-updated.event';
 import { ContactResourceDto } from 'src/contacts/dto/contact-resource.dto';
 import { chatResource } from '../resources/chat.resource';
 import { ChatService } from '../services/chat.service';
-import { isImageUrl, messageResource } from '../resources/message.resource';
+import { MessageResource } from '../resources/message.resource';
 
 @WebSocketGateway({ cors: true, namespace: '/chats' })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -44,7 +42,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ) {}
 
   @OnEvent('message.sended')
-  handleMessageSendedEvent(event: MessageSendedEvent) {
+  handleMessageSendedEvent(event: MessageResource) {
     this.emitMessageReceived(event);
   }
 
@@ -107,20 +105,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
 
-  async emitMessageReceived(event: MessageSendedEvent) {
-    const chat = event.chat;
+  async emitMessageReceived(messageResource: MessageResource) {
+    const room = `user-${messageResource.userId}-connected`;
 
-    for (let userId of chat.usersId) {
-      const room = `user-${userId}-connected`;
-
-      const data: {
-        message: MessageResponseDto;
-      } = {
-        message: messageResource(event.message, userId),
-      };
-
-      this.server.to(room).emit('messageReceived', data);
-    }
+    this.server.to(room).emit('messageReceived', messageResource.response);
   }
 
   async emitChatUpdated(event: ChatUpdatedEvent) {

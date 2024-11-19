@@ -1,11 +1,15 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsString, IsUUID } from 'class-validator';
 
 export class SendMessageDto {
   @IsString()
   @IsNotEmpty()
   readonly content: string;
 
-  @IsString()
+  @IsUUID()
   @IsNotEmpty()
   readonly chatId: string;
+
+  @IsUUID()
+  @IsNotEmpty()
+  readonly temporalId: string;
 }

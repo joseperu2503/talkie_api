@@ -15,12 +15,11 @@ import { v4 as uuidv4 } from 'uuid';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { ChatUser } from '../entities/chat-user.entity';
 import { SendMessageDto } from '../dto/send-message.dto';
-import { MessageSendedEvent } from '../events/message-sended.event';
 import { ChatUpdatedEvent } from '../events/chat-updated.event';
 import { MarkChatAsReadDto } from '../dto/mark-chat-as-read.dto';
 import { extname } from 'path';
 import { NotificationsService } from 'src/notifications/services/notifications.service';
-import { messageResource } from '../resources/message.resource';
+import { MessageResource } from '../resources/message.resource';
 
 @Injectable()
 export class ChatService {
@@ -117,7 +116,13 @@ export class ChatService {
 
     const fileUrl = await this.uploadFile(file);
 
-    return await this.sendMessageService(sender, chatId, null, fileUrl);
+    return await this.sendMessageService(
+      sender,
+      chatId,
+      null,
+      fileUrl,
+      'asasd',
+    );
   }
 
   sendMessage(sendMessageDto: SendMessageDto, sender: User) {
@@ -126,6 +131,7 @@ export class ChatService {
       sendMessageDto.chatId,
       sendMessageDto.content,
       null,
+      sendMessageDto.temporalId,
     );
   }
 
@@ -134,8 +140,9 @@ export class ChatService {
     chatId: string,
     content: string | null,
     fileUrl: string | null,
+    temporalId: string,
   ) {
-    let chat = await this.chatRepository.findOne({
+    const chat = await this.chatRepository.findOne({
       where: {
         id: chatId,
       },
@@ -144,6 +151,13 @@ export class ChatService {
           user: {
             fcmTokens: true,
           },
+        },
+        lastMessage: {
+          sender: true,
+          chat: true,
+        },
+        contacts: {
+          targetContact: true,
         },
       },
     });
@@ -181,35 +195,17 @@ export class ChatService {
       body: content ?? 'foto',
     });
 
-    chat = await this.chatRepository.findOne({
-      where: {
-        id: chatId,
-      },
-      relations: {
-        chatUsers: {
-          user: true,
-        },
-        lastMessage: {
-          sender: true,
-          chat: true,
-        },
-        contacts: {
-          targetContact: true,
-        },
-      },
-    });
+    for (let userId of chat.usersId) {
+      const messageResource = new MessageResource(message, userId, temporalId);
 
-    const messageSendedEvent = new MessageSendedEvent();
-    messageSendedEvent.message = message;
-    messageSendedEvent.chat = chat!;
-
-    this.eventEmitter.emit('message.sended', messageSendedEvent);
+      this.eventEmitter.emit('message.sended', messageResource);
+    }
 
     const chatUpdatedEvent = new ChatUpdatedEvent();
     chatUpdatedEvent.chat = chat!;
     this.eventEmitter.emit('chat.updated', chatUpdatedEvent);
 
-    return messageResource(message, sender.id);
+    return new MessageResource(message, sender.id, temporalId).response;
   }
 
   async markChatAsReadDto(readChatDto: MarkChatAsReadDto, user: User) {
@@ -292,7 +288,7 @@ export class ChatService {
 
     const messages = await query.getMany();
     return messages.map((message) => {
-      return messageResource(message, user.id);
+      return new MessageResource(message, user.id).response;
     });
   }
 }

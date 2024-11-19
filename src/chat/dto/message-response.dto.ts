@@ -19,4 +19,8 @@ export class MessageResponseDto {
   isImage: boolean;
 
   chatId: string;
+
+  temporalId?: string | null;
+
+  statusId: number;
 }

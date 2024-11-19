@@ -1,6 +1,6 @@
 import { ContactResourceDto } from 'src/contacts/dto/contact-resource.dto';
 import { Chat } from '../entities/chat.entity';
-import { messageResource } from './message.resource';
+import { MessageResource } from './message.resource';
 
 export const chatResource = (chat: Chat, userId: number) => {
   const receiver: ContactResourceDto = chat.contacts
@@ -27,7 +27,7 @@ export const chatResource = (chat: Chat, userId: number) => {
   return {
     id: chat.id,
     lastMessage: chat.lastMessage
-      ? messageResource(chat.lastMessage, userId)
+      ? new MessageResource(chat.lastMessage, userId).response
       : null,
     receiver: receiver,
     unreadMessagesCount: currentChatUser
