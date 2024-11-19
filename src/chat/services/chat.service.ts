@@ -5,7 +5,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ArrayContains, Repository } from 'typeorm';
+import { ArrayContains, IsNull, Repository } from 'typeorm';
 import { User } from 'src/auth/entities/user.entity';
 import { Chat } from '../entities/chat.entity';
 import { Message } from '../entities/message.entity';
@@ -76,9 +76,47 @@ export class ChatService {
       },
     });
 
+    this.markAllMessagesAsDelivered(user);
+
     return chats.map((chat) => {
       return chatResource(chat, user.id);
     });
+  }
+
+  async markAllMessagesAsDelivered(user: User) {
+    const messageUsers = await this.messageUserRepository.find({
+      where: {
+        user: {
+          id: user.id,
+        },
+        deliveredAt: IsNull(),
+      },
+      relations: {
+        message: {
+          sender: true,
+          chat: true,
+          messageUsers: true,
+        },
+      },
+    });
+
+    for (const messageUser of messageUsers) {
+      messageUser.deliveredAt = new Date();
+      await this.messageUserRepository.save(messageUser);
+
+      const message = await this.messageRepository
+        .createQueryBuilder('message')
+        .leftJoinAndSelect('message.sender', 'sender')
+        .leftJoinAndSelect('message.chat', 'chat')
+        .leftJoinAndSelect('message.messageUsers', 'messageUser')
+        .where('message.id = :id', { id: messageUser.message.id })
+        .getOne();
+
+      this.eventEmitter.emit(
+        'message.delivered',
+        new MessageResource(message!, messageUser.message.sender.id),
+      );
+    }
   }
 
   async uploadFile(file: Express.Multer.File) {
@@ -325,7 +363,7 @@ export class ChatService {
       },
     });
 
-    messageUser!.delivered_at = new Date();
+    messageUser!.deliveredAt = new Date();
 
     await this.messageUserRepository.save(messageUser!);
 
@@ -334,8 +372,7 @@ export class ChatService {
       .leftJoinAndSelect('message.sender', 'sender')
       .leftJoinAndSelect('message.chat', 'chat')
       .leftJoinAndSelect('message.messageUsers', 'messageUser')
-      .where('message.chat_id = :id', { id: messageResource.response.chatId })
-      .orderBy('message.timestamp', 'DESC')
+      .where('message.id = :id', { id: messageResource.message.id })
       .getOne();
 
     this.eventEmitter.emit(

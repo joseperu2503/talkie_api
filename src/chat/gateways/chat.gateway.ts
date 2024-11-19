@@ -129,7 +129,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   async emitMessageDelivered(messageResource: MessageResource) {
-    console.log('emit delivered', messageResource);
     const room = `user-${messageResource.userId}-connected`;
 
     this.server.to(room).emit('messageDelivered', messageResource.response);
@@ -149,7 +148,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   async emitContactUpdated(event: ContactUpdatedEvent) {
     const user = event.user;
-    console.log('contactUpdated');
     for (let contact of event.contacts) {
       const room = `user-${contact.targetContact.id}-connected`;
 

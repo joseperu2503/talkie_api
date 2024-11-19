@@ -22,10 +22,10 @@ export class MessageUser {
   user: User;
 
   // Fecha y hora de entrega
-  @Column({ type: 'timestamp', nullable: true })
-  delivered_at: Date | null;
+  @Column({ type: 'timestamp', nullable: true, name: 'delivered_at' })
+  deliveredAt: Date | null;
 
   // Fecha y hora de lectura
-  @Column({ type: 'timestamp', nullable: true })
-  read_at: Date | null;
+  @Column({ type: 'timestamp', nullable: true, name: 'read_at' })
+  readAt: Date | null;
 }

@@ -32,7 +32,7 @@ export class MessageResource {
       chatId: chat.id,
       temporalId: this.temporalId,
       receivers: this.message.messageUsers.map((receiver) => {
-        const { delivered_at, read_at } = receiver;
+        const { deliveredAt: delivered_at, readAt: read_at } = receiver;
         return { delivered_at, read_at };
       }),
     };
