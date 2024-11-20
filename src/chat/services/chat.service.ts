@@ -21,7 +21,6 @@ import { extname } from 'path';
 import { NotificationsService } from 'src/notifications/services/notifications.service';
 import { MessageResource } from '../resources/message.resource';
 import { MessageUser } from '../entities/message-user.entity';
-import { MessageResponseDto } from '../dto/message-response.dto';
 
 @Injectable()
 export class ChatService {
@@ -114,6 +113,47 @@ export class ChatService {
 
       this.eventEmitter.emit(
         'message.delivered',
+        new MessageResource(message!, messageUser.message.sender.id),
+      );
+    }
+  }
+
+  async ReadMessages(user: User, chat: Chat) {
+    const messageUsers = await this.messageUserRepository.find({
+      where: {
+        user: {
+          id: user.id,
+        },
+        message: {
+          chat: {
+            id: chat.id,
+          },
+        },
+        readAt: IsNull(),
+      },
+      relations: {
+        message: {
+          sender: true,
+          chat: true,
+          messageUsers: true,
+        },
+      },
+    });
+
+    for (const messageUser of messageUsers) {
+      messageUser.readAt = new Date();
+      await this.messageUserRepository.save(messageUser);
+
+      const message = await this.messageRepository
+        .createQueryBuilder('message')
+        .leftJoinAndSelect('message.sender', 'sender')
+        .leftJoinAndSelect('message.chat', 'chat')
+        .leftJoinAndSelect('message.messageUsers', 'messageUser')
+        .where('message.id = :id', { id: messageUser.message.id })
+        .getOne();
+
+      this.eventEmitter.emit(
+        'message.read',
         new MessageResource(message!, messageUser.message.sender.id),
       );
     }
@@ -253,7 +293,7 @@ export class ChatService {
     for (let userId of chat.usersId) {
       const messageResource = new MessageResource(message, userId, temporalId);
 
-      this.eventEmitter.emit('message.sended', messageResource);
+      this.eventEmitter.emit('message.sent', messageResource);
     }
 
     const chatUpdatedEvent = new ChatUpdatedEvent();
@@ -263,7 +303,7 @@ export class ChatService {
     return new MessageResource(message, sender.id, temporalId).response;
   }
 
-  async markChatAsReadDto(readChatDto: MarkChatAsReadDto, user: User) {
+  async readChat(readChatDto: MarkChatAsReadDto, user: User) {
     // Obtener el chat con las relaciones necesarias
     const chat = await this.chatRepository.findOne({
       where: {
@@ -302,6 +342,8 @@ export class ChatService {
     // Marcar como leídos los mensajes no leídos
     chatUser.unreadMessagesCount = 0;
     await this.chatUserRepository.save(chatUser);
+
+    this.ReadMessages(user, chat);
 
     // Emitir evento
     const chatUpdatedEvent = new ChatUpdatedEvent();

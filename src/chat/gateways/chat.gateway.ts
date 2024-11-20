@@ -41,7 +41,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private readonly jwtService: JwtService,
   ) {}
 
-  @OnEvent('message.sended')
+  @OnEvent('message.sent')
   handleMessageSendedEvent(event: MessageResource) {
     this.emitMessageReceived(event);
   }
@@ -49,6 +49,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @OnEvent('message.delivered')
   handleMessageDeliveredEvent(event: MessageResource) {
     this.emitMessageDelivered(event);
+  }
+
+  @OnEvent('message.read')
+  handleMessageReadEvent(event: MessageResource) {
+    this.emitMessageRead(event);
   }
 
   @OnEvent('chat.updated')
@@ -134,6 +139,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.server.to(room).emit('messageDelivered', messageResource.response);
   }
 
+  async emitMessageRead(messageResource: MessageResource) {
+    const room = `user-${messageResource.userId}-connected`;
+
+    this.server.to(room).emit('messageRead', messageResource.response);
+  }
+
   async emitChatUpdated(event: ChatUpdatedEvent) {
     const chat = event.chat;
 
@@ -180,7 +191,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('markChatAsRead')
   async handleMarkChatAsRead(client: Socket, payload: MarkChatAsReadDto) {
     const sender: User = client['user'];
-    return await this.chatService.markChatAsReadDto(payload, sender);
+    return await this.chatService.readChat(payload, sender);
   }
 
   @UseGuards(WsJwtGuard)
