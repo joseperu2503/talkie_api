@@ -11,10 +11,12 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  Unique,
   UpdateDateColumn,
 } from 'typeorm';
 
 @Entity('users')
+@Unique(['phoneCountry', 'phone']) // Define la restricción única compuesta
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
@@ -37,9 +39,7 @@ export class User {
   @JoinColumn({ name: 'phone_country_id' })
   phoneCountry: Country;
 
-  @Column('text', {
-    unique: true,
-  })
+  @Column('text')
   phone: string;
 
   @Column('text', {

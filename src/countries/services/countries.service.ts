@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Country } from '../entities/country.entity';
 import { CreateCountryDto } from '../dto/create-country.dto';
+import { countries } from 'src/seed/data/countries';
 
 @Injectable()
 export class CountriesService {
@@ -33,5 +34,11 @@ export class CountriesService {
       const newCountry = this.countryRepository.create(createCountryDto);
       return this.countryRepository.save(newCountry);
     }
+  }
+
+  async getAllCountries() {
+    const countries = await this.countryRepository.find();
+
+    return countries;
   }
 }

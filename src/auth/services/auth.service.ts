@@ -1,4 +1,6 @@
 import {
+  BadRequestException,
+  HttpException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -17,6 +19,7 @@ import { UpdateUserStatusDto } from 'src/chat/dto/update-user-status.dto';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { ContactUpdatedEvent } from 'src/chat/events/contact-updated.event';
 import { Country } from 'src/countries/entities/country.entity';
+import { UsersService } from 'src/users/services/users.service';
 
 @Injectable()
 export class AuthService {
@@ -24,6 +27,7 @@ export class AuthService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     private readonly jwtService: JwtService,
+    private readonly usersService: UsersService,
 
     @InjectRepository(Country)
     private readonly countryRepository: Repository<Country>,
@@ -32,32 +36,75 @@ export class AuthService {
 
   async register(registerUserDto: RegisterUserDto) {
     try {
-      const { password, phoneCountryId, ...userData } = registerUserDto;
+      const { password, email, phone, username, ...userData } = registerUserDto;
 
-      const user = this.userRepository.create({
-        ...userData,
-        password: bcrypt.hashSync(password, 10),
+      // Validar si el email ya existe
+      const emailExists = await this.userRepository.findOne({
+        where: { email },
       });
 
+      if (emailExists) {
+        throw new BadRequestException(`The email ${email} is already in use.`);
+      }
+
+      // Validar si el username ya existe
+      const usernameExists = await this.userRepository.findOne({
+        where: { username },
+      });
+
+      if (usernameExists) {
+        throw new BadRequestException(
+          `The username ${username} is already in use.`,
+        );
+      }
+
+      //** Validar si existe el country */
       const country = await this.countryRepository.findOne({
-        where: {
-          id: phoneCountryId,
-        },
+        where: { id: phone.countryId },
       });
 
       if (!country) {
         throw new NotFoundException(
-          `Phone Country with ID ${phoneCountryId} not found.`,
+          `Phone Country with ID ${phone.countryId} not found.`,
         );
       }
 
-      user.phoneCountry = country;
+      //** Validar si la combinación phone + phoneCountry ya existe */
+      const phoneExists = await this.userRepository.findOne({
+        where: {
+          phone: phone.number,
+          phoneCountry: { id: phone.countryId },
+        },
+        relations: ['phoneCountry'], // Asegurar que las relaciones se carguen para la consulta
+      });
 
+      if (phoneExists) {
+        throw new BadRequestException(
+          `The phone number ${phone.number} with country ID ${phone.countryId} is already in use.`,
+        );
+      }
+
+      // Crear el usuario
+      const user = this.userRepository.create({
+        ...userData,
+        email,
+        phone: phone.number,
+        username,
+        password: bcrypt.hashSync(password, 10),
+        phoneCountry: country,
+      });
+
+      // Guardar el usuario
       await this.userRepository.save(user);
-      const me = this.me(user);
+
+      // Retornar la respuesta
+      const me = await this.usersService.profile(user.id);
       return { user: me, token: this.getJwt({ id: user.id }) };
     } catch (error) {
-      throw new InternalServerErrorException(error);
+      if (!(error instanceof HttpException)) {
+        throw new InternalServerErrorException(error.message);
+      }
+      throw error;
     }
   }
 
@@ -77,68 +124,12 @@ export class AuthService {
     if (!bcrypt.compareSync(password, user.password)) {
       throw new UnauthorizedException(`Credentials are not valid`);
     }
-    const me = this.me(user);
+    const me = await this.usersService.profile(user.id);
     return { user: me, token: this.getJwt({ id: user.id }) };
-  }
-
-  me(user: User) {
-    const { id, email, name, surname, phone } = user;
-
-    return {
-      id,
-      email,
-      name,
-      surname,
-      phone,
-    };
-  }
-
-  async update(user: User, UpdateAuthDto: UpdateAuthDto) {
-    this.userRepository.merge(user, UpdateAuthDto);
-
-    await this.userRepository.save(user);
-    return this.me(user);
   }
 
   private getJwt(payload: JwtPayload) {
     const token = this.jwtService.sign(payload);
     return token;
-  }
-
-  async findOne(userId: number): Promise<User | null> {
-    const user = await this.userRepository.findOneBy({ id: userId });
-    return user;
-  }
-
-  async updateStatus(user: User, updateUserStatusDto: UpdateUserStatusDto) {
-    // Actualizar el estado de conexión del usuario
-    user.isConnected = updateUserStatusDto.isConnected;
-    if (!updateUserStatusDto.isConnected) {
-      user.lastConnection = new Date();
-    }
-    await this.userRepository.save(user);
-
-    const contacts = await this.getContacts(user.id);
-    if (!contacts) return;
-
-    const contactUpdatedEvent = new ContactUpdatedEvent();
-    contactUpdatedEvent.contacts = contacts;
-    contactUpdatedEvent.user = user;
-
-    this.eventEmitter.emit('contact.updated', contactUpdatedEvent);
-  }
-
-  async getContacts(userId: number) {
-    const user = await this.userRepository.findOne({
-      where: { id: userId },
-      relations: {
-        initiatedContacts: {
-          chat: true,
-          targetContact: true,
-        },
-      },
-    });
-
-    return user?.initiatedContacts;
   }
 }

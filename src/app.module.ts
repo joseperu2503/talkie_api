@@ -4,7 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { SeedModule } from './seed/seed.module';
 import { AuthModule } from './auth/auth.module';
 import { AppController } from './app.controller';
-import { SeedCommand } from './seed/seed.command';
+import { SeedCommand } from './seed/commands/seed.command';
 import { ChatModule } from './chat/chat.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ContactsModule } from './contacts/contacts.module';

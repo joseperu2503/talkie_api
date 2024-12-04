@@ -1,3 +1,4 @@
+import { Type } from 'class-transformer';
 import {
   IsEmail,
   IsNotEmpty,
@@ -9,7 +10,18 @@ import {
   Matches,
   MaxLength,
   MinLength,
+  ValidateNested,
 } from 'class-validator';
+
+class PhoneDto {
+  @IsPositive()
+  @IsNumber()
+  countryId: number;
+
+  @IsString()
+  @IsNotEmpty()
+  number: string;
+}
 
 export class RegisterUserDto {
   @IsString()
@@ -33,9 +45,9 @@ export class RegisterUserDto {
   @IsNotEmpty()
   surname: string;
 
-  @IsString()
-  @IsNotEmpty()
-  phone: string;
+  @ValidateNested()
+  @Type(() => PhoneDto)
+  phone: PhoneDto;
 
   @IsString()
   @IsNotEmpty()
@@ -44,8 +56,4 @@ export class RegisterUserDto {
   @IsOptional()
   @IsUrl()
   photo?: string;
-
-  @IsPositive()
-  @IsNumber()
-  phoneCountryId: number;
 }
