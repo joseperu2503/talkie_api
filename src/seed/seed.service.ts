@@ -1,9 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { initialData } from './data/seed-data';
-import { AuthService } from 'src/auth/auth.service';
+import { countries } from './data/countries';
+import { AuthService } from 'src/auth/services/auth.service';
 import { DataSource } from 'typeorm';
-import { User } from 'src/auth/entities/user.entity';
+import { User } from 'src/users/entities/user.entity';
 import { ContactService } from 'src/contacts/services/contact.service';
+import { CountriesService } from 'src/countries/services/countries.service';
 
 @Injectable()
 export class SeedService {
@@ -11,27 +13,35 @@ export class SeedService {
     private readonly authService: AuthService,
     private readonly dataSource: DataSource,
     private readonly contactService: ContactService,
+    private readonly countriesService: CountriesService,
   ) {}
 
   async runSeed() {
     await this.dropAllTables();
-    await this.userSeed();
-    await this.contactSeed();
+    await this.countrySeed();
+    await this.testUserSeed();
+    await this.testContactSeed();
   }
 
-  private async userSeed() {
+  private async testUserSeed() {
     const users = initialData.users;
     for (const user of users) {
       await this.authService.register(user);
     }
   }
 
-  private async contactSeed() {
+  private async testContactSeed() {
     const contacts = initialData.contacts;
     const user: User | null = await this.authService.findOne(1);
     if (!user) return;
     for (const contact of contacts) {
       await this.contactService.addContact(contact, user, false);
+    }
+  }
+
+  private async countrySeed() {
+    for (const country of countries) {
+      await this.countriesService.create(country);
     }
   }
 

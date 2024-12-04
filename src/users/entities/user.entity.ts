@@ -1,11 +1,14 @@
 import { ChatUser } from 'src/chat/entities/chat-user.entity';
 import { Message } from 'src/chat/entities/message.entity';
 import { Contact } from 'src/contacts/entities/contact.entity';
+import { Country } from 'src/countries/entities/country.entity';
 import { FcmToken } from 'src/notifications/entities/fcm-token.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
+  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -29,6 +32,10 @@ export class User {
 
   @Column('text')
   surname: string;
+
+  @ManyToOne(() => Country, (country) => country.users, { nullable: false })
+  @JoinColumn({ name: 'phone_country_id' })
+  phoneCountry: Country;
 
   @Column('text', {
     unique: true,

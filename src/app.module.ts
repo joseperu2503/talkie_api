@@ -9,6 +9,8 @@ import { ChatModule } from './chat/chat.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ContactsModule } from './contacts/contacts.module';
 import { NotificationsModule } from './notifications/notifications.module';
+import { CountriesModule } from './countries/countries.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   controllers: [AppController],
@@ -17,12 +19,12 @@ import { NotificationsModule } from './notifications/notifications.module';
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.DB_HOST,
-      port: +process.env.DB_PORT!,
+      port: +process.env.DB_PORT!, 
       database: process.env.DB_NAME,
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       autoLoadEntities: true,
-      synchronize: false,
+      synchronize: true,
     }),
     SeedModule,
     AuthModule,
@@ -30,6 +32,8 @@ import { NotificationsModule } from './notifications/notifications.module';
     EventEmitterModule.forRoot(),
     ContactsModule,
     NotificationsModule,
+    CountriesModule,
+    UsersModule,
   ],
   providers: [SeedCommand],
 })

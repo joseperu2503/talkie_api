@@ -8,7 +8,7 @@ import {
 import { Socket, Server } from 'socket.io';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { User } from 'src/auth/entities/user.entity';
+import { User } from 'src/users/entities/user.entity';
 import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from 'src/auth/interfaces/jwt-payload.interfaces';
 import { OnEvent } from '@nestjs/event-emitter';
@@ -17,7 +17,7 @@ import { UseGuards } from '@nestjs/common';
 import { WsJwtGuard } from 'src/auth/guards/ws-jwt.guard';
 import { MarkChatAsReadDto } from '../dto/mark-chat-as-read.dto';
 import { ChatUpdatedEvent } from '../events/chat-updated.event';
-import { AuthService } from 'src/auth/auth.service';
+import { AuthService } from 'src/auth/services/auth.service';
 import { UpdateUserStatusDto } from '../dto/update-user-status.dto';
 import { ContactUpdatedEvent } from '../events/contact-updated.event';
 import { ContactResourceDto } from 'src/contacts/dto/contact-resource.dto';

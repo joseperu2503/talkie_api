@@ -1,7 +1,9 @@
 import {
   IsEmail,
   IsNotEmpty,
+  IsNumber,
   IsOptional,
+  IsPositive,
   IsString,
   IsUrl,
   Matches,
@@ -42,4 +44,8 @@ export class RegisterUserDto {
   @IsOptional()
   @IsUrl()
   photo?: string;
+
+  @IsPositive()
+  @IsNumber()
+  phoneCountryId: number;
 }

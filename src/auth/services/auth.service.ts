@@ -1,20 +1,22 @@
 import {
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { RegisterUserDto } from './dto/register-user.dto';
+import { RegisterUserDto } from '../dto/register-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from './entities/user.entity';
+import { User } from '../../users/entities/user.entity';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import { LoginUserDto } from './dto/login-user-dto';
-import { JwtPayload } from './interfaces/jwt-payload.interfaces';
+import { LoginUserDto } from '../dto/login-user-dto';
+import { JwtPayload } from '../interfaces/jwt-payload.interfaces';
 import { JwtService } from '@nestjs/jwt';
-import { UpdateAuthDto } from './dto/update-auth.dto';
+import { UpdateAuthDto } from '../dto/update-auth.dto';
 import { UpdateUserStatusDto } from 'src/chat/dto/update-user-status.dto';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { ContactUpdatedEvent } from 'src/chat/events/contact-updated.event';
+import { Country } from 'src/countries/entities/country.entity';
 
 @Injectable()
 export class AuthService {
@@ -22,17 +24,34 @@ export class AuthService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     private readonly jwtService: JwtService,
+
+    @InjectRepository(Country)
+    private readonly countryRepository: Repository<Country>,
     private eventEmitter: EventEmitter2,
   ) {}
 
   async register(registerUserDto: RegisterUserDto) {
     try {
-      const { password, ...userData } = registerUserDto;
+      const { password, phoneCountryId, ...userData } = registerUserDto;
 
       const user = this.userRepository.create({
         ...userData,
         password: bcrypt.hashSync(password, 10),
       });
+
+      const country = await this.countryRepository.findOne({
+        where: {
+          id: phoneCountryId,
+        },
+      });
+
+      if (!country) {
+        throw new NotFoundException(
+          `Phone Country with ID ${phoneCountryId} not found.`,
+        );
+      }
+
+      user.phoneCountry = country;
 
       await this.userRepository.save(user);
       const me = this.me(user);

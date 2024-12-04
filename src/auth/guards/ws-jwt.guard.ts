@@ -7,7 +7,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { Socket } from 'socket.io';
 import { Repository } from 'typeorm';
-import { User } from '../entities/user.entity';
+import { User } from '../../users/entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
