@@ -38,7 +38,8 @@ export class UsersService {
       },
     });
 
-    const { id, name, email, surname, phone, phoneCountry, username } = user!;
+    const { id, name, email, surname, phone, phoneCountry, username, photo } =
+      user!;
 
     return {
       id,
@@ -50,6 +51,7 @@ export class UsersService {
         country: phoneCountry,
       },
       username,
+      photo,
     };
   }
 
