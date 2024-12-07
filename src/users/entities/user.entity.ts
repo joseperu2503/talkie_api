@@ -23,8 +23,9 @@ export class User {
 
   @Column('text', {
     unique: true,
+    nullable: true,
   })
-  email: string;
+  email: string | null;
 
   @Column('text')
   password: string;
@@ -35,20 +36,15 @@ export class User {
   @Column('text')
   surname: string;
 
-  @ManyToOne(() => Country, (country) => country.users, { nullable: false })
+  @ManyToOne(() => Country, (country) => country.users, { nullable: true })
   @JoinColumn({ name: 'phone_country_id' })
-  phoneCountry: Country;
-
-  @Column('text')
-  phone: string;
-
-  @Column('text', {
-    unique: true,
-  })
-  username: string;
+  phoneCountry: Country | null;
 
   @Column('text', { nullable: true })
-  photo: string;
+  phone: string | null;
+
+  @Column('text', { nullable: true })
+  photo: string | null;
 
   @CreateDateColumn({
     type: 'timestamptz',

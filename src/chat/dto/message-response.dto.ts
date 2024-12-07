@@ -13,8 +13,8 @@ export class MessageResponseDto {
     id: number;
     name: string;
     surname: string;
-    email: string;
-    photo: string;
+    email: string | null;
+    photo: string | null;
   };
 
   isSender: boolean;

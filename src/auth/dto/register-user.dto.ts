@@ -1,23 +1,30 @@
 import { Type } from 'class-transformer';
 import {
   IsEmail,
+  IsEnum,
   IsNotEmpty,
-  IsNumber,
   IsOptional,
-  IsPositive,
   IsString,
   IsUrl,
   Matches,
   MaxLength,
   MinLength,
+  ValidateIf,
   ValidateNested,
 } from 'class-validator';
 import { PhoneDto } from './phone.dto';
+import { AuthMethod } from './login-user-dto';
 
 export class RegisterUserDto {
+  @ValidateIf((dto) => dto.type === AuthMethod.EMAIL) // Se valida solo si type es 'email'
   @IsString()
   @IsEmail()
-  email: string;
+  email?: string; // Obligatorio si type es 'email'
+
+  @ValidateIf((dto) => dto.type === AuthMethod.PHONE) // Se valida solo si type es 'phone'
+  @ValidateNested()
+  @Type(() => PhoneDto)
+  phone?: PhoneDto;
 
   @IsString()
   @MinLength(6)
@@ -36,15 +43,10 @@ export class RegisterUserDto {
   @IsNotEmpty()
   surname: string;
 
-  @ValidateNested()
-  @Type(() => PhoneDto)
-  phone: PhoneDto;
-
-  @IsString()
-  @IsNotEmpty()
-  username: string;
-
   @IsOptional()
   @IsUrl()
   photo?: string;
+
+  @IsEnum(AuthMethod)
+  type: AuthMethod;
 }

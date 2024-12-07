@@ -3,29 +3,27 @@ import {
   HttpException,
   Injectable,
   InternalServerErrorException,
-  NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../entities/user.entity';
 import { Not, Repository } from 'typeorm';
-import { JwtService } from '@nestjs/jwt';
 import { UpdateUserStatusDto } from 'src/chat/dto/update-user-status.dto';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { ContactUpdatedEvent } from 'src/chat/events/contact-updated.event';
 import { Country } from 'src/countries/entities/country.entity';
 import { UpdateAuthDto } from 'src/auth/dto/update-auth.dto';
 import * as bcrypt from 'bcrypt';
+import { CountriesService } from 'src/countries/services/countries.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-    private readonly jwtService: JwtService,
 
-    @InjectRepository(Country)
-    private readonly countryRepository: Repository<Country>,
     private eventEmitter: EventEmitter2,
+
+    private readonly countriesService: CountriesService,
   ) {}
 
   async profile(userId: number) {
@@ -38,27 +36,27 @@ export class UsersService {
       },
     });
 
-    const { id, name, email, surname, phone, phoneCountry, username, photo } =
-      user!;
+    const { id, name, email, surname, phone, phoneCountry, photo } = user!;
 
     return {
       id,
       email,
       name,
       surname,
-      phone: {
-        number: phone,
-        country: phoneCountry,
-      },
-      username,
+      phone:
+        phone && phoneCountry
+          ? {
+              number: phone,
+              country: phoneCountry,
+            }
+          : null,
       photo,
     };
   }
 
   async updateProfile(user: User, updateAuthDto: UpdateAuthDto) {
     try {
-      const { email, phone, username, password, ...otherUpdates } =
-        updateAuthDto;
+      const { email, phone, password, ...otherUpdates } = updateAuthDto;
 
       // Validar email duplicado
       if (email) {
@@ -75,15 +73,8 @@ export class UsersService {
       // Validar combinación de phone y phoneCountry duplicada
       if (phone) {
         //** Validar si existe el country */
-        const country = await this.countryRepository.findOne({
-          where: { id: phone.countryId },
-        });
-
-        if (!country) {
-          throw new NotFoundException(
-            `Phone Country with ID ${phone.countryId} not found.`,
-          );
-        }
+        const country: Country =
+          await this.countriesService.findOneWithExeption(phone!.countryId);
 
         //** Validar si la combinación phone + phoneCountry ya existe */
         const phoneCombinationExists = await this.userRepository.findOne({
@@ -102,18 +93,6 @@ export class UsersService {
 
         user.phone = phone.number;
         user.phoneCountry = country;
-      }
-
-      // Validar username duplicado
-      if (username) {
-        const usernameExists = await this.userRepository.findOne({
-          where: { username, id: Not(user.id) },
-        });
-        if (usernameExists) {
-          throw new BadRequestException('Username is already in use.');
-        }
-
-        user.username = username;
       }
 
       // Encriptar la nueva contraseña si se envía

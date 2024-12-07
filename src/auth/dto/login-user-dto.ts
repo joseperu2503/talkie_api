@@ -2,36 +2,31 @@ import { Type } from 'class-transformer';
 import {
   IsEmail,
   IsString,
-  IsInt,
-  IsIn,
   ValidateIf,
   ValidateNested,
   IsEnum,
 } from 'class-validator';
 import { PhoneDto } from './phone.dto';
 
-export enum LoginType {
+export enum AuthMethod {
   EMAIL = 'email',
   PHONE = 'phone',
 }
 
 export class LoginUserDto {
-  @ValidateIf((dto) => dto.type === LoginType.EMAIL) // Se valida solo si type es 'email'
+  @ValidateIf((dto) => dto.type === AuthMethod.EMAIL) // Se valida solo si type es 'email'
   @IsString()
-  @IsEmail(
-    {},
-    { message: 'A valid email address is required when type is "email".' },
-  )
+  @IsEmail()
   email?: string; // Obligatorio si type es 'email'
 
-  @ValidateIf((dto) => dto.type === LoginType.PHONE) // Se valida solo si type es 'phone'
+  @ValidateIf((dto) => dto.type === AuthMethod.PHONE) // Se valida solo si type es 'phone'
   @ValidateNested()
   @Type(() => PhoneDto)
-  phone: PhoneDto;
+  phone?: PhoneDto;
 
   @IsString()
   password: string; // Siempre obligatorio
 
-  @IsEnum(LoginType)
-  type: LoginType;
+  @IsEnum(AuthMethod)
+  type: AuthMethod;
 }

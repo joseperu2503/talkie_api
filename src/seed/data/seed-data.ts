@@ -1,3 +1,4 @@
+import { AuthMethod } from 'src/auth/dto/login-user-dto';
 import { RegisterUserDto } from 'src/auth/dto/register-user.dto';
 import { AddContactDto } from 'src/contacts/dto/add-contact.dto';
 
@@ -17,8 +18,8 @@ export const initialData: SeedData = {
         number: '993689111',
         countryId: 168,
       },
-      username: 'john_smith01',
       photo: 'https://randomuser.me/api/portraits/men/1.jpg',
+      type: AuthMethod.EMAIL,
     },
     {
       email: 'test2@gmail.com',
@@ -29,8 +30,8 @@ export const initialData: SeedData = {
         number: '993689112',
         countryId: 168,
       },
-      username: 'emily_johnson02',
       photo: 'https://randomuser.me/api/portraits/women/1.jpg',
+      type: AuthMethod.EMAIL,
     },
     {
       email: 'test3@gmail.com',
@@ -41,7 +42,7 @@ export const initialData: SeedData = {
         number: '993689113',
         countryId: 168,
       },
-      username: 'michael_brown03',
+      type: AuthMethod.EMAIL,
     },
     {
       email: 'test4@gmail.com',
@@ -52,8 +53,8 @@ export const initialData: SeedData = {
         number: '993689114',
         countryId: 168,
       },
-      username: 'sarah_davis04',
       photo: 'https://randomuser.me/api/portraits/women/2.jpg',
+      type: AuthMethod.EMAIL,
     },
     {
       email: 'test5@gmail.com',
@@ -64,8 +65,8 @@ export const initialData: SeedData = {
         number: '993689115',
         countryId: 168,
       },
-      username: 'david_wilson05',
       photo: 'https://randomuser.me/api/portraits/men/2.jpg',
+      type: AuthMethod.EMAIL,
     },
     {
       email: 'test6@gmail.com',
@@ -76,8 +77,8 @@ export const initialData: SeedData = {
         number: '993689116',
         countryId: 168,
       },
-      username: 'olivia_taylor06',
       photo: 'https://randomuser.me/api/portraits/women/3.jpg',
+      type: AuthMethod.EMAIL,
     },
     {
       email: 'test7@gmail.com',
@@ -88,8 +89,8 @@ export const initialData: SeedData = {
         number: '993689117',
         countryId: 168,
       },
-      username: 'james_anderson07',
       photo: 'https://randomuser.me/api/portraits/men/3.jpg',
+      type: AuthMethod.EMAIL,
     },
     {
       email: 'test8@gmail.com',
@@ -100,7 +101,7 @@ export const initialData: SeedData = {
         number: '993689118',
         countryId: 168,
       },
-      username: 'sophia_thomas08',
+      type: AuthMethod.EMAIL,
     },
     {
       email: 'test9@gmail.com',
@@ -111,8 +112,8 @@ export const initialData: SeedData = {
         number: '993689119',
         countryId: 168,
       },
-      username: 'william_martinez09',
       photo: 'https://randomuser.me/api/portraits/men/4.jpg',
+      type: AuthMethod.EMAIL,
     },
     {
       email: 'test10@gmail.com',
@@ -123,7 +124,7 @@ export const initialData: SeedData = {
         number: '993689120',
         countryId: 168,
       },
-      username: 'mia_harris10',
+      type: AuthMethod.EMAIL,
     },
     {
       email: 'test11@gmail.com',
@@ -134,8 +135,8 @@ export const initialData: SeedData = {
         number: '993689121',
         countryId: 168,
       },
-      username: 'robert_clark11',
       photo: 'https://randomuser.me/api/portraits/men/5.jpg',
+      type: AuthMethod.EMAIL,
     },
     {
       email: 'test12@gmail.com',
@@ -146,7 +147,7 @@ export const initialData: SeedData = {
         number: '993689122',
         countryId: 168,
       },
-      username: 'ava_lewis12',
+      type: AuthMethod.EMAIL,
     },
     {
       email: 'test13@gmail.com',
@@ -157,31 +158,38 @@ export const initialData: SeedData = {
         number: '983689123',
         countryId: 168,
       },
-      username: 'benjamin_hall13',
       photo: 'https://randomuser.me/api/portraits/men/6.jpg',
+      type: AuthMethod.EMAIL,
     },
   ],
   contacts: [
     {
-      username: 'emily_johnson02',
+      email: 'emily_johnson02',
+      type: AuthMethod.EMAIL,
     },
     {
-      username: 'michael_brown03',
+      email: 'michael_brown03',
+      type: AuthMethod.EMAIL,
     },
     {
-      username: 'sarah_davis04',
+      email: 'sarah_davis04',
+      type: AuthMethod.EMAIL,
     },
     {
-      username: 'david_wilson05',
+      email: 'david_wilson05',
+      type: AuthMethod.EMAIL,
     },
     {
-      username: 'olivia_taylor06',
+      email: 'olivia_taylor06',
+      type: AuthMethod.EMAIL,
     },
     {
-      username: 'james_anderson07',
+      email: 'james_anderson07',
+      type: AuthMethod.EMAIL,
     },
     {
-      username: 'sophia_thomas08',
+      email: 'sophia_thomas08',
+      type: AuthMethod.EMAIL,
     },
   ],
 };

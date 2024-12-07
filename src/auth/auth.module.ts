@@ -6,15 +6,15 @@ import { User } from '../users/entities/user.entity';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './strategies/jwt.strategy';
-import { Country } from 'src/countries/entities/country.entity';
 import { UsersService } from 'src/users/services/users.service';
 import { TwilioService } from 'src/twilio/services/twilio.service';
+import { CountriesModule } from 'src/countries/countries.module';
 
 @Module({
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy, UsersService, TwilioService],
   imports: [
-    TypeOrmModule.forFeature([User, Country]),
+    TypeOrmModule.forFeature([User]),
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
       useFactory: () => {
@@ -26,6 +26,7 @@ import { TwilioService } from 'src/twilio/services/twilio.service';
         };
       },
     }),
+    CountriesModule,
   ],
   exports: [TypeOrmModule, JwtStrategy, PassportModule, JwtModule, AuthService],
 })

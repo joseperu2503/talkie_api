@@ -37,22 +37,26 @@ export class ContactService {
     user: User,
     withSocket: boolean = true,
   ) {
-    // Verificar que el username no sea el del usuario actual
-    if (addContactDto.username === user.username) {
+    // Verificar que el email o phone no sea el del usuario actual
+    if (
+      addContactDto.email === user.email ||
+      (addContactDto.phone?.number === user.phone &&
+        addContactDto.phone?.countryId === user.phoneCountry?.id)
+    ) {
       throw new ConflictException(`Cannot add yourself as a contact.`);
     }
 
-    // Buscar el usuario con el username proporcionado
+    // Buscar el usuario con el email proporcionado
     const contactUser = await this.userRepository.findOne({
       where: {
-        username: addContactDto.username,
+        email: addContactDto.email,
       },
     });
 
     // Verificar si el usuario existe
     if (!contactUser) {
       throw new NotFoundException(
-        `User with username ${addContactDto.username} not found.`,
+        `User with email ${addContactDto.email} not found.`,
       );
     }
 
