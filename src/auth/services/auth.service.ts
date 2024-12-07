@@ -14,24 +14,23 @@ import * as bcrypt from 'bcrypt';
 import { LoginUserDto } from '../dto/login-user-dto';
 import { JwtPayload } from '../interfaces/jwt-payload.interfaces';
 import { JwtService } from '@nestjs/jwt';
-import { UpdateAuthDto } from '../dto/update-auth.dto';
-import { UpdateUserStatusDto } from 'src/chat/dto/update-user-status.dto';
-import { EventEmitter2 } from '@nestjs/event-emitter';
-import { ContactUpdatedEvent } from 'src/chat/events/contact-updated.event';
 import { Country } from 'src/countries/entities/country.entity';
 import { UsersService } from 'src/users/services/users.service';
+import { TwilioService } from 'src/twilio/services/twilio.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+
     private readonly jwtService: JwtService,
     private readonly usersService: UsersService,
 
     @InjectRepository(Country)
     private readonly countryRepository: Repository<Country>,
-    private eventEmitter: EventEmitter2,
+
+    private readonly twilioService: TwilioService,
   ) {}
 
   async register(registerUserDto: RegisterUserDto) {
@@ -131,5 +130,42 @@ export class AuthService {
   private getJwt(payload: JwtPayload) {
     const token = this.jwtService.sign(payload);
     return token;
+  }
+
+  async sendVerificationCode(to: string) {
+    try {
+      await this.twilioService.sendVerificationCode(to);
+      return { success: true, message: 'Verification code sent' };
+    } catch (error) {
+      if (!(error instanceof HttpException)) {
+        throw new InternalServerErrorException(
+          'Failed to send verification code',
+        );
+      }
+      throw error;
+    }
+  }
+
+  // Método para verificar el código ingresado por el usuario
+  async checkVerificationCode(to: string, code: string) {
+    try {
+      const verificationCheck = await this.twilioService.checkVerificationCode(
+        to,
+        code,
+      );
+
+      if (verificationCheck) {
+        return { success: true, message: 'Phone number verified successfully' };
+      } else {
+        throw new BadRequestException('Invalid verification code');
+      }
+    } catch (error) {
+      if (!(error instanceof HttpException)) {
+        throw new InternalServerErrorException(
+          'Failed to check verification code',
+        );
+      }
+      throw error;
+    }
   }
 }
