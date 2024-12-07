@@ -12,16 +12,7 @@ import {
   MinLength,
   ValidateNested,
 } from 'class-validator';
-
-class PhoneDto {
-  @IsPositive()
-  @IsNumber()
-  countryId: number;
-
-  @IsString()
-  @IsNotEmpty()
-  number: string;
-}
+import { PhoneDto } from './phone.dto';
 
 export class RegisterUserDto {
   @IsString()
