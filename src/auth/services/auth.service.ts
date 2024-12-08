@@ -19,6 +19,7 @@ import { TwilioService } from 'src/twilio/services/twilio.service';
 import { PhoneDto } from '../dto/phone.dto';
 import { VerifyCodeDto } from '../dto/verify-code.dto';
 import { CountriesService } from 'src/countries/services/countries.service';
+import { VerifyAccountDto } from '../dto/verify-account.dto';
 
 @Injectable()
 export class AuthService {
@@ -167,9 +168,15 @@ export class AuthService {
     }
   }
 
-  async verifyPhone(phone: PhoneDto) {
+  async verifyAccount(verifyAccountDto: VerifyAccountDto) {
     try {
-      const result = await this.findPhone(phone);
+      const { phone, type, email } = verifyAccountDto;
+      let result: any;
+      if (type == AuthMethod.EMAIL) {
+        result = await this.findEmail(email!);
+      } else {
+        result = await this.findPhone(phone!);
+      }
 
       return { success: true, exists: result.exist };
     } catch (error) {
@@ -191,7 +198,7 @@ export class AuthService {
       throw new BadRequestException(`The email ${email} is already in use.`);
     }
 
-    return user;
+    return { exist: !!user, email: email };
   }
 
   async findPhone(phone: PhoneDto, throwErrorIfExist = false) {
@@ -202,10 +209,6 @@ export class AuthService {
       const country: Country = await this.countriesService.findOneWithExeption(
         phone.countryId,
       );
-
-      if (!country) {
-        return { exist: false, country: null, phone: phoneProcessed };
-      }
 
       const phoneExists = await this.userRepository.findOne({
         where: {

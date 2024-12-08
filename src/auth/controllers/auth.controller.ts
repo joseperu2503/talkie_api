@@ -4,6 +4,7 @@ import { RegisterUserDto } from '../dto/register-user.dto';
 import { LoginUserDto } from '../dto/login-user-dto';
 import { PhoneDto } from '../dto/phone.dto';
 import { VerifyCodeDto } from '../dto/verify-code.dto';
+import { VerifyAccountDto } from '../dto/verify-account.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -32,8 +33,8 @@ export class AuthController {
     return this.authService.verifyCode(body);
   }
 
-  @Post('verify-phone')
-  async verifyPhone(@Body() body: PhoneDto) {
-    return this.authService.verifyPhone(body);
+  @Post('verify-account')
+  async verifyAccount(@Body() body: VerifyAccountDto) {
+    return this.authService.verifyAccount(body);
   }
 }
