@@ -11,6 +11,7 @@ import { ContactsModule } from './contacts/contacts.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { CountriesModule } from './countries/countries.module';
 import { UsersModule } from './users/users.module';
+import { VerificationCodesModule } from './verification-codes/verification-codes.module';
 
 @Module({
   controllers: [AppController],
@@ -34,6 +35,7 @@ import { UsersModule } from './users/users.module';
     NotificationsModule,
     CountriesModule,
     UsersModule,
+    VerificationCodesModule,
   ],
   providers: [SeedCommand],
 })

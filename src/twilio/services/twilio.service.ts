@@ -15,11 +15,11 @@ export class TwilioService {
   }
 
   // Método para enviar SMS de verificación
-  async sendVerificationCode(to: string) {
+  async sendVerificationCode(to: string, code: string) {
     try {
       const verification = await this.client.verify.v2
         .services(this.verifyServiceSid)
-        .verifications.create({ to: to, channel: 'sms', customCode: '4569' });
+        .verifications.create({ to: to, channel: 'sms', customCode: code });
 
       console.log(verification);
     } catch (error) {

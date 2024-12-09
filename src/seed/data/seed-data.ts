@@ -20,7 +20,6 @@ export const initialData: SeedData = {
       },
       photo: 'https://randomuser.me/api/portraits/men/1.jpg',
       type: AuthMethod.EMAIL,
-      verificationCode: '',
     },
     {
       email: 'test2@gmail.com',
@@ -33,7 +32,6 @@ export const initialData: SeedData = {
       },
       photo: 'https://randomuser.me/api/portraits/women/1.jpg',
       type: AuthMethod.EMAIL,
-      verificationCode: '',
     },
     {
       email: 'test3@gmail.com',
@@ -45,7 +43,6 @@ export const initialData: SeedData = {
         countryId: 168,
       },
       type: AuthMethod.EMAIL,
-      verificationCode: '',
     },
     {
       email: 'test4@gmail.com',
@@ -58,7 +55,6 @@ export const initialData: SeedData = {
       },
       photo: 'https://randomuser.me/api/portraits/women/2.jpg',
       type: AuthMethod.EMAIL,
-      verificationCode: '',
     },
     {
       email: 'test5@gmail.com',
@@ -71,7 +67,6 @@ export const initialData: SeedData = {
       },
       photo: 'https://randomuser.me/api/portraits/men/2.jpg',
       type: AuthMethod.EMAIL,
-      verificationCode: '',
     },
     {
       email: 'test6@gmail.com',
@@ -84,7 +79,6 @@ export const initialData: SeedData = {
       },
       photo: 'https://randomuser.me/api/portraits/women/3.jpg',
       type: AuthMethod.EMAIL,
-      verificationCode: '',
     },
     {
       email: 'test7@gmail.com',
@@ -97,7 +91,6 @@ export const initialData: SeedData = {
       },
       photo: 'https://randomuser.me/api/portraits/men/3.jpg',
       type: AuthMethod.EMAIL,
-      verificationCode: '',
     },
     {
       email: 'test8@gmail.com',
@@ -109,7 +102,6 @@ export const initialData: SeedData = {
         countryId: 168,
       },
       type: AuthMethod.EMAIL,
-      verificationCode: '',
     },
     {
       email: 'test9@gmail.com',
@@ -122,7 +114,6 @@ export const initialData: SeedData = {
       },
       photo: 'https://randomuser.me/api/portraits/men/4.jpg',
       type: AuthMethod.EMAIL,
-      verificationCode: '',
     },
     {
       email: 'test10@gmail.com',
@@ -134,7 +125,6 @@ export const initialData: SeedData = {
         countryId: 168,
       },
       type: AuthMethod.EMAIL,
-      verificationCode: '',
     },
     {
       email: 'test11@gmail.com',
@@ -147,7 +137,6 @@ export const initialData: SeedData = {
       },
       photo: 'https://randomuser.me/api/portraits/men/5.jpg',
       type: AuthMethod.EMAIL,
-      verificationCode: '',
     },
     {
       email: 'test12@gmail.com',
@@ -159,7 +148,6 @@ export const initialData: SeedData = {
         countryId: 168,
       },
       type: AuthMethod.EMAIL,
-      verificationCode: '',
     },
     {
       email: 'test13@gmail.com',
@@ -172,7 +160,6 @@ export const initialData: SeedData = {
       },
       photo: 'https://randomuser.me/api/portraits/men/6.jpg',
       type: AuthMethod.EMAIL,
-      verificationCode: '',
     },
   ],
   contacts: [

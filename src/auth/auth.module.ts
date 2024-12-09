@@ -9,12 +9,20 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 import { UsersService } from 'src/users/services/users.service';
 import { TwilioService } from 'src/twilio/services/twilio.service';
 import { CountriesModule } from 'src/countries/countries.module';
+import { VerificationCodesService } from 'src/verification-codes/services/verification-codes.service';
+import { VerificationCode } from 'src/verification-codes/entities/verification-code.entity';
 
 @Module({
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy, UsersService, TwilioService],
+  providers: [
+    AuthService,
+    JwtStrategy,
+    UsersService,
+    TwilioService,
+    VerificationCodesService,
+  ],
   imports: [
-    TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([User, VerificationCode]),
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
       useFactory: () => {

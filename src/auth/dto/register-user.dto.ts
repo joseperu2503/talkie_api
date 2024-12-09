@@ -6,7 +6,6 @@ import {
   IsOptional,
   IsString,
   IsUrl,
-  Length,
   Matches,
   MaxLength,
   MinLength,
@@ -15,6 +14,7 @@ import {
 } from 'class-validator';
 import { PhoneDto } from './phone.dto';
 import { AuthMethod } from './login-user-dto';
+import { VerificationcodeDto } from './verification-code.dto';
 
 export class RegisterUserDto {
   @ValidateIf((dto) => dto.type === AuthMethod.EMAIL) // Se valida solo si type es 'email'
@@ -26,6 +26,9 @@ export class RegisterUserDto {
   @ValidateNested()
   @Type(() => PhoneDto)
   phone?: PhoneDto;
+
+  @IsEnum(AuthMethod)
+  type: AuthMethod;
 
   @IsString()
   @MinLength(6)
@@ -48,10 +51,8 @@ export class RegisterUserDto {
   @IsUrl()
   photo?: string;
 
-  @IsEnum(AuthMethod)
-  type: AuthMethod;
-
-  @IsString()
-  @Length(4, 4) // El código tiene que ser de exactamente 6 caracteres
-  verificationCode: string;
+  @ValidateNested()
+  @Type(() => VerificationcodeDto)
+  @IsOptional()
+  verificationCode?: VerificationcodeDto;
 }

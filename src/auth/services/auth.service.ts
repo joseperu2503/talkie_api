@@ -20,6 +20,7 @@ import { PhoneDto } from '../dto/phone.dto';
 import { VerifyCodeDto } from '../dto/verify-code.dto';
 import { CountriesService } from 'src/countries/services/countries.service';
 import { VerifyAccountDto } from '../dto/verify-account.dto';
+import { VerificationCodesService } from 'src/verification-codes/services/verification-codes.service';
 
 @Injectable()
 export class AuthService {
@@ -33,6 +34,8 @@ export class AuthService {
     private readonly countriesService: CountriesService,
 
     private readonly twilioService: TwilioService,
+
+    private readonly verificationCodesService: VerificationCodesService,
   ) {}
 
   async register(registerUserDto: RegisterUserDto) {
@@ -61,9 +64,8 @@ export class AuthService {
       }
 
       //** verificar codigo 4 digitos */
-
-      if (verificationCode != '1234') {
-        throw new BadRequestException('Incorrect verification code.');
+      if (verificationCode) {
+        await this.verificationCodesService.verify(verificationCode);
       }
 
       //** Guardar el usuario */
@@ -127,6 +129,8 @@ export class AuthService {
     try {
       const { phone, type, email } = verifyAccountDto;
 
+      const verificationCode = await this.verificationCodesService.create();
+
       if (type == AuthMethod.EMAIL) {
         //Todo: implementar envio de codigo por email
       } else {
@@ -136,10 +140,20 @@ export class AuthService {
 
         const phoneString: string = `${country.dialCode}${phone!.number}`;
 
-        // await this.twilioService.sendVerificationCode(phoneString);
+        //** Enviar sms con Twilio */
+        await this.twilioService.sendVerificationCode(
+          phoneString,
+          verificationCode.code,
+        );
       }
 
-      return { success: true, message: 'Verification code sent' };
+      return {
+        success: true,
+        message: 'Verification code sent',
+        data: {
+          verificationCodeId: verificationCode.id,
+        },
+      };
     } catch (error) {
       if (!(error instanceof HttpException)) {
         throw new InternalServerErrorException(
