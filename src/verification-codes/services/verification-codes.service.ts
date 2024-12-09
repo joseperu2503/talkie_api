@@ -14,19 +14,25 @@ export class VerificationCodesService {
 
   async create() {
     // Generar un código aleatorio de 4 dígitos
-    const verificationCode = Math.floor(1000 + Math.random() * 9000).toString();
-    console.log(verificationCode);
-    const hashVerificationCode = bcrypt.hashSync(verificationCode, 10);
+    const code = Math.floor(1000 + Math.random() * 9000).toString();
+    console.log(code);
+    const hashCode = bcrypt.hashSync(code, 10);
 
     // Establecer la fecha de expiración (1 hora y 30 minutos desde ahora)
     const expirationTime = new Date();
     expirationTime.setMinutes(expirationTime.getMinutes() + 90); // 1 hora y 30 minutos
 
     const newCode = this.verificationcodeRepository.create({
-      code: hashVerificationCode,
+      code: hashCode,
       expirationTime,
     });
-    return this.verificationcodeRepository.save(newCode);
+    const verificationCode =
+      await this.verificationcodeRepository.save(newCode);
+
+    return {
+      ...verificationCode,
+      code: code,
+    };
   }
 
   async verify(
