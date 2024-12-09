@@ -37,31 +37,38 @@ export class AuthService {
 
   async register(registerUserDto: RegisterUserDto) {
     try {
-      const { password, email, phone, type, ...userData } = registerUserDto;
+      const { password, email, phone, type, verificationCode, ...userData } =
+        registerUserDto;
 
-      // Crear el usuario
+      //** Crear el usuario */
       const user = this.userRepository.create({
         ...userData,
         password: bcrypt.hashSync(password, 10),
       });
 
+      //** Aignar email o telefono */
       if (type == AuthMethod.EMAIL) {
         //** Validar si existe el email */
-        await this.findEmail(email!, true);
+        await this._findEmail(email!, true);
 
         user.email = email!;
       } else {
         //** Validar si existe el phone */
-        const result = await this.findPhone(registerUserDto.phone!, true);
+        const result = await this._findPhone(registerUserDto.phone!, true);
 
         user.phone = result.phone;
         user.phoneCountry = result.country;
       }
 
-      // Guardar el usuario
+      //** verificar codigo 4 digitos */
+
+      if (verificationCode != '1234') {
+        throw new BadRequestException('Incorrect verification code.');
+      }
+
+      //** Guardar el usuario */
       await this.userRepository.save(user);
 
-      // Retornar la respuesta
       const me = await this.usersService.profile(user.id);
       return { user: me, token: this.getJwt({ id: user.id }) };
     } catch (error) {
@@ -116,16 +123,22 @@ export class AuthService {
     return token;
   }
 
-  async sendVerificationCode(phone: PhoneDto) {
+  async sendVerificationCode(verifyAccountDto: VerifyAccountDto) {
     try {
-      //** Validar si existe el country */
-      const country: Country = await this.countriesService.findOneWithExeption(
-        phone!.countryId,
-      );
+      const { phone, type, email } = verifyAccountDto;
 
-      const phoneString: string = `${country.dialCode}${phone.number}`;
+      if (type == AuthMethod.EMAIL) {
+        //Todo: implementar envio de codigo por email
+      } else {
+        //** Validar si existe el country */
+        const country: Country =
+          await this.countriesService.findOneWithExeption(phone!.countryId);
 
-      await this.twilioService.sendVerificationCode(phoneString);
+        const phoneString: string = `${country.dialCode}${phone!.number}`;
+
+        // await this.twilioService.sendVerificationCode(phoneString);
+      }
+
       return { success: true, message: 'Verification code sent' };
     } catch (error) {
       if (!(error instanceof HttpException)) {
@@ -173,9 +186,9 @@ export class AuthService {
       const { phone, type, email } = verifyAccountDto;
       let result: any;
       if (type == AuthMethod.EMAIL) {
-        result = await this.findEmail(email!);
+        result = await this._findEmail(email!);
       } else {
-        result = await this.findPhone(phone!);
+        result = await this._findPhone(phone!);
       }
 
       return { success: true, exists: result.exist };
@@ -189,7 +202,7 @@ export class AuthService {
     }
   }
 
-  async findEmail(email: string, throwErrorIfExist = false) {
+  private async _findEmail(email: string, throwErrorIfExist = false) {
     const user = await this.userRepository.findOne({
       where: { email },
     });
@@ -201,7 +214,7 @@ export class AuthService {
     return { exist: !!user, email: email };
   }
 
-  async findPhone(phone: PhoneDto, throwErrorIfExist = false) {
+  private async _findPhone(phone: PhoneDto, throwErrorIfExist = false) {
     try {
       const phoneProcessed = phone!.number.replaceAll(' ', '');
 

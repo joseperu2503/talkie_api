@@ -2,7 +2,6 @@ import { Controller, Post, Body } from '@nestjs/common';
 import { AuthService } from '../services/auth.service';
 import { RegisterUserDto } from '../dto/register-user.dto';
 import { LoginUserDto } from '../dto/login-user-dto';
-import { PhoneDto } from '../dto/phone.dto';
 import { VerifyCodeDto } from '../dto/verify-code.dto';
 import { VerifyAccountDto } from '../dto/verify-account.dto';
 
@@ -20,14 +19,11 @@ export class AuthController {
     return this.authService.login(loginUserDto);
   }
 
-  // Endpoint para enviar SMS con código de verificación
   @Post('send-verification-code')
-  async sendVerificationCode(@Body() body: PhoneDto) {
-    // Enviar el código de verificación a través de Twilio
+  async sendVerificationCode(@Body() body: VerifyAccountDto) {
     return this.authService.sendVerificationCode(body);
   }
 
-  // Endpoint para verificar el código ingresado
   @Post('verify-code')
   async verifyCode(@Body() body: VerifyCodeDto) {
     return this.authService.verifyCode(body);

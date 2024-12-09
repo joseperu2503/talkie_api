@@ -6,6 +6,7 @@ import {
   IsOptional,
   IsString,
   IsUrl,
+  Length,
   Matches,
   MaxLength,
   MinLength,
@@ -49,4 +50,8 @@ export class RegisterUserDto {
 
   @IsEnum(AuthMethod)
   type: AuthMethod;
+
+  @IsString()
+  @Length(4, 4) // El código tiene que ser de exactamente 6 caracteres
+  verificationCode: string;
 }

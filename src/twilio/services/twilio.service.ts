@@ -19,7 +19,7 @@ export class TwilioService {
     try {
       const verification = await this.client.verify.v2
         .services(this.verifyServiceSid)
-        .verifications.create({ to: to, channel: 'sms' });
+        .verifications.create({ to: to, channel: 'sms', customCode: '4569' });
 
       console.log(verification);
     } catch (error) {
