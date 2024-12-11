@@ -135,7 +135,10 @@ export class AuthService {
       const verificationCode = await this.verificationCodesService.create();
 
       if (type == AuthMethod.EMAIL) {
-        await this.mailService.sendVerificationCode(email!, verificationCode.code);
+        await this.mailService.sendVerificationCode(
+          email!,
+          verificationCode.code,
+        );
       } else {
         //** Validar si existe el country */
         const country: Country =
