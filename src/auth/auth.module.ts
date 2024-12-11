@@ -11,6 +11,7 @@ import { TwilioService } from 'src/twilio/services/twilio.service';
 import { CountriesModule } from 'src/countries/countries.module';
 import { VerificationCodesService } from 'src/verification-codes/services/verification-codes.service';
 import { VerificationCode } from 'src/verification-codes/entities/verification-code.entity';
+import { MailModule } from 'src/mail/mail.module';
 
 @Module({
   controllers: [AuthController],
@@ -35,6 +36,7 @@ import { VerificationCode } from 'src/verification-codes/entities/verification-c
       },
     }),
     CountriesModule,
+    MailModule,
   ],
   exports: [TypeOrmModule, JwtStrategy, PassportModule, JwtModule, AuthService],
 })

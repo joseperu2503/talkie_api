@@ -21,6 +21,7 @@ import { CountriesService } from 'src/countries/services/countries.service';
 import { VerifyAccountDto } from '../dto/verify-account.dto';
 import { VerificationCodesService } from 'src/verification-codes/services/verification-codes.service';
 import { VerificationcodeDto } from '../dto/verification-code.dto';
+import { MailService } from 'src/mail/services/mail.service';
 
 @Injectable()
 export class AuthService {
@@ -34,6 +35,8 @@ export class AuthService {
     private readonly countriesService: CountriesService,
 
     private readonly twilioService: TwilioService,
+
+    private readonly mailService: MailService,
 
     private readonly verificationCodesService: VerificationCodesService,
   ) {}
@@ -132,7 +135,7 @@ export class AuthService {
       const verificationCode = await this.verificationCodesService.create();
 
       if (type == AuthMethod.EMAIL) {
-        //Todo: implementar envio de codigo por email
+        await this.mailService.sendVerificationCode(email!, verificationCode.code);
       } else {
         //** Validar si existe el country */
         const country: Country =

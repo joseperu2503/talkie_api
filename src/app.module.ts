@@ -12,6 +12,7 @@ import { NotificationsModule } from './notifications/notifications.module';
 import { CountriesModule } from './countries/countries.module';
 import { UsersModule } from './users/users.module';
 import { VerificationCodesModule } from './verification-codes/verification-codes.module';
+import { MailModule } from './mail/mail.module';
 
 @Module({
   controllers: [AppController],
@@ -20,7 +21,7 @@ import { VerificationCodesModule } from './verification-codes/verification-codes
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.DB_HOST,
-      port: +process.env.DB_PORT!, 
+      port: +process.env.DB_PORT!,
       database: process.env.DB_NAME,
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
@@ -36,6 +37,7 @@ import { VerificationCodesModule } from './verification-codes/verification-codes
     CountriesModule,
     UsersModule,
     VerificationCodesModule,
+    MailModule,
   ],
   providers: [SeedCommand],
 })
