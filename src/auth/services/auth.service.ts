@@ -17,10 +17,10 @@ import { Country } from 'src/countries/entities/country.entity';
 import { UsersService } from 'src/users/services/users.service';
 import { TwilioService } from 'src/twilio/services/twilio.service';
 import { PhoneDto } from '../dto/phone.dto';
-import { VerifyCodeDto } from '../dto/verify-code.dto';
 import { CountriesService } from 'src/countries/services/countries.service';
 import { VerifyAccountDto } from '../dto/verify-account.dto';
 import { VerificationCodesService } from 'src/verification-codes/services/verification-codes.service';
+import { VerificationcodeDto } from '../dto/verification-code.dto';
 
 @Injectable()
 export class AuthService {
@@ -65,7 +65,7 @@ export class AuthService {
 
       //** verificar codigo 4 digitos */
       if (verificationCode) {
-        await this.verificationCodesService.verify(verificationCode);
+        await this.verificationCodesService.verify(verificationCode, false);
       }
 
       //** Guardar el usuario */
@@ -165,26 +165,11 @@ export class AuthService {
   }
 
   // Método para verificar el código ingresado por el usuario
-  async verifyCode(verifyCodeDto: VerifyCodeDto) {
+  async verifyCode(verifyCodeDto: VerificationcodeDto) {
     try {
-      const { phone, code } = verifyCodeDto;
-      //** Validar si existe el country */
-      const country: Country = await this.countriesService.findOneWithExeption(
-        phone!.countryId,
-      );
+      await this.verificationCodesService.verify(verifyCodeDto);
 
-      const phoneString: string = `${country.dialCode}${phone.number}`;
-
-      const verificationCheck = await this.twilioService.checkVerificationCode(
-        phoneString,
-        code,
-      );
-
-      if (verificationCheck) {
-        return { success: true, message: 'Phone number verified successfully' };
-      } else {
-        throw new BadRequestException('Invalid verification code');
-      }
+      return { success: true, message: 'Code verified successfully' };
     } catch (error) {
       if (!(error instanceof HttpException)) {
         throw new InternalServerErrorException(

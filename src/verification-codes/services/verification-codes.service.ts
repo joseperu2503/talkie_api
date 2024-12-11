@@ -37,8 +37,9 @@ export class VerificationCodesService {
 
   async verify(
     verificationcodeDto: VerificationcodeDto,
+    checkVerified: boolean = true,
   ): Promise<VerificationCode | null> {
-    const verificationCode = await this.verificationcodeRepository.findOne({
+    let verificationCode = await this.verificationcodeRepository.findOne({
       where: {
         id: verificationcodeDto.id,
       },
@@ -51,6 +52,24 @@ export class VerificationCodesService {
     if (!bcrypt.compareSync(verificationcodeDto.code, verificationCode.code)) {
       throw new BadRequestException('Incorrect verification code.');
     }
+
+    if (verificationCode.verified && checkVerified) {
+      throw new BadRequestException(
+        'This verification code has already been verified.',
+      );
+    }
+
+    if (!verificationCode.verified && !checkVerified) {
+      throw new BadRequestException(
+        'This verification code has not been verified.',
+      );
+    }
+
+    verificationCode.verified = true;
+
+    verificationCode =
+      await this.verificationcodeRepository.save(verificationCode);
+
     return verificationCode;
   }
 }
