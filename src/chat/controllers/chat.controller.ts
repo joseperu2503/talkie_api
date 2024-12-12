@@ -8,7 +8,7 @@ import {
   UseInterceptors,
   Body,
 } from '@nestjs/common';
-import { User } from 'src/auth/entities/user.entity';
+import { User } from 'src/users/entities/user.entity';
 import { GetUser } from 'src/auth/decorators/get-user.decorator';
 import { JwtAuth } from 'src/auth/decorators/jwt-auth.decorator';
 import { ChatService } from '../services/chat.service';

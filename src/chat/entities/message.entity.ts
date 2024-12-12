@@ -9,7 +9,7 @@ import {
   OneToMany,
 } from 'typeorm';
 import { Chat } from './chat.entity';
-import { User } from 'src/auth/entities/user.entity';
+import { User } from 'src/users/entities/user.entity';
 import { MessageUser } from './message-user.entity';
 
 @Entity('messages')

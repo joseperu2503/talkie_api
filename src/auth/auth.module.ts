@@ -1,17 +1,29 @@
 import { Module } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { AuthController } from './auth.controller';
+import { AuthService } from './services/auth.service';
+import { AuthController } from './controllers/auth.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from './entities/user.entity';
+import { User } from '../users/entities/user.entity';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './strategies/jwt.strategy';
+import { UsersService } from 'src/users/services/users.service';
+import { TwilioService } from 'src/twilio/services/twilio.service';
+import { CountriesModule } from 'src/countries/countries.module';
+import { VerificationCodesService } from 'src/verification-codes/services/verification-codes.service';
+import { VerificationCode } from 'src/verification-codes/entities/verification-code.entity';
+import { MailModule } from 'src/mail/mail.module';
 
 @Module({
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy],
+  providers: [
+    AuthService,
+    JwtStrategy,
+    UsersService,
+    TwilioService,
+    VerificationCodesService,
+  ],
   imports: [
-    TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([User, VerificationCode]),
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
       useFactory: () => {
@@ -23,6 +35,8 @@ import { JwtStrategy } from './strategies/jwt.strategy';
         };
       },
     }),
+    CountriesModule,
+    MailModule,
   ],
   exports: [TypeOrmModule, JwtStrategy, PassportModule, JwtModule, AuthService],
 })

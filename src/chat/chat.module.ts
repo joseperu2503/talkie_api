@@ -11,6 +11,7 @@ import { MulterModule } from '@nestjs/platform-express';
 import * as multer from 'multer';
 import { NotificationsModule } from 'src/notifications/notifications.module';
 import { MessageUser } from './entities/message-user.entity';
+import { UsersModule } from 'src/users/users.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { MessageUser } from './entities/message-user.entity';
       storage: multer.memoryStorage(),
     }),
     NotificationsModule,
+    UsersModule,
   ],
   controllers: [ChatController],
   providers: [ChatService, ChatGateway],

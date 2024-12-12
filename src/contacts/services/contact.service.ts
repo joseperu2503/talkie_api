@@ -3,7 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { User } from 'src/auth/entities/user.entity';
+import { User } from 'src/users/entities/user.entity';
 import { ArrayContains, Repository } from 'typeorm';
 import { Contact } from '../entities/contact.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -13,6 +13,7 @@ import { ChatUser } from 'src/chat/entities/chat-user.entity';
 import { ContactResourceDto } from '../dto/contact-resource.dto';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { ChatUpdatedEvent } from 'src/chat/events/chat-updated.event';
+import { AuthMethod } from 'src/auth/dto/login-user-dto';
 
 @Injectable()
 export class ContactService {
@@ -37,23 +38,38 @@ export class ContactService {
     user: User,
     withSocket: boolean = true,
   ) {
-    // Verificar que el username no sea el del usuario actual
-    if (addContactDto.username === user.username) {
-      throw new ConflictException(`Cannot add yourself as a contact.`);
+    const { email, phone, type } = addContactDto;
+
+    let contactUser: User | null = null;
+
+    if (type == AuthMethod.EMAIL) {
+      // Buscar el usuario con el email proporcionado
+      contactUser = await this.userRepository.findOne({
+        where: {
+          email: email,
+        },
+      });
+    } else {
+      // Buscar el usuario con el phone proporcionado
+
+      const phoneProcessed = phone!.number.replaceAll(' ', '');
+
+      contactUser = await this.userRepository.findOne({
+        where: {
+          phone: phoneProcessed,
+          phoneCountry: { id: phone!.countryId },
+        },
+      });
     }
 
-    // Buscar el usuario con el username proporcionado
-    const contactUser = await this.userRepository.findOne({
-      where: {
-        username: addContactDto.username,
-      },
-    });
-
-    // Verificar si el usuario existe
+    // Lanzar error si el usuario a agregar no existe
     if (!contactUser) {
-      throw new NotFoundException(
-        `User with username ${addContactDto.username} not found.`,
-      );
+      throw new NotFoundException(`User not found.`);
+    }
+
+    // Lanzar error si el usuario a agregar es el mismo que el usuario
+    if (contactUser.id == user.id) {
+      throw new ConflictException(`Cannot add yourself as a contact.`);
     }
 
     // Verificar si ya existe el contacto

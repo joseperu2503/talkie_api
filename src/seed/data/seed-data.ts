@@ -1,3 +1,4 @@
+import { AuthMethod } from 'src/auth/dto/login-user-dto';
 import { RegisterUserDto } from 'src/auth/dto/register-user.dto';
 import { AddContactDto } from 'src/contacts/dto/add-contact.dto';
 
@@ -13,136 +14,182 @@ export const initialData: SeedData = {
       name: 'John',
       surname: 'Smith',
       password: 'Abc123',
-      phone: '993689111',
-      username: 'john_smith01',
+      phone: {
+        number: '993689111',
+        countryId: 168,
+      },
       photo: 'https://randomuser.me/api/portraits/men/1.jpg',
+      type: AuthMethod.EMAIL,
     },
     {
       email: 'test2@gmail.com',
       name: 'Emily',
       surname: 'Johnson',
       password: 'Abc123',
-      phone: '993689112',
-      username: 'emily_johnson02',
+      phone: {
+        number: '993689112',
+        countryId: 168,
+      },
       photo: 'https://randomuser.me/api/portraits/women/1.jpg',
+      type: AuthMethod.EMAIL,
     },
     {
       email: 'test3@gmail.com',
       name: 'Michael',
       surname: 'Brown',
       password: 'Abc123',
-      phone: '993689113',
-      username: 'michael_brown03',
+      phone: {
+        number: '993689113',
+        countryId: 168,
+      },
+      type: AuthMethod.EMAIL,
     },
     {
       email: 'test4@gmail.com',
       name: 'Sarah',
       surname: 'Davis',
       password: 'Abc123',
-      phone: '993689114',
-      username: 'sarah_davis04',
+      phone: {
+        number: '993689114',
+        countryId: 168,
+      },
       photo: 'https://randomuser.me/api/portraits/women/2.jpg',
+      type: AuthMethod.EMAIL,
     },
     {
       email: 'test5@gmail.com',
       name: 'David',
       surname: 'Wilson',
       password: 'Abc123',
-      phone: '993689115',
-      username: 'david_wilson05',
+      phone: {
+        number: '993689115',
+        countryId: 168,
+      },
       photo: 'https://randomuser.me/api/portraits/men/2.jpg',
+      type: AuthMethod.EMAIL,
     },
     {
       email: 'test6@gmail.com',
       name: 'Olivia',
       surname: 'Taylor',
       password: 'Abc123',
-      phone: '993689116',
-      username: 'olivia_taylor06',
+      phone: {
+        number: '993689116',
+        countryId: 168,
+      },
       photo: 'https://randomuser.me/api/portraits/women/3.jpg',
+      type: AuthMethod.EMAIL,
     },
     {
       email: 'test7@gmail.com',
       name: 'James',
       surname: 'Anderson',
       password: 'Abc123',
-      phone: '993689117',
-      username: 'james_anderson07',
+      phone: {
+        number: '993689117',
+        countryId: 168,
+      },
       photo: 'https://randomuser.me/api/portraits/men/3.jpg',
+      type: AuthMethod.EMAIL,
     },
     {
       email: 'test8@gmail.com',
       name: 'Sophia',
       surname: 'Thomas',
       password: 'Abc123',
-      phone: '993689118',
-      username: 'sophia_thomas08',
+      phone: {
+        number: '993689118',
+        countryId: 168,
+      },
+      type: AuthMethod.EMAIL,
     },
     {
       email: 'test9@gmail.com',
       name: 'William',
       surname: 'Martinez',
       password: 'Abc123',
-      phone: '993689119',
-      username: 'william_martinez09',
+      phone: {
+        number: '993689119',
+        countryId: 168,
+      },
       photo: 'https://randomuser.me/api/portraits/men/4.jpg',
+      type: AuthMethod.EMAIL,
     },
     {
       email: 'test10@gmail.com',
       name: 'Mia',
       surname: 'Harris',
       password: 'Abc123',
-      phone: '993689120',
-      username: 'mia_harris10',
+      phone: {
+        number: '993689120',
+        countryId: 168,
+      },
+      type: AuthMethod.EMAIL,
     },
     {
       email: 'test11@gmail.com',
       name: 'Robert',
       surname: 'Clark',
       password: 'Abc123',
-      phone: '993689121',
-      username: 'robert_clark11',
+      phone: {
+        number: '993689121',
+        countryId: 168,
+      },
       photo: 'https://randomuser.me/api/portraits/men/5.jpg',
+      type: AuthMethod.EMAIL,
     },
     {
       email: 'test12@gmail.com',
       name: 'Ava',
       surname: 'Lewis',
       password: 'Abc123',
-      phone: '993689122',
-      username: 'ava_lewis12',
+      phone: {
+        number: '993689122',
+        countryId: 168,
+      },
+      type: AuthMethod.EMAIL,
     },
     {
       email: 'test13@gmail.com',
       name: 'Benjamin',
       surname: 'Hall',
       password: 'Abc123',
-      phone: '983689123',
-      username: 'benjamin_hall13',
+      phone: {
+        number: '983689123',
+        countryId: 168,
+      },
       photo: 'https://randomuser.me/api/portraits/men/6.jpg',
+      type: AuthMethod.EMAIL,
     },
   ],
   contacts: [
-    {
-      username: 'emily_johnson02',
-    },
-    {
-      username: 'michael_brown03',
-    },
-    {
-      username: 'sarah_davis04',
-    },
-    {
-      username: 'david_wilson05',
-    },
-    {
-      username: 'olivia_taylor06',
-    },
-    {
-      username: 'james_anderson07',
-    },
-    {
-      username: 'sophia_thomas08',
-    },
+    // {
+    //   email: 'test2@gmail.com',
+    //   type: AuthMethod.EMAIL,
+    // },
+    // {
+    //   email: 'test3@gmail.com',
+    //   type: AuthMethod.EMAIL,
+    // },
+    // {
+    //   email: 'test4@gmail.com',
+    //   type: AuthMethod.EMAIL,
+    // },
+    // {
+    //   email: 'test5@gmail.com',
+    //   type: AuthMethod.EMAIL,
+    // },
+    // {
+    //   email: 'test6@gmail.com',
+    //   type: AuthMethod.EMAIL,
+    // },
+    // {
+    //   email: 'test7@gmail.com',
+    //   type: AuthMethod.EMAIL,
+    // },
+    // {
+    //   email: 'test8@gmail.com',
+    //   type: AuthMethod.EMAIL,
+    // },
   ],
 };
