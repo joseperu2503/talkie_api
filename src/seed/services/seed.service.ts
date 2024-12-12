@@ -26,6 +26,8 @@ export class SeedService {
   }
 
   private async testUserSeed() {
+    if (process.env.NODE_ENV !== 'development') return;
+
     const users = initialData.users;
     for (const user of users) {
       await this.authService.register(user);
@@ -33,6 +35,8 @@ export class SeedService {
   }
 
   private async testContactSeed() {
+    if (process.env.NODE_ENV !== 'development') return;
+
     const contacts = initialData.contacts;
     const user: User | null = await this.usersService.findOne(1);
     if (!user) return;

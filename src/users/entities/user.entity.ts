@@ -40,6 +40,9 @@ export class User {
   @JoinColumn({ name: 'phone_country_id' })
   phoneCountry: Country | null;
 
+  @Column('number', { nullable: true, name: "phone_country_id" })
+  phoneCountryId: number | null;
+
   @Column('text', { nullable: true })
   phone: string | null;
 

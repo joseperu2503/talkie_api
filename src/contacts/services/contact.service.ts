@@ -13,6 +13,7 @@ import { ChatUser } from 'src/chat/entities/chat-user.entity';
 import { ContactResourceDto } from '../dto/contact-resource.dto';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { ChatUpdatedEvent } from 'src/chat/events/chat-updated.event';
+import { AuthMethod } from 'src/auth/dto/login-user-dto';
 
 @Injectable()
 export class ContactService {
@@ -37,27 +38,38 @@ export class ContactService {
     user: User,
     withSocket: boolean = true,
   ) {
-    // Verificar que el email o phone no sea el del usuario actual
-    if (
-      addContactDto.email === user.email ||
-      (addContactDto.phone?.number === user.phone &&
-        addContactDto.phone?.countryId === user.phoneCountry?.id)
-    ) {
-      throw new ConflictException(`Cannot add yourself as a contact.`);
+    const { email, phone, type } = addContactDto;
+
+    let contactUser: User | null = null;
+
+    if (type == AuthMethod.EMAIL) {
+      // Buscar el usuario con el email proporcionado
+      contactUser = await this.userRepository.findOne({
+        where: {
+          email: email,
+        },
+      });
+    } else {
+      // Buscar el usuario con el phone proporcionado
+
+      const phoneProcessed = phone!.number.replaceAll(' ', '');
+
+      contactUser = await this.userRepository.findOne({
+        where: {
+          phone: phoneProcessed,
+          phoneCountry: { id: phone!.countryId },
+        },
+      });
     }
 
-    // Buscar el usuario con el email proporcionado
-    const contactUser = await this.userRepository.findOne({
-      where: {
-        email: addContactDto.email,
-      },
-    });
-
-    // Verificar si el usuario existe
+    // Lanzar error si el usuario a agregar no existe
     if (!contactUser) {
-      throw new NotFoundException(
-        `User with email ${addContactDto.email} not found.`,
-      );
+      throw new NotFoundException(`User not found.`);
+    }
+
+    // Lanzar error si el usuario a agregar es el mismo que el usuario
+    if (contactUser.id == user.id) {
+      throw new ConflictException(`Cannot add yourself as a contact.`);
     }
 
     // Verificar si ya existe el contacto
