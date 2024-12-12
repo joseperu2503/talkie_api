@@ -147,10 +147,12 @@ export class AuthService {
         const phoneString: string = `${country.dialCode}${phone!.number}`;
 
         //** Enviar sms con Twilio */
-        // await this.twilioService.sendVerificationCode(
-        //   phoneString,
-        //   verificationCode.code,
-        // );
+        if (process.env.TWILIO_ENABLED) {
+          await this.twilioService.sendVerificationCode(
+            phoneString,
+            verificationCode.code,
+          );
+        }
       }
 
       return {
