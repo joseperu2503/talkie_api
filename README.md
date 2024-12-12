@@ -48,10 +48,10 @@ docker exec -it talkie_api_staging sh
 npm run migrations:run
 ```
 
-3. (Opcional) Ejecutar Seeders
+3. Ejecutar Seeders
 
 ```bash
-npm run cli -- seed
+NODE_OPTIONS="--max-old-space-size=2048" npm run cli -- seed
 ```
 
 4. Salir:
