@@ -1,8 +1,8 @@
-import { Module } from '@nestjs/common';
-import { MailService } from './services/mail.service';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
+import { Module } from '@nestjs/common';
 import { join } from 'path';
+import { MailService } from './services/mail.service';
 
 @Module({
   imports: [
@@ -17,7 +17,7 @@ import { join } from 'path';
         },
       },
       defaults: {
-        from: `"No Reply" <${process.env.MAIL_FROM}>`,
+        from: `Talkie <${process.env.MAIL_FROM}>`,
       },
       template: {
         dir: join(process.cwd(), 'src', 'mail', 'templates'),

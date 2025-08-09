@@ -17,7 +17,7 @@ nano .env.staging
 ## Desarrollo
 
 ```bash
-docker compose -f docker-compose.dev.yml --env-file .env.dev -p talkie_api_dev up -d --build
+docker compose -f docker-compose.dev.yml --env-file .env.dev -p talkie_api_dev up --build
 ```
 
 ## Produccion
