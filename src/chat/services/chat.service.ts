@@ -12,9 +12,9 @@ import { NotificationsService } from 'src/notifications/services/notifications.s
 import { User } from 'src/users/entities/user.entity';
 import { ArrayContains, IsNull, Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
-import { MarkChatAsReadDto } from '../dto/mark-chat-as-read.dto';
 import { MessageDeliveredRequestDto } from '../dto/message-delivered-request.dto';
-import { SendMessageDto } from '../dto/send-message.dto';
+import { ReadChatRequestDto } from '../dto/read-chat-request.dto';
+import { SendMessageRequestDto } from '../dto/send-message-request.dto';
 import { ChatUser } from '../entities/chat-user.entity';
 import { Chat } from '../entities/chat.entity';
 import { MessageUser } from '../entities/message-user.entity';
@@ -169,7 +169,7 @@ export class ChatService {
     );
   }
 
-  sendMessage(sendMessageDto: SendMessageDto, sender: User) {
+  sendMessage(sendMessageDto: SendMessageRequestDto, sender: User) {
     return this.sendMessageService(
       sender,
       sendMessageDto.chatId,
@@ -263,7 +263,7 @@ export class ChatService {
     return new MessageResource(message, sender.id, temporalId).response;
   }
 
-  async readChat(readChatDto: MarkChatAsReadDto, user: User) {
+  async readChat(readChatDto: ReadChatRequestDto, user: User) {
     // Obtener el chat con las relaciones necesarias
     const chat = await this.chatRepository.findOne({
       where: {

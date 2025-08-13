@@ -16,10 +16,10 @@ import { ContactResourceDto } from 'src/contacts/dto/contact-resource.dto';
 import { User } from 'src/users/entities/user.entity';
 import { UsersService } from 'src/users/services/users.service';
 import { Repository } from 'typeorm';
-import { MarkChatAsReadDto } from '../dto/mark-chat-as-read.dto';
 import { MessageDeliveredRequestDto } from '../dto/message-delivered-request.dto';
-import { SendMessageDto } from '../dto/send-message.dto';
-import { UpdateUserStatusDto } from '../dto/update-user-status.dto';
+import { ReadChatRequestDto } from '../dto/read-chat-request.dto';
+import { SendMessageRequestDto } from '../dto/send-message-request.dto';
+import { UpdateUserStatusRequestDto } from '../dto/update-user-status-request.dto';
 import { ChatUpdatedEvent } from '../events/chat-updated.event';
 import { ContactUpdatedEvent } from '../events/contact-updated.event';
 import { chatResource } from '../resources/chat.resource';
@@ -77,7 +77,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       );
 
       await client.join(`user-${user.id}-connected`);
-      await this.updateUserStatus(user);
+      await this._updateUserStatus(user);
     } catch (error) {
       client.disconnect();
     }
@@ -102,7 +102,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const user = await this.userRepository.findOneBy({ id: payload.id });
     if (user) {
       // Verificar clientes en la sala después de la desconexión
-      await this.updateUserStatus(user);
+      await this._updateUserStatus(user);
     }
   }
 
@@ -148,7 +148,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @UseGuards(WsJwtGuard)
   @SubscribeMessage('sendMessage')
-  async handleSendMessage(client: Socket, payload: SendMessageDto) {
+  async handleSendMessage(client: Socket, payload: SendMessageRequestDto) {
     const sender: User = client['user'];
     console.log(`${sender.name} ${sender.surname} send message:`, payload);
 
@@ -167,8 +167,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @UseGuards(WsJwtGuard)
-  @SubscribeMessage('markChatAsRead')
-  async handleMarkChatAsRead(client: Socket, payload: MarkChatAsReadDto) {
+  @SubscribeMessage('readChat')
+  async handleReadChat(client: Socket, payload: ReadChatRequestDto) {
     const sender: User = client['user'];
     return await this.chatService.readChat(payload, sender);
   }
@@ -177,7 +177,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('updateDeviceConnectionStatus')
   async updateDeviceConnectionStatus(
     client: Socket,
-    payload: UpdateUserStatusDto,
+    payload: UpdateUserStatusRequestDto,
   ) {
     const user: User = client['user'];
     // Unirse a diferentes canales según el estado de conexión
@@ -191,14 +191,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       client.leave(`user-${user.id}-connected`);
     }
 
-    await this.updateUserStatus(user);
+    await this._updateUserStatus(user);
   }
 
-  async updateUserStatus(user: User) {
-    const isConnected = await this.verifyClientsInRoom(user.id);
+  private async _updateUserStatus(user: User) {
+    const isConnected = await this._verifyClientsInRoom(user.id);
     console.log(`${user.name} ${user.surname} is connected: ${isConnected}`);
 
-    const updateUserStatusDto: UpdateUserStatusDto = {
+    const updateUserStatusDto: UpdateUserStatusRequestDto = {
       isConnected: isConnected,
     };
 
@@ -207,7 +207,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
 
-  async verifyClientsInRoom(userId: number) {
+  private async _verifyClientsInRoom(userId: number) {
     const room = `user-${userId}-connected`;
 
     // Verificar si hay clientes en el canal de conectados

@@ -1,19 +1,19 @@
 import {
+  Body,
   Controller,
   Get,
   Param,
-  Query,
   Post,
+  Query,
   UploadedFile,
   UseInterceptors,
-  Body,
 } from '@nestjs/common';
-import { User } from 'src/users/entities/user.entity';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { GetUser } from 'src/auth/decorators/get-user.decorator';
 import { JwtAuth } from 'src/auth/decorators/jwt-auth.decorator';
+import { User } from 'src/users/entities/user.entity';
+import { SendMessageRequestDto } from '../dto/send-message-request.dto';
 import { ChatService } from '../services/chat.service';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { SendMessageDto } from '../dto/send-message.dto';
 
 @Controller('chats')
 export class ChatController {
@@ -28,7 +28,7 @@ export class ChatController {
   @Post('/send/message')
   @JwtAuth()
   async sendMessage(
-    @Body() sendMessageDto: SendMessageDto,
+    @Body() sendMessageDto: SendMessageRequestDto,
     @GetUser() sender: User,
   ) {
     return this.chatService.sendMessage(sendMessageDto, sender);

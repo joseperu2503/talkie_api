@@ -1,5 +1,3 @@
-import { MessageUser } from '../entities/message-user.entity';
-
 export class MessageResponseDto {
   id: string;
 

@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsString, IsUUID } from 'class-validator';
 
-export class SendMessageDto {
+export class SendMessageRequestDto {
   @IsString()
   @IsNotEmpty()
   readonly content: string;

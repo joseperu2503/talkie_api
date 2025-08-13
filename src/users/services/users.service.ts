@@ -4,16 +4,16 @@ import {
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { User } from '../entities/user.entity';
-import { Not, Repository } from 'typeorm';
-import { UpdateUserStatusDto } from 'src/chat/dto/update-user-status.dto';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { InjectRepository } from '@nestjs/typeorm';
+import * as bcrypt from 'bcrypt';
+import { UpdateAuthDto } from 'src/auth/dto/update-auth.dto';
+import { UpdateUserStatusRequestDto } from 'src/chat/dto/update-user-status-request.dto';
 import { ContactUpdatedEvent } from 'src/chat/events/contact-updated.event';
 import { Country } from 'src/countries/entities/country.entity';
-import { UpdateAuthDto } from 'src/auth/dto/update-auth.dto';
-import * as bcrypt from 'bcrypt';
 import { CountriesService } from 'src/countries/services/countries.service';
+import { Not, Repository } from 'typeorm';
+import { User } from '../entities/user.entity';
 
 @Injectable()
 export class UsersService {
@@ -122,7 +122,7 @@ export class UsersService {
     return user;
   }
 
-  async updateStatus(user: User, updateUserStatusDto: UpdateUserStatusDto) {
+  async updateStatus(user: User, updateUserStatusDto: UpdateUserStatusRequestDto) {
     // Actualizar el estado de conexión del usuario
     user.isConnected = updateUserStatusDto.isConnected;
     if (!updateUserStatusDto.isConnected) {

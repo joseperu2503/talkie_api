@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsString } from 'class-validator';
 
-export class MarkChatAsReadDto {
+export class ReadChatRequestDto {
   @IsString()
   @IsNotEmpty()
   readonly chatId: string;
