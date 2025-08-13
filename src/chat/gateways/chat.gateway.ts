@@ -1,29 +1,30 @@
+import { UseGuards } from '@nestjs/common';
+import { OnEvent } from '@nestjs/event-emitter';
+import { JwtService } from '@nestjs/jwt';
+import { InjectRepository } from '@nestjs/typeorm';
 import {
   OnGatewayConnection,
   OnGatewayDisconnect,
+  SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
-  SubscribeMessage,
 } from '@nestjs/websockets';
-import { Socket, Server } from 'socket.io';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { User } from 'src/users/entities/user.entity';
-import { JwtService } from '@nestjs/jwt';
-import { JwtPayload } from 'src/auth/interfaces/jwt-payload.interfaces';
-import { OnEvent } from '@nestjs/event-emitter';
-import { SendMessageDto } from '../dto/send-message.dto';
-import { UseGuards } from '@nestjs/common';
+import { Server, Socket } from 'socket.io';
 import { WsJwtGuard } from 'src/auth/guards/ws-jwt.guard';
-import { MarkChatAsReadDto } from '../dto/mark-chat-as-read.dto';
-import { ChatUpdatedEvent } from '../events/chat-updated.event';
-import { UpdateUserStatusDto } from '../dto/update-user-status.dto';
-import { ContactUpdatedEvent } from '../events/contact-updated.event';
+import { JwtPayload } from 'src/auth/interfaces/jwt-payload.interfaces';
 import { ContactResourceDto } from 'src/contacts/dto/contact-resource.dto';
-import { chatResource } from '../resources/chat.resource';
-import { ChatService } from '../services/chat.service';
-import { MessageResource } from '../resources/message.resource';
+import { User } from 'src/users/entities/user.entity';
 import { UsersService } from 'src/users/services/users.service';
+import { Repository } from 'typeorm';
+import { MarkChatAsReadDto } from '../dto/mark-chat-as-read.dto';
+import { MessageDeliveredRequestDto } from '../dto/message-delivered-request.dto';
+import { SendMessageDto } from '../dto/send-message.dto';
+import { UpdateUserStatusDto } from '../dto/update-user-status.dto';
+import { ChatUpdatedEvent } from '../events/chat-updated.event';
+import { ContactUpdatedEvent } from '../events/contact-updated.event';
+import { chatResource } from '../resources/chat.resource';
+import { MessageResource } from '../resources/message.resource';
+import { ChatService } from '../services/chat.service';
 
 @WebSocketGateway({ cors: true, namespace: '/chats' })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -41,19 +42,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private readonly jwtService: JwtService,
   ) {}
 
-  @OnEvent('message.sent')
+  @OnEvent('message.updated')
   handleMessageSendedEvent(event: MessageResource) {
-    this.emitMessageReceived(event);
-  }
-
-  @OnEvent('message.delivered')
-  handleMessageDeliveredEvent(event: MessageResource) {
-    this.emitMessageDelivered(event);
-  }
-
-  @OnEvent('message.read')
-  handleMessageReadEvent(event: MessageResource) {
-    this.emitMessageRead(event);
+    this.emitMessageUpdated(event);
   }
 
   @OnEvent('chat.updated')
@@ -115,34 +106,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
 
-  //** Emitir al usuario de un nuevo mensaje */
-  async emitMessageReceived(messageResource: MessageResource) {
-    const room = `user-${messageResource.userId}-connected`;
-    let newMessageResource = messageResource;
-    if (messageResource.message.sender.id != messageResource.userId) {
-      //** Verificar si el mensaje fue entregado */
-      const isConnected = await this.verifyClientsInRoom(
-        messageResource.userId,
-      );
-      if (isConnected) {
-        newMessageResource =
-          await this.chatService.messageDelivered(messageResource);
-      }
-    }
-
-    this.server.to(room).emit('messageReceived', newMessageResource.response);
-  }
-
-  async emitMessageDelivered(messageResource: MessageResource) {
+  //** Emitir al usuario de un nuevo mensaje, un mensaje ha sido leido o entregado */
+  async emitMessageUpdated(messageResource: MessageResource) {
     const room = `user-${messageResource.userId}-connected`;
 
-    this.server.to(room).emit('messageDelivered', messageResource.response);
-  }
-
-  async emitMessageRead(messageResource: MessageResource) {
-    const room = `user-${messageResource.userId}-connected`;
-
-    this.server.to(room).emit('messageRead', messageResource.response);
+    this.server.to(room).emit('messageUpdated', messageResource.response);
   }
 
   async emitChatUpdated(event: ChatUpdatedEvent) {
@@ -185,6 +153,17 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     console.log(`${sender.name} ${sender.surname} send message:`, payload);
 
     return await this.chatService.sendMessage(payload, sender);
+  }
+
+  @UseGuards(WsJwtGuard)
+  @SubscribeMessage('messageDelivered')
+  async handleReceiveMessage(
+    client: Socket,
+    payload: MessageDeliveredRequestDto,
+  ) {
+    const receiver: User = client['user'];
+
+    return await this.chatService.messageDelivered(payload, receiver);
   }
 
   @UseGuards(WsJwtGuard)

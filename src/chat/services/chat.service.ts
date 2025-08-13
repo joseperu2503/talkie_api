@@ -1,26 +1,27 @@
+import { Storage } from '@google-cloud/storage';
 import {
   BadRequestException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { ArrayContains, IsNull, Repository } from 'typeorm';
-import { User } from 'src/users/entities/user.entity';
-import { Chat } from '../entities/chat.entity';
-import { Message } from '../entities/message.entity';
-import { chatResource } from '../resources/chat.resource';
-import { Storage } from '@google-cloud/storage';
-import { v4 as uuidv4 } from 'uuid';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { ChatUser } from '../entities/chat-user.entity';
-import { SendMessageDto } from '../dto/send-message.dto';
-import { ChatUpdatedEvent } from '../events/chat-updated.event';
-import { MarkChatAsReadDto } from '../dto/mark-chat-as-read.dto';
+import { InjectRepository } from '@nestjs/typeorm';
 import { extname } from 'path';
 import { NotificationsService } from 'src/notifications/services/notifications.service';
-import { MessageResource } from '../resources/message.resource';
+import { User } from 'src/users/entities/user.entity';
+import { ArrayContains, IsNull, Repository } from 'typeorm';
+import { v4 as uuidv4 } from 'uuid';
+import { MarkChatAsReadDto } from '../dto/mark-chat-as-read.dto';
+import { MessageDeliveredRequestDto } from '../dto/message-delivered-request.dto';
+import { SendMessageDto } from '../dto/send-message.dto';
+import { ChatUser } from '../entities/chat-user.entity';
+import { Chat } from '../entities/chat.entity';
 import { MessageUser } from '../entities/message-user.entity';
+import { Message } from '../entities/message.entity';
+import { ChatUpdatedEvent } from '../events/chat-updated.event';
+import { chatResource } from '../resources/chat.resource';
+import { MessageResource } from '../resources/message.resource';
 
 @Injectable()
 export class ChatService {
@@ -112,48 +113,7 @@ export class ChatService {
         .getOne();
 
       this.eventEmitter.emit(
-        'message.delivered',
-        new MessageResource(message!, messageUser.message.sender.id),
-      );
-    }
-  }
-
-  async ReadMessages(user: User, chat: Chat) {
-    const messageUsers = await this.messageUserRepository.find({
-      where: {
-        user: {
-          id: user.id,
-        },
-        message: {
-          chat: {
-            id: chat.id,
-          },
-        },
-        readAt: IsNull(),
-      },
-      relations: {
-        message: {
-          sender: true,
-          chat: true,
-          messageUsers: true,
-        },
-      },
-    });
-
-    for (const messageUser of messageUsers) {
-      messageUser.readAt = new Date();
-      await this.messageUserRepository.save(messageUser);
-
-      const message = await this.messageRepository
-        .createQueryBuilder('message')
-        .leftJoinAndSelect('message.sender', 'sender')
-        .leftJoinAndSelect('message.chat', 'chat')
-        .leftJoinAndSelect('message.messageUsers', 'messageUser')
-        .where('message.id = :id', { id: messageUser.message.id })
-        .getOne();
-
-      this.eventEmitter.emit(
-        'message.read',
+        'message.updated',
         new MessageResource(message!, messageUser.message.sender.id),
       );
     }
@@ -293,7 +253,7 @@ export class ChatService {
     for (let userId of chat.usersId) {
       const messageResource = new MessageResource(message, userId, temporalId);
 
-      this.eventEmitter.emit('message.sent', messageResource);
+      this.eventEmitter.emit('message.updated', messageResource);
     }
 
     const chatUpdatedEvent = new ChatUpdatedEvent();
@@ -343,7 +303,7 @@ export class ChatService {
     chatUser.unreadMessagesCount = 0;
     await this.chatUserRepository.save(chatUser);
 
-    this.ReadMessages(user, chat);
+    this.readMessages(user, chat);
 
     // Emitir evento
     const chatUpdatedEvent = new ChatUpdatedEvent();
@@ -391,37 +351,82 @@ export class ChatService {
     });
   }
 
-  async messageDelivered(messageResource: MessageResource) {
-    const userId = messageResource.userId;
+  async readMessages(user: User, chat: Chat) {
+    // Lisar los mensajes no leídos
+    const messageUsers = await this.messageUserRepository.find({
+      where: {
+        user: {
+          id: user.id,
+        },
+        message: {
+          chat: {
+            id: chat.id,
+          },
+        },
+        readAt: IsNull(),
+      },
+      relations: {
+        message: true,
+      },
+    });
 
+    // Marcar como leídos los mensajes no leídos
+    for (const messageUser of messageUsers) {
+      messageUser.readAt = new Date();
+      await this.messageUserRepository.save(messageUser);
+
+      const message = await this.messageRepository
+        .createQueryBuilder('message')
+        .leftJoinAndSelect('message.sender', 'sender')
+        .leftJoinAndSelect('message.chat', 'chat')
+        .leftJoinAndSelect('message.messageUsers', 'messageUser')
+        .where('message.id = :id', { id: messageUser.message.id })
+        .getOne();
+
+      this.eventEmitter.emit(
+        'message.updated',
+        new MessageResource(message!, message!.sender.id),
+      );
+    }
+  }
+
+  async messageDelivered(
+    messageResource: MessageDeliveredRequestDto,
+    receiver: User,
+  ) {
+    // Actualizar el messageUser del usuario que recibe el mensaje
     const messageUser = await this.messageUserRepository.findOne({
       where: {
         message: {
-          id: messageResource.message.id,
+          id: messageResource.messageId,
         },
         user: {
-          id: userId,
+          id: receiver.id,
         },
       },
     });
 
-    messageUser!.deliveredAt = new Date();
+    if (!messageUser) return;
+
+    messageUser.deliveredAt = new Date();
 
     await this.messageUserRepository.save(messageUser!);
+
+    //Notificar al usuario emisor que el mensaje ha sido recibido
 
     const message = await this.messageRepository
       .createQueryBuilder('message')
       .leftJoinAndSelect('message.sender', 'sender')
       .leftJoinAndSelect('message.chat', 'chat')
       .leftJoinAndSelect('message.messageUsers', 'messageUser')
-      .where('message.id = :id', { id: messageResource.message.id })
+      .where('message.id = :id', { id: messageResource.messageId })
       .getOne();
 
-    this.eventEmitter.emit(
-      'message.delivered',
-      new MessageResource(message!, messageResource.message.sender.id),
-    );
+    if (!message) return;
 
-    return new MessageResource(message!, userId);
+    this.eventEmitter.emit(
+      'message.updated',
+      new MessageResource(message, message.sender.id),
+    );
   }
 }
