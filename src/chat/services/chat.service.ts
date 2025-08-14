@@ -120,10 +120,6 @@ export class ChatService {
   }
 
   async uploadFile(file: Express.Multer.File) {
-    if (!file) {
-      throw new BadRequestException('No file uploaded');
-    }
-
     const GCP_BUCKET = process.env.GCP_BUCKET ?? '';
     const fileExtension = extname(file.originalname);
     const blobName = `${uuidv4()}${fileExtension}`;
@@ -153,39 +149,15 @@ export class ChatService {
     return publicUrl;
   }
 
-  async sendFile(sender: User, file: Express.Multer.File, chatId: string) {
-    if (!chatId) {
-      throw new BadRequestException('No chatId');
-    }
-
+  async sendFile(file: Express.Multer.File) {
     const fileUrl = await this.uploadFile(file);
 
-    return await this.sendMessageService(
-      sender,
-      chatId,
-      null,
-      fileUrl,
-      'asasd',
-    );
+    return fileUrl;
   }
 
-  sendMessage(sendMessageDto: SendMessageRequestDto, sender: User) {
-    return this.sendMessageService(
-      sender,
-      sendMessageDto.chatId,
-      sendMessageDto.content,
-      null,
-      sendMessageDto.temporalId,
-    );
-  }
+  async sendMessage(params: SendMessageRequestDto, sender: User) {
+    const { chatId, content, fileUrl, temporalId } = params;
 
-  async sendMessageService(
-    sender: User,
-    chatId: string,
-    content: string | null,
-    fileUrl: string | null,
-    temporalId: string,
-  ) {
     const chat = await this.chatRepository.findOne({
       where: {
         id: chatId,
