@@ -28,7 +28,7 @@ COPY --from=deps /usr/src/app/node_modules ./node_modules
 COPY . .
 
 # Compilar la aplicación
-RUN npm run build
+RUN NODE_OPTIONS="--max-old-space-size=4096" npm run build
 
 # ----------------------------------------------------------
 
