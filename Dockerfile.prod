@@ -1,0 +1,51 @@
+# Etapa para instalar las dependencias
+FROM node:18-alpine3.15 AS deps
+
+# Instalar dependencias necesarias (en caso de que sean requeridas como libc6-compat)
+RUN apk add --no-cache libc6-compat
+
+# Establecer el directorio de trabajo
+WORKDIR /usr/src/app
+
+# Copiar los archivos de dependencias
+COPY package.json package-lock.json ./
+
+# Instalar dependencias con npm
+RUN npm ci
+
+# ----------------------------------------------------------
+
+# Etapa de construcción (build)
+FROM node:18-alpine3.15 AS builder
+
+# Establecer el directorio de trabajo
+WORKDIR /usr/src/app
+
+# Copiar solo las dependencias necesarias desde la etapa deps
+COPY --from=deps /usr/src/app/node_modules ./node_modules
+
+# Copiar todo el código fuente
+COPY . .
+
+# Compilar la aplicación
+RUN npm run build
+
+# ----------------------------------------------------------
+
+# Etapa para producción (solo dependencias necesarias y código compilado)
+FROM node:18-alpine3.15 AS runner
+
+# Establecer el directorio de trabajo
+WORKDIR /usr/src/app
+
+# Copiar los archivos de dependencias de producción
+COPY package.json package-lock.json ./
+
+# Instalar solo las dependencias de producción
+RUN npm install --only=production
+
+# Copiar la aplicación compilada desde la etapa build
+COPY --from=builder /usr/src/app/dist ./dist
+
+# Comando para iniciar la aplicación en producción
+CMD ["node", "dist/src/main"]

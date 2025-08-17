@@ -1,8 +1,7 @@
+import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ValidationPipe } from '@nestjs/common';
-import * as serviceAccount from '../firebase-admin.json';
-import * as admin from 'firebase-admin';
+import { initializeFirebaseApp } from './firebase.config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -18,10 +17,7 @@ async function bootstrap() {
     origin: '*',
   });
 
-  //**firebase */
-  admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount as admin.ServiceAccount),
-  });
+  initializeFirebaseApp();
 
   await app.listen(parseInt(process.env.SERVER_PORT || '3000'));
 }

@@ -1,10 +1,9 @@
 services:
   api:
-    container_name: talkie_api_dev
+    container_name: talkie_api_${ENV}
     build:
       context: .
-      target: development
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
@@ -12,27 +11,26 @@ services:
       - '${SERVER_PORT}:${SERVER_PORT}'
     depends_on:
       - db
-    image: talkie_api_dev
+    image: talkie_api_${ENV}
     networks:
       - talkie_net
-    restart: always
     env_file:
-      - .env.dev
+      - .env.${ENV}
 
   db:
     container_name: ${DB_HOST}
     image: postgres:14.3
-    restart: always
+    restart: no
+    ports:
+      - '${DB_EXPOSED_PORT}:${DB_PORT}'
     networks:
       - talkie_net
     environment:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME}
-    ports:
-      - '${DB_EXPOSED_PORT}:5432'
-
+      PGPORT: ${DB_PORT}
     volumes:
-      - ./postgres/dev:/var/lib/postgresql/data
+      - ./postgres/${ENV}:/var/lib/postgresql/data
 
 networks:
   talkie_net:
