@@ -1,12 +1,12 @@
 import { Storage } from '@google-cloud/storage';
 import {
-  BadRequestException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectRepository } from '@nestjs/typeorm';
+import * as admin from 'firebase-admin';
 import { extname } from 'path';
 import { NotificationsService } from 'src/notifications/services/notifications.service';
 import { User } from 'src/users/entities/user.entity';
@@ -120,39 +120,22 @@ export class ChatService {
   }
 
   async uploadFile(file: Express.Multer.File) {
-    const GCP_BUCKET = process.env.GCP_BUCKET ?? '';
+    const bucket = admin.storage().bucket();
     const fileExtension = extname(file.originalname);
-    const blobName = `${uuidv4()}${fileExtension}`;
-    const blob = this.storage.bucket(GCP_BUCKET).file(blobName);
+    const fileName = uuidv4() + fileExtension;
 
-    const blobStream = blob.createWriteStream({
-      resumable: false,
-      gzip: true,
+    const fileUpload = bucket.file(fileName);
+
+    await fileUpload.save(file.buffer, {
+      contentType: file.mimetype,
+      metadata: {
+        contentType: file.mimetype,
+      },
     });
 
-    blobStream.on('error', (err) => {
-      throw new BadRequestException('Error uploading file');
-    });
+    await fileUpload.makePublic();
 
-    // Espera a que el archivo esté completamente subido
-    await new Promise<void>((resolve, reject) => {
-      blobStream.on('finish', async () => {
-        resolve();
-      });
-
-      // Envía el archivo al bucket
-      blobStream.end(file.buffer);
-    });
-
-    // Devuelve la URL pública
-    const publicUrl = `https://storage.googleapis.com/${GCP_BUCKET}/${blob.name}`;
-    return publicUrl;
-  }
-
-  async sendFile(file: Express.Multer.File) {
-    const fileUrl = await this.uploadFile(file);
-
-    return fileUrl;
+    return fileUpload.publicUrl();
   }
 
   async sendMessage(params: SendMessageRequestDto, sender: User) {

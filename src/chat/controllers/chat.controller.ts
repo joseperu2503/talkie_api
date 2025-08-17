@@ -5,7 +5,7 @@ import {
   Post,
   Query,
   UploadedFile,
-  UseInterceptors
+  UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { GetUser } from 'src/auth/decorators/get-user.decorator';
@@ -27,7 +27,7 @@ export class ChatController {
   @UseInterceptors(FileInterceptor('file'))
   @JwtAuth()
   async uploadFile(@UploadedFile() file: Express.Multer.File) {
-    return this.chatService.sendFile(file);
+    return this.chatService.uploadFile(file);
   }
 
   @Get(':chatId/messages')

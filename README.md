@@ -1,6 +1,8 @@
 # Talkie API
 
-## Variables de entorno
+## Installation
+
+### Environments
 
 ```bash
 cp .env.example .env.dev
@@ -14,27 +16,27 @@ nano .env.prod
 nano .env.staging
 ```
 
-## Desarrollo
+## Start all services in development mode with Docker:
 
 ```bash
 docker compose -f docker-compose.dev.yml --env-file .env.dev -p talkie_api_dev up --build
 ```
 
-## Produccion
+## Run the API in detached, production-ready mode:
 
 ```bash
 docker compose -f docker-compose.prod.yml --env-file .env.prod -p talkie_api_prod up -d --build
 ```
 
-## Staging
+## Run the API in detached, staging-ready mode:
 
 ```bash
 docker compose -f docker-compose.staging.yml --env-file .env.staging -p talkie_api_staging up -d --build
 ```
 
-# Migraciones
+## Running Migrations
 
-1. Entrar al contenedor:
+1. Enter the running container:
 
 ```bash
 docker exec -it talkie_api_dev sh
@@ -42,48 +44,49 @@ docker exec -it talkie_api_prod sh
 docker exec -it talkie_api_staging sh
 ```
 
-2. Ejecutar el comando dentro del contenedor:
+2. Execute pending migrations:
 
 ```bash
 npm run migrations:run
 ```
 
-3. Ejecutar Seeders
+3. Seed the database inside the container:
 
 ```bash
-NODE_OPTIONS="--max-old-space-size=2048" npm run cli -- seed
+npm run cli -- seed
+npm run cli:prod -- seed
 ```
 
-4. Salir:
+4. Exit the container:
 
 ```bash
 exit
 ```
 
-## Limpiar imagenes dangling
+## Generating Migrations
 
 ```bash
-docker image prune -f
+npm run migrations:generate database/migrations/<MigrationName>
 ```
 
-## Crear migraciones
+Example:
 
 ```bash
-npm run migrations:generate database/migrations/init
+npm run migrations:generate database/migrations/create-places-table
 ```
 
 ## Configuracion Ngnix
 
 server {
-server_name talkie-api.joseperezgil.com www.talkie-api.joseperezgil.com;
-location / {
-proxy_pass http://localhost:3007;
-proxy_http_version 1.1;
-proxy_set_header Upgrade $http_upgrade;
-proxy_set_header Connection "upgrade";
-proxy_set_header Host $host;
-proxy_set_header X-Real-IP $remote_addr;
-proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-proxy_set_header X-Forwarded-Proto $scheme;
-}
+    server_name talkie-api.joseperezgil.com www.talkie-api.joseperezgil.com;
+    location / {
+        proxy_pass http://localhost:3007;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
 }
