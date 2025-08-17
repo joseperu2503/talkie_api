@@ -219,7 +219,7 @@ export class ChatService {
     this.notificationsService.sendMessage({
       users: chatUsersToUpdate.map((chatUser) => chatUser.user),
       title: `${sender.name} ${sender.surname}`,
-      body: content ?? 'foto',
+      body: content ?? 'photo',
     });
 
     for (let userId of chat.usersId) {
