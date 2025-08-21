@@ -3,17 +3,17 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { InjectRepository } from '@nestjs/typeorm';
+import { AuthMethod } from 'src/auth/dto/login-request.dto';
+import { ChatUser } from 'src/chat/entities/chat-user.entity';
+import { Chat } from 'src/chat/entities/chat.entity';
+import { ChatUpdatedEvent } from 'src/chat/events/chat-updated.event';
 import { User } from 'src/users/entities/user.entity';
 import { ArrayContains, Repository } from 'typeorm';
-import { Contact } from '../entities/contact.entity';
-import { InjectRepository } from '@nestjs/typeorm';
 import { AddContactDto } from '../dto/add-contact.dto';
-import { Chat } from 'src/chat/entities/chat.entity';
-import { ChatUser } from 'src/chat/entities/chat-user.entity';
 import { ContactResourceDto } from '../dto/contact-resource.dto';
-import { EventEmitter2 } from '@nestjs/event-emitter';
-import { ChatUpdatedEvent } from 'src/chat/events/chat-updated.event';
-import { AuthMethod } from 'src/auth/dto/login-user-dto';
+import { Contact } from '../entities/contact.entity';
 
 @Injectable()
 export class ContactService {

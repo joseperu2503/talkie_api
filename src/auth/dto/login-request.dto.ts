@@ -1,10 +1,10 @@
 import { Type } from 'class-transformer';
 import {
   IsEmail,
+  IsEnum,
   IsString,
   ValidateIf,
   ValidateNested,
-  IsEnum,
 } from 'class-validator';
 import { PhoneDto } from './phone.dto';
 
@@ -13,7 +13,7 @@ export enum AuthMethod {
   PHONE = 'phone',
 }
 
-export class LoginUserDto {
+export class LoginRequest {
   @ValidateIf((dto) => dto.type === AuthMethod.EMAIL) // Se valida solo si type es 'email'
   @IsString()
   @IsEmail()

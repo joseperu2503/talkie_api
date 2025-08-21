@@ -12,11 +12,11 @@ import {
   ValidateIf,
   ValidateNested,
 } from 'class-validator';
+import { AuthMethod } from './login-request.dto';
 import { PhoneDto } from './phone.dto';
-import { AuthMethod } from './login-user-dto';
 import { VerificationcodeDto } from './verification-code.dto';
 
-export class RegisterUserDto {
+export class RegisterRequestDto {
   @ValidateIf((dto) => dto.type === AuthMethod.EMAIL) // Se valida solo si type es 'email'
   @IsString()
   @IsEmail()

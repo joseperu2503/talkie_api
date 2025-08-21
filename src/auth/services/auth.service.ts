@@ -5,23 +5,24 @@ import {
   InternalServerErrorException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { RegisterUserDto } from '../dto/register-user.dto';
-import { InjectRepository } from '@nestjs/typeorm';
-import { User } from '../../users/entities/user.entity';
-import { Repository } from 'typeorm';
-import * as bcrypt from 'bcrypt';
-import { AuthMethod, LoginUserDto } from '../dto/login-user-dto';
-import { JwtPayload } from '../interfaces/jwt-payload.interfaces';
 import { JwtService } from '@nestjs/jwt';
+import { InjectRepository } from '@nestjs/typeorm';
+import * as bcrypt from 'bcrypt';
 import { Country } from 'src/countries/entities/country.entity';
-import { UsersService } from 'src/users/services/users.service';
-import { TwilioService } from 'src/twilio/services/twilio.service';
-import { PhoneDto } from '../dto/phone.dto';
 import { CountriesService } from 'src/countries/services/countries.service';
-import { VerifyAccountDto } from '../dto/verify-account.dto';
-import { VerificationCodesService } from 'src/verification-codes/services/verification-codes.service';
-import { VerificationcodeDto } from '../dto/verification-code.dto';
 import { MailService } from 'src/mail/services/mail.service';
+import { TwilioService } from 'src/twilio/services/twilio.service';
+import { UsersService } from 'src/users/services/users.service';
+import { VerificationCodesService } from 'src/verification-codes/services/verification-codes.service';
+import { Repository } from 'typeorm';
+import { User } from '../../users/entities/user.entity';
+import { AuthResponseDto } from '../dto/auth-response.dto';
+import { AuthMethod, LoginRequest } from '../dto/login-request.dto';
+import { PhoneDto } from '../dto/phone.dto';
+import { RegisterRequestDto } from '../dto/register-request.dto';
+import { VerificationcodeDto } from '../dto/verification-code.dto';
+import { VerifyAccountDto } from '../dto/verify-account.dto';
+import { JwtPayload } from '../interfaces/jwt-payload.interfaces';
 
 @Injectable()
 export class AuthService {
@@ -41,7 +42,7 @@ export class AuthService {
     private readonly verificationCodesService: VerificationCodesService,
   ) {}
 
-  async register(registerUserDto: RegisterUserDto) {
+  async register(registerUserDto: RegisterRequestDto): Promise<AuthResponseDto> {
     try {
       const { password, email, phone, type, verificationCode, ...userData } =
         registerUserDto;
@@ -74,8 +75,7 @@ export class AuthService {
       //** Guardar el usuario */
       await this.userRepository.save(user);
 
-      const me = await this.usersService.profile(user.id);
-      return { user: me, token: this.getJwt({ id: user.id }) };
+      return this.buildAuthResponse(user);
     } catch (error) {
       if (!(error instanceof HttpException)) {
         throw new InternalServerErrorException(error.message);
@@ -84,7 +84,7 @@ export class AuthService {
     }
   }
 
-  async login(loginUserDto: LoginUserDto) {
+  async login(loginUserDto: LoginRequest): Promise<AuthResponseDto> {
     const { password, email, phone, type } = loginUserDto;
 
     let user: User | null = null;
@@ -116,16 +116,7 @@ export class AuthService {
       throw new UnauthorizedException('Credentials are not valid');
     }
 
-    // Obtener información del perfil
-    const me = await this.usersService.profile(user.id);
-
-    // Retornar usuario y token JWT
-    return { user: me, token: this.getJwt({ id: user.id }) };
-  }
-
-  private getJwt(payload: JwtPayload) {
-    const token = this.jwtService.sign(payload);
-    return token;
+    return this.buildAuthResponse(user);
   }
 
   async sendVerificationCode(verifyAccountDto: VerifyAccountDto) {
@@ -248,5 +239,22 @@ export class AuthService {
     } catch (error) {
       throw error;
     }
+  }
+
+  private getJwt(payload: JwtPayload) {
+    const token = this.jwtService.sign(payload);
+    return token;
+  }
+
+  private buildAuthResponse(user: User): AuthResponseDto {
+    return {
+      user: {
+        id: user.id,
+        email: user.email,
+        phone: user.phone,
+        name: user.name,
+      },
+      token: this.getJwt({ id: user.id }),
+    };
   }
 }

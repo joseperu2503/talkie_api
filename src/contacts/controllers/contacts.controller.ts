@@ -1,12 +1,12 @@
-import { Controller, Post, Body, Get } from '@nestjs/common';
-import { User } from 'src/users/entities/user.entity';
+import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Auth } from 'src/auth/decorators/auth.decorator';
 import { GetUser } from 'src/auth/decorators/get-user.decorator';
-import { JwtAuth } from 'src/auth/decorators/jwt-auth.decorator';
-import { ContactService } from '../services/contact.service';
+import { User } from 'src/users/entities/user.entity';
 import { AddContactDto } from '../dto/add-contact.dto';
+import { ContactService } from '../services/contact.service';
 
 @Controller('contacts')
-@JwtAuth()
+@Auth()
 export class ContactController {
   constructor(private readonly contactService: ContactService) {}
 

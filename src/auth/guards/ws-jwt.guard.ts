@@ -1,14 +1,14 @@
 import {
-  Injectable,
   CanActivate,
   ExecutionContext,
+  Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { InjectRepository } from '@nestjs/typeorm';
 import { Socket } from 'socket.io';
 import { Repository } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
-import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class WsJwtGuard implements CanActivate {
@@ -35,11 +35,6 @@ export class WsJwtGuard implements CanActivate {
       throw new UnauthorizedException('Invalid token');
     }
     return true;
-  }
-
-  private extractTokenFromHeader(client: Socket): string {
-    const token = client.handshake.headers.authorization as string;
-    return token;
   }
 
   // Cambiar para extraer el token desde la query string

@@ -1,9 +1,9 @@
-import { AuthMethod } from 'src/auth/dto/login-user-dto';
-import { RegisterUserDto } from 'src/auth/dto/register-user.dto';
+import { AuthMethod } from 'src/auth/dto/login-request.dto';
+import { RegisterRequestDto } from 'src/auth/dto/register-request.dto';
 import { AddContactDto } from 'src/contacts/dto/add-contact.dto';
 
 interface SeedData {
-  users: RegisterUserDto[];
+  users: RegisterRequestDto[];
   contacts: AddContactDto[];
 }
 

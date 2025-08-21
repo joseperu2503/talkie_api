@@ -8,8 +8,8 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { Auth } from 'src/auth/decorators/auth.decorator';
 import { GetUser } from 'src/auth/decorators/get-user.decorator';
-import { JwtAuth } from 'src/auth/decorators/jwt-auth.decorator';
 import { User } from 'src/users/entities/user.entity';
 import { ChatService } from '../services/chat.service';
 
@@ -18,20 +18,20 @@ export class ChatController {
   constructor(private readonly chatService: ChatService) {}
 
   @Get()
-  @JwtAuth()
+  @Auth()
   async getAllChats(@GetUser() user: User) {
     return this.chatService.getAllChats(user);
   }
 
   @Post('/upload-file')
   @UseInterceptors(FileInterceptor('file'))
-  @JwtAuth()
+  @Auth()
   async uploadFile(@UploadedFile() file: Express.Multer.File) {
     return this.chatService.uploadFile(file);
   }
 
   @Get(':chatId/messages')
-  @JwtAuth()
+  @Auth()
   async getMessages(
     @GetUser() user: User,
     @Param('chatId') chatId: string,

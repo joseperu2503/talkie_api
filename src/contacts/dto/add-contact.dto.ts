@@ -1,12 +1,12 @@
 import { Type } from 'class-transformer';
 import {
+  IsEmail,
+  IsEnum,
   IsString,
   ValidateIf,
-  IsEmail,
   ValidateNested,
-  IsEnum,
 } from 'class-validator';
-import { AuthMethod } from 'src/auth/dto/login-user-dto';
+import { AuthMethod } from 'src/auth/dto/login-request.dto';
 import { PhoneDto } from 'src/auth/dto/phone.dto';
 
 export class AddContactDto {

@@ -1,6 +1,6 @@
 import { OmitType } from '@nestjs/mapped-types';
-import { LoginUserDto } from './login-user-dto';
+import { LoginRequest } from './login-request.dto';
 
-export class VerifyAccountDto extends OmitType(LoginUserDto, [
+export class VerifyAccountDto extends OmitType(LoginRequest, [
   'password',
 ] as const) {}
