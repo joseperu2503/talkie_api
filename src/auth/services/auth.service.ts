@@ -12,16 +12,15 @@ import { Country } from 'src/countries/entities/country.entity';
 import { CountriesService } from 'src/countries/services/countries.service';
 import { MailService } from 'src/mail/services/mail.service';
 import { TwilioService } from 'src/twilio/services/twilio.service';
-import { UsersService } from 'src/users/services/users.service';
 import { VerificationCodesService } from 'src/verification-codes/services/verification-codes.service';
 import { Repository } from 'typeorm';
-import { UserEntity } from '../../users/entities/user.entity';
 import { AuthResponseDto } from '../dto/auth-response.dto';
 import { AuthMethod, LoginRequestDto } from '../dto/login-request.dto';
 import { PhoneDto } from '../dto/phone.dto';
 import { RegisterRequestDto } from '../dto/register-request.dto';
 import { VerifyAccountRequestDto } from '../dto/verify-account-request.dto';
 import { VerifyCodeRequestDto } from '../dto/verify-code-request.dto';
+import { UserEntity } from '../entities/user.entity';
 import { JwtPayload } from '../interfaces/jwt-payload.interfaces';
 
 @Injectable()
@@ -31,7 +30,6 @@ export class AuthService {
     private readonly userRepository: Repository<UserEntity>,
 
     private readonly jwtService: JwtService,
-    private readonly usersService: UsersService,
 
     private readonly countriesService: CountriesService,
 

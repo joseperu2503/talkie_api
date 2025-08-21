@@ -6,10 +6,10 @@ import {
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AuthMethod } from 'src/auth/dto/login-request.dto';
+import { UserEntity } from 'src/auth/entities/user.entity';
 import { ChatUser } from 'src/chat/entities/chat-user.entity';
 import { Chat } from 'src/chat/entities/chat.entity';
 import { ChatUpdatedEvent } from 'src/chat/events/chat-updated.event';
-import { UserEntity } from 'src/users/entities/user.entity';
 import { ArrayContains, Repository } from 'typeorm';
 import { AddContactDto } from '../dto/add-contact.dto';
 import { ContactResourceDto } from '../dto/contact-resource.dto';

@@ -10,10 +10,10 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { UserEntity } from 'src/auth/entities/user.entity';
 import { WsJwtGuard } from 'src/auth/guards/ws-jwt.guard';
 import { JwtPayload } from 'src/auth/interfaces/jwt-payload.interfaces';
 import { ContactResourceDto } from 'src/contacts/dto/contact-resource.dto';
-import { UserEntity } from 'src/users/entities/user.entity';
 import { UsersService } from 'src/users/services/users.service';
 import { Repository } from 'typeorm';
 import { MessageDeliveredRequestDto } from '../dto/message-delivered-request.dto';

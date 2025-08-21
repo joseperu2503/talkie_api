@@ -8,7 +8,7 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Socket } from 'socket.io';
 import { Repository } from 'typeorm';
-import { UserEntity } from '../../users/entities/user.entity';
+import { UserEntity } from '../entities/user.entity';
 
 @Injectable()
 export class WsJwtGuard implements CanActivate {

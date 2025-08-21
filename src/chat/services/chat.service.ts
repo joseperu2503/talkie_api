@@ -1,4 +1,3 @@
-import { Storage } from '@google-cloud/storage';
 import {
   Injectable,
   NotFoundException,
@@ -8,9 +7,8 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as admin from 'firebase-admin';
 import { extname } from 'path';
+import { UserEntity } from 'src/auth/entities/user.entity';
 import { NotificationsService } from 'src/notifications/services/notifications.service';
-import { UserEntity } from 'src/users/entities/user.entity';
-import { User } from 'src/users/models/user.model';
 import { ArrayContains, IsNull, Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import { MessageDeliveredRequestDto } from '../dto/message-delivered-request.dto';
@@ -42,17 +40,9 @@ export class ChatService {
 
     @InjectRepository(MessageUser)
     private messageUserRepository: Repository<MessageUser>,
-  ) {
-    const GCP_KEY_FILE_PATH = 'firebase-admin.json';
+  ) {}
 
-    this.storage = new Storage({
-      keyFilename: GCP_KEY_FILE_PATH,
-    });
-  }
-
-  private readonly storage: Storage;
-
-  async getAllChats(user: User) {
+  async getAllChats(user: UserEntity) {
     const chats = await this.chatRepository.find({
       where: {
         usersId: ArrayContains([user.id]), // Verifica si el ID del usuario está contenido en el arreglo de usersId
@@ -84,7 +74,7 @@ export class ChatService {
     });
   }
 
-  async markAllMessagesAsDelivered(user: User) {
+  async markAllMessagesAsDelivered(user: UserEntity) {
     const messageUsers = await this.messageUserRepository.find({
       where: {
         user: {

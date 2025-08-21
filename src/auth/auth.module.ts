@@ -5,11 +5,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { CountriesModule } from 'src/countries/countries.module';
 import { MailModule } from 'src/mail/mail.module';
 import { TwilioService } from 'src/twilio/services/twilio.service';
-import { UsersService } from 'src/users/services/users.service';
 import { VerificationCode } from 'src/verification-codes/entities/verification-code.entity';
 import { VerificationCodesService } from 'src/verification-codes/services/verification-codes.service';
-import { UserEntity } from '../users/entities/user.entity';
 import { AuthController } from './controllers/auth.controller';
+import { UserEntity } from './entities/user.entity';
 import { AuthService } from './services/auth.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
 
@@ -18,7 +17,6 @@ import { JwtStrategy } from './strategies/jwt.strategy';
   providers: [
     AuthService,
     JwtStrategy,
-    UsersService,
     TwilioService,
     VerificationCodesService,
   ],

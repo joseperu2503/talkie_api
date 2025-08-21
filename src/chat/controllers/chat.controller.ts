@@ -10,7 +10,7 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Auth } from 'src/auth/decorators/auth.decorator';
 import { GetUser } from 'src/auth/decorators/get-user.decorator';
-import { UserEntity } from 'src/users/entities/user.entity';
+import { UserEntity } from 'src/auth/entities/user.entity';
 import { ChatService } from '../services/chat.service';
 
 @Controller('chats')

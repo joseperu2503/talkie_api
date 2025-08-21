@@ -8,8 +8,8 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
+import { UserEntity } from 'src/auth/entities/user.entity';
 import { Chat } from 'src/chat/entities/chat.entity';
-import { UserEntity } from 'src/users/entities/user.entity';
 
 @Entity('contacts')
 export class Contact {

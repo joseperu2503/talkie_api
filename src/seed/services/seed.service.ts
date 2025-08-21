@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
+import { UserEntity } from 'src/auth/entities/user.entity';
 import { AuthService } from 'src/auth/services/auth.service';
 import { ContactService } from 'src/contacts/services/contact.service';
 import { CountriesService } from 'src/countries/services/countries.service';
-import { UserEntity } from 'src/users/entities/user.entity';
 import { UsersService } from 'src/users/services/users.service';
 import { DataSource } from 'typeorm';
 import { countries } from '../data/countries';

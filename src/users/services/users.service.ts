@@ -13,7 +13,7 @@ import { Country } from 'src/countries/entities/country.entity';
 import { CountriesService } from 'src/countries/services/countries.service';
 import { UpdateProfileRequestDto } from 'src/users/dto/update-profile-request.dto';
 import { Not, Repository } from 'typeorm';
-import { UserEntity } from '../entities/user.entity';
+import { UserEntity } from '../../auth/entities/user.entity';
 
 @Injectable()
 export class UsersService {

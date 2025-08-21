@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as admin from 'firebase-admin';
 import { Message } from 'firebase-admin/lib/messaging/messaging-api';
-import { UserEntity } from 'src/users/entities/user.entity';
+import { UserEntity } from 'src/auth/entities/user.entity';
 import { Repository } from 'typeorm';
 import { CreateFcmTokenDto } from '../dto/create-fcm-token.dto';
 import { FcmToken } from '../entities/fcm-token.entity';
