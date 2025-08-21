@@ -1,7 +1,7 @@
-import { User } from 'src/users/entities/user.entity';
 import { Contact } from 'src/contacts/entities/contact.entity';
+import { UserEntity } from 'src/users/entities/user.entity';
 
 export class ContactUpdatedEvent {
-  user: User;
+  user: UserEntity;
   contacts: Contact[];
 }

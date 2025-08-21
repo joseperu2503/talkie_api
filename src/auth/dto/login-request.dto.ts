@@ -13,7 +13,7 @@ export enum AuthMethod {
   PHONE = 'phone',
 }
 
-export class LoginRequest {
+export class LoginRequestDto {
   @ValidateIf((dto) => dto.type === AuthMethod.EMAIL) // Se valida solo si type es 'email'
   @IsString()
   @IsEmail()

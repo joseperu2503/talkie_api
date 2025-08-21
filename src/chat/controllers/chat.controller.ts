@@ -10,7 +10,7 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Auth } from 'src/auth/decorators/auth.decorator';
 import { GetUser } from 'src/auth/decorators/get-user.decorator';
-import { User } from 'src/users/entities/user.entity';
+import { UserEntity } from 'src/users/entities/user.entity';
 import { ChatService } from '../services/chat.service';
 
 @Controller('chats')
@@ -19,7 +19,7 @@ export class ChatController {
 
   @Get()
   @Auth()
-  async getAllChats(@GetUser() user: User) {
+  async getAllChats(@GetUser() user: UserEntity) {
     return this.chatService.getAllChats(user);
   }
 
@@ -33,7 +33,7 @@ export class ChatController {
   @Get(':chatId/messages')
   @Auth()
   async getMessages(
-    @GetUser() user: User,
+    @GetUser() user: UserEntity,
     @Param('chatId') chatId: string,
     @Query('limit') limit: number = 20, // Cantidad de mensajes por página
     @Query('lastMessageId') lastMessageId?: string, // ID del último mensaje cargado

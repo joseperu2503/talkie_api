@@ -17,7 +17,7 @@ import {
 
 @Entity('users')
 @Unique(['phoneCountry', 'phone']) // Define la restricción única compuesta
-export class User {
+export class UserEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -40,7 +40,7 @@ export class User {
   @JoinColumn({ name: 'phone_country_id' })
   phoneCountry: Country | null;
 
-  @Column('number', { nullable: true, name: "phone_country_id" })
+  @Column('number', { nullable: true, name: 'phone_country_id' })
   phoneCountryId: number | null;
 
   @Column('text', { nullable: true })

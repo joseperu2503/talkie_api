@@ -1,14 +1,14 @@
 import {
-  Entity,
-  PrimaryGeneratedColumn,
   Column,
+  CreateDateColumn,
+  Entity,
   JoinColumn,
   ManyToOne,
-  CreateDateColumn,
+  PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 
-import { User } from 'src/users/entities/user.entity';
+import { UserEntity } from 'src/users/entities/user.entity';
 
 @Entity('fcm_tokens')
 export class FcmToken {
@@ -18,9 +18,9 @@ export class FcmToken {
   @Column('text')
   token: string;
 
-  @ManyToOne(() => User, (user) => user.fcmTokens)
+  @ManyToOne(() => UserEntity, (user) => user.fcmTokens)
   @JoinColumn({ name: 'user_id' })
-  user: User;
+  user: UserEntity;
 
   @CreateDateColumn({
     type: 'timestamptz',

@@ -7,19 +7,19 @@ import {
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
-import { UpdateAuthDto } from 'src/auth/dto/update-auth.dto';
 import { UpdateUserStatusRequestDto } from 'src/chat/dto/update-user-status-request.dto';
 import { ContactUpdatedEvent } from 'src/chat/events/contact-updated.event';
 import { Country } from 'src/countries/entities/country.entity';
 import { CountriesService } from 'src/countries/services/countries.service';
+import { UpdateProfileRequestDto } from 'src/users/dto/update-profile-request.dto';
 import { Not, Repository } from 'typeorm';
-import { User } from '../entities/user.entity';
+import { UserEntity } from '../entities/user.entity';
 
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
+    @InjectRepository(UserEntity)
+    private readonly userRepository: Repository<UserEntity>,
 
     private eventEmitter: EventEmitter2,
 
@@ -54,7 +54,7 @@ export class UsersService {
     };
   }
 
-  async updateProfile(user: User, updateAuthDto: UpdateAuthDto) {
+  async updateProfile(user: UserEntity, updateAuthDto: UpdateProfileRequestDto) {
     try {
       const { email, phone, password, ...otherUpdates } = updateAuthDto;
 
@@ -117,12 +117,12 @@ export class UsersService {
     }
   }
 
-  async findOne(userId: number): Promise<User | null> {
+  async findOne(userId: number): Promise<UserEntity | null> {
     const user = await this.userRepository.findOneBy({ id: userId });
     return user;
   }
 
-  async updateStatus(user: User, updateUserStatusDto: UpdateUserStatusRequestDto) {
+  async updateStatus(user: UserEntity, updateUserStatusDto: UpdateUserStatusRequestDto) {
     // Actualizar el estado de conexión del usuario
     user.isConnected = updateUserStatusDto.isConnected;
     if (!updateUserStatusDto.isConnected) {

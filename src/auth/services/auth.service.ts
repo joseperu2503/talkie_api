@@ -15,20 +15,20 @@ import { TwilioService } from 'src/twilio/services/twilio.service';
 import { UsersService } from 'src/users/services/users.service';
 import { VerificationCodesService } from 'src/verification-codes/services/verification-codes.service';
 import { Repository } from 'typeorm';
-import { User } from '../../users/entities/user.entity';
+import { UserEntity } from '../../users/entities/user.entity';
 import { AuthResponseDto } from '../dto/auth-response.dto';
-import { AuthMethod, LoginRequest } from '../dto/login-request.dto';
+import { AuthMethod, LoginRequestDto } from '../dto/login-request.dto';
 import { PhoneDto } from '../dto/phone.dto';
 import { RegisterRequestDto } from '../dto/register-request.dto';
-import { VerificationcodeDto } from '../dto/verification-code.dto';
-import { VerifyAccountDto } from '../dto/verify-account.dto';
+import { VerifyAccountRequestDto } from '../dto/verify-account-request.dto';
+import { VerifyCodeRequestDto } from '../dto/verify-code-request.dto';
 import { JwtPayload } from '../interfaces/jwt-payload.interfaces';
 
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
+    @InjectRepository(UserEntity)
+    private readonly userRepository: Repository<UserEntity>,
 
     private readonly jwtService: JwtService,
     private readonly usersService: UsersService,
@@ -42,10 +42,10 @@ export class AuthService {
     private readonly verificationCodesService: VerificationCodesService,
   ) {}
 
-  async register(registerUserDto: RegisterRequestDto): Promise<AuthResponseDto> {
+  async register(params: RegisterRequestDto): Promise<AuthResponseDto> {
     try {
       const { password, email, phone, type, verificationCode, ...userData } =
-        registerUserDto;
+        params;
 
       //** Crear el usuario */
       const user = this.userRepository.create({
@@ -61,7 +61,7 @@ export class AuthService {
         user.email = email!;
       } else {
         //** Validar si existe el phone */
-        const result = await this._findPhone(registerUserDto.phone!, true);
+        const result = await this._findPhone(params.phone!, true);
 
         user.phone = result.phone;
         user.phoneCountry = result.country;
@@ -84,10 +84,10 @@ export class AuthService {
     }
   }
 
-  async login(loginUserDto: LoginRequest): Promise<AuthResponseDto> {
-    const { password, email, phone, type } = loginUserDto;
+  async login(params: LoginRequestDto): Promise<AuthResponseDto> {
+    const { password, email, phone, type } = params;
 
-    let user: User | null = null;
+    let user: UserEntity | null = null;
 
     // Buscar usuario por email o (phone y phoneCountry)
     if (type == AuthMethod.EMAIL) {
@@ -119,9 +119,9 @@ export class AuthService {
     return this.buildAuthResponse(user);
   }
 
-  async sendVerificationCode(verifyAccountDto: VerifyAccountDto) {
+  async sendVerificationCode(params: VerifyAccountRequestDto) {
     try {
-      const { phone, type, email } = verifyAccountDto;
+      const { phone, type, email } = params;
 
       const verificationCode = await this.verificationCodesService.create();
 
@@ -164,9 +164,9 @@ export class AuthService {
   }
 
   // Método para verificar el código ingresado por el usuario
-  async verifyCode(verifyCodeDto: VerificationcodeDto) {
+  async verifyCode(params: VerifyCodeRequestDto) {
     try {
-      await this.verificationCodesService.verify(verifyCodeDto);
+      await this.verificationCodesService.verify(params);
 
       return { success: true, message: 'Code verified successfully' };
     } catch (error) {
@@ -179,9 +179,9 @@ export class AuthService {
     }
   }
 
-  async verifyAccount(verifyAccountDto: VerifyAccountDto) {
+  async verifyAccount(params: VerifyAccountRequestDto) {
     try {
-      const { phone, type, email } = verifyAccountDto;
+      const { phone, type, email } = params;
       let result: any;
       if (type == AuthMethod.EMAIL) {
         result = await this._findEmail(email!);
@@ -246,7 +246,7 @@ export class AuthService {
     return token;
   }
 
-  private buildAuthResponse(user: User): AuthResponseDto {
+  private buildAuthResponse(user: UserEntity): AuthResponseDto {
     return {
       user: {
         id: user.id,

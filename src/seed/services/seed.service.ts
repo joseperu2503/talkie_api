@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { initialData } from '../data/seed-data';
-import { countries } from '../data/countries';
 import { AuthService } from 'src/auth/services/auth.service';
-import { DataSource } from 'typeorm';
-import { User } from 'src/users/entities/user.entity';
 import { ContactService } from 'src/contacts/services/contact.service';
 import { CountriesService } from 'src/countries/services/countries.service';
+import { UserEntity } from 'src/users/entities/user.entity';
 import { UsersService } from 'src/users/services/users.service';
+import { DataSource } from 'typeorm';
+import { countries } from '../data/countries';
+import { initialData } from '../data/seed-data';
 
 @Injectable()
 export class SeedService {
@@ -38,7 +38,7 @@ export class SeedService {
     // if (process.env.NODE_ENV !== 'development') return;
 
     const contacts = initialData.contacts;
-    const user: User | null = await this.usersService.findOne(1);
+    const user: UserEntity | null = await this.usersService.findOne(1);
     if (!user) return;
     for (const contact of contacts) {
       await this.contactService.addContact(contact, user, false);

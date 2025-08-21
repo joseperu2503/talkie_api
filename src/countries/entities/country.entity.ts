@@ -1,11 +1,9 @@
-import { User } from 'src/users/entities/user.entity';
+import { UserEntity } from 'src/users/entities/user.entity';
 import {
-  Entity,
-  PrimaryGeneratedColumn,
   Column,
-  CreateDateColumn,
-  UpdateDateColumn,
+  Entity,
   OneToMany,
+  PrimaryGeneratedColumn
 } from 'typeorm';
 
 @Entity('countries')
@@ -28,6 +26,6 @@ export class Country {
   @Column('text')
   mask: string;
 
-  @OneToMany(() => User, (user) => user.phoneCountry)
-  users: User[];
+  @OneToMany(() => UserEntity, (user) => user.phoneCountry)
+  users: UserEntity[];
 }

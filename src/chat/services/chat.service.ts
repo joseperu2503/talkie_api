@@ -9,7 +9,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import * as admin from 'firebase-admin';
 import { extname } from 'path';
 import { NotificationsService } from 'src/notifications/services/notifications.service';
-import { User } from 'src/users/entities/user.entity';
+import { UserEntity } from 'src/users/entities/user.entity';
+import { User } from 'src/users/models/user.model';
 import { ArrayContains, IsNull, Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import { MessageDeliveredRequestDto } from '../dto/message-delivered-request.dto';
@@ -138,7 +139,7 @@ export class ChatService {
     return fileUpload.publicUrl();
   }
 
-  async sendMessage(params: SendMessageRequestDto, sender: User) {
+  async sendMessage(params: SendMessageRequestDto, sender: UserEntity) {
     const { chatId, content, fileUrl, temporalId } = params;
 
     const chat = await this.chatRepository.findOne({
@@ -218,7 +219,7 @@ export class ChatService {
     return new MessageResource(message, sender.id, temporalId).response;
   }
 
-  async readChat(readChatDto: ReadChatRequestDto, user: User) {
+  async readChat(readChatDto: ReadChatRequestDto, user: UserEntity) {
     // Obtener el chat con las relaciones necesarias
     const chat = await this.chatRepository.findOne({
       where: {
@@ -268,7 +269,7 @@ export class ChatService {
 
   async getMessages(
     chatId: string,
-    user: User,
+    user: UserEntity,
     limit: number,
     lastMessageId?: string,
   ) {
@@ -306,7 +307,7 @@ export class ChatService {
     });
   }
 
-  async readMessages(user: User, chat: Chat) {
+  async readMessages(user: UserEntity, chat: Chat) {
     // Lisar los mensajes no leídos
     const messageUsers = await this.messageUserRepository.find({
       where: {
@@ -347,7 +348,7 @@ export class ChatService {
 
   async messageDelivered(
     messageResource: MessageDeliveredRequestDto,
-    receiver: User,
+    receiver: UserEntity,
   ) {
     // Actualizar el messageUser del usuario que recibe el mensaje
     const messageUser = await this.messageUserRepository.findOne({

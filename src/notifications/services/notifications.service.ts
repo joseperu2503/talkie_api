@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { CreateFcmTokenDto } from '../dto/create-fcm-token.dto';
-import { User } from 'src/users/entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FcmToken } from '../entities/fcm-token.entity';
-import { Repository } from 'typeorm';
 import * as admin from 'firebase-admin';
 import { Message } from 'firebase-admin/lib/messaging/messaging-api';
+import { UserEntity } from 'src/users/entities/user.entity';
+import { Repository } from 'typeorm';
+import { CreateFcmTokenDto } from '../dto/create-fcm-token.dto';
+import { FcmToken } from '../entities/fcm-token.entity';
 
 @Injectable()
 export class NotificationsService {
@@ -14,7 +14,7 @@ export class NotificationsService {
     private fcmTokenRepository: Repository<FcmToken>,
   ) { }
 
-  async createFcmToken(createFcmTokenDto: CreateFcmTokenDto, user: User) {
+  async createFcmToken(createFcmTokenDto: CreateFcmTokenDto, user: UserEntity) {
     // Verificar si el token ya existe
     const existingToken = await this.fcmTokenRepository.findOne({
       where: { token: createFcmTokenDto.fcmToken },
@@ -35,7 +35,7 @@ export class NotificationsService {
   }
 
   async sendMessage(payload: {
-    users: User[];
+    users: UserEntity[];
     body: string;
     title: string;
     data?: { [key: string]: string };

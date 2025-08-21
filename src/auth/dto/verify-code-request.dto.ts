@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsString, IsUUID, Length } from 'class-validator';
 
-export class VerificationcodeDto {
+export class VerifyCodeRequestDto {
   @IsUUID()
   @IsNotEmpty()
   id: string;

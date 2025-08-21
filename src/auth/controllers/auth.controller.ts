@@ -1,8 +1,8 @@
 import { Body, Controller, Post } from '@nestjs/common';
-import { LoginRequest } from '../dto/login-request.dto';
+import { LoginRequestDto } from '../dto/login-request.dto';
 import { RegisterRequestDto } from '../dto/register-request.dto';
-import { VerificationcodeDto } from '../dto/verification-code.dto';
-import { VerifyAccountDto } from '../dto/verify-account.dto';
+import { VerifyAccountRequestDto } from '../dto/verify-account-request.dto';
+import { VerifyCodeRequestDto } from '../dto/verify-code-request.dto';
 import { AuthService } from '../services/auth.service';
 
 @Controller('auth')
@@ -10,27 +10,27 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('register')
-  register(@Body() registerUserDto: RegisterRequestDto) {
-    return this.authService.register(registerUserDto);
+  register(@Body() request: RegisterRequestDto) {
+    return this.authService.register(request);
   }
 
   @Post('login')
-  login(@Body() loginUserDto: LoginRequest) {
-    return this.authService.login(loginUserDto);
+  login(@Body() request: LoginRequestDto) {
+    return this.authService.login(request);
   }
 
   @Post('send-verification-code')
-  async sendVerificationCode(@Body() body: VerifyAccountDto) {
-    return this.authService.sendVerificationCode(body);
+  async sendVerificationCode(@Body() request: VerifyAccountRequestDto) {
+    return this.authService.sendVerificationCode(request);
   }
 
   @Post('verify-code')
-  async verifyCode(@Body() body: VerificationcodeDto) {
-    return this.authService.verifyCode(body);
+  async verifyCode(@Body() request: VerifyCodeRequestDto) {
+    return this.authService.verifyCode(request);
   }
 
   @Post('verify-account')
-  async verifyAccount(@Body() body: VerifyAccountDto) {
-    return this.authService.verifyAccount(body);
+  async verifyAccount(@Body() request: VerifyAccountRequestDto) {
+    return this.authService.verifyAccount(request);
   }
 }

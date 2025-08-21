@@ -1,17 +1,17 @@
 import { Module } from '@nestjs/common';
-import { AuthService } from './services/auth.service';
-import { AuthController } from './controllers/auth.controller';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from '../users/entities/user.entity';
-import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
-import { JwtStrategy } from './strategies/jwt.strategy';
-import { UsersService } from 'src/users/services/users.service';
-import { TwilioService } from 'src/twilio/services/twilio.service';
+import { PassportModule } from '@nestjs/passport';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { CountriesModule } from 'src/countries/countries.module';
-import { VerificationCodesService } from 'src/verification-codes/services/verification-codes.service';
-import { VerificationCode } from 'src/verification-codes/entities/verification-code.entity';
 import { MailModule } from 'src/mail/mail.module';
+import { TwilioService } from 'src/twilio/services/twilio.service';
+import { UsersService } from 'src/users/services/users.service';
+import { VerificationCode } from 'src/verification-codes/entities/verification-code.entity';
+import { VerificationCodesService } from 'src/verification-codes/services/verification-codes.service';
+import { UserEntity } from '../users/entities/user.entity';
+import { AuthController } from './controllers/auth.controller';
+import { AuthService } from './services/auth.service';
+import { JwtStrategy } from './strategies/jwt.strategy';
 
 @Module({
   controllers: [AuthController],
@@ -23,7 +23,7 @@ import { MailModule } from 'src/mail/mail.module';
     VerificationCodesService,
   ],
   imports: [
-    TypeOrmModule.forFeature([User, VerificationCode]),
+    TypeOrmModule.forFeature([UserEntity, VerificationCode]),
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
       useFactory: () => {

@@ -9,7 +9,7 @@ import { AuthMethod } from 'src/auth/dto/login-request.dto';
 import { ChatUser } from 'src/chat/entities/chat-user.entity';
 import { Chat } from 'src/chat/entities/chat.entity';
 import { ChatUpdatedEvent } from 'src/chat/events/chat-updated.event';
-import { User } from 'src/users/entities/user.entity';
+import { UserEntity } from 'src/users/entities/user.entity';
 import { ArrayContains, Repository } from 'typeorm';
 import { AddContactDto } from '../dto/add-contact.dto';
 import { ContactResourceDto } from '../dto/contact-resource.dto';
@@ -18,8 +18,8 @@ import { Contact } from '../entities/contact.entity';
 @Injectable()
 export class ContactService {
   constructor(
-    @InjectRepository(User)
-    private userRepository: Repository<User>,
+    @InjectRepository(UserEntity)
+    private userRepository: Repository<UserEntity>,
 
     @InjectRepository(Chat)
     private chatRepository: Repository<Chat>,
@@ -35,12 +35,12 @@ export class ContactService {
 
   async addContact(
     addContactDto: AddContactDto,
-    user: User,
+    user: UserEntity,
     withSocket: boolean = true,
   ) {
     const { email, phone, type } = addContactDto;
 
-    let contactUser: User | null = null;
+    let contactUser: UserEntity | null = null;
 
     if (type == AuthMethod.EMAIL) {
       // Buscar el usuario con el email proporcionado
@@ -163,7 +163,7 @@ export class ContactService {
     return { message: 'Contact added successfully' };
   }
 
-  async getContacts(user: User): Promise<ContactResourceDto[]> {
+  async getContacts(user: UserEntity): Promise<ContactResourceDto[]> {
     const contacts = await this.contactRepository.find({
       where: {
         ownerUser: {

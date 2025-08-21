@@ -1,3 +1,4 @@
+import { UserEntity } from 'src/users/entities/user.entity';
 import {
   Column,
   CreateDateColumn,
@@ -8,7 +9,6 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Chat } from './chat.entity';
-import { User } from 'src/users/entities/user.entity';
 
 @Entity('chat_users')
 export class ChatUser {
@@ -19,9 +19,9 @@ export class ChatUser {
   @JoinColumn({ name: 'chat_id' })
   chat: Chat;
 
-  @ManyToOne(() => User, (user) => user.chatUsers)
+  @ManyToOne(() => UserEntity, (user) => user.chatUsers)
   @JoinColumn({ name: 'user_id' })
-  user: User;
+  user: UserEntity;
 
   @Column({ type: 'int', default: 0, name: 'unread_messages_count' })
   unreadMessagesCount: number;

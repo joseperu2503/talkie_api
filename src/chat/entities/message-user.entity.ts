@@ -1,3 +1,4 @@
+import { UserEntity } from 'src/users/entities/user.entity';
 import {
   Column,
   Entity,
@@ -5,7 +6,6 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { User } from 'src/users/entities/user.entity';
 import { Message } from './message.entity';
 
 @Entity('message_users')
@@ -17,9 +17,9 @@ export class MessageUser {
   @JoinColumn({ name: 'message_id' })
   message: Message;
 
-  @ManyToOne(() => User, (user) => user.chatUsers)
+  @ManyToOne(() => UserEntity, (user) => user.chatUsers)
   @JoinColumn({ name: 'user_id' })
-  user: User;
+  user: UserEntity;
 
   // Fecha y hora de entrega
   @Column({ type: 'timestamp', nullable: true, name: 'delivered_at' })

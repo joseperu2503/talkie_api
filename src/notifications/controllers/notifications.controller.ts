@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { Auth } from 'src/auth/decorators/auth.decorator';
 import { GetUser } from 'src/auth/decorators/get-user.decorator';
-import { User } from 'src/users/entities/user.entity';
+import { UserEntity } from 'src/users/entities/user.entity';
 import { CreateFcmTokenDto } from '../dto/create-fcm-token.dto';
 import { FirebaseService } from '../services/firebase.service';
 import { NotificationsService } from '../services/notifications.service';
@@ -17,7 +17,7 @@ export class NotificationsController {
   @Post('/fcm-token')
   async createFcmToken(
     @Body() createFcmTokenDto: CreateFcmTokenDto,
-    @GetUser() user: User,
+    @GetUser() user: UserEntity,
   ) {
     return this.notificationsService.createFcmToken(createFcmTokenDto, user);
   }

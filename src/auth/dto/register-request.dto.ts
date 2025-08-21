@@ -14,7 +14,7 @@ import {
 } from 'class-validator';
 import { AuthMethod } from './login-request.dto';
 import { PhoneDto } from './phone.dto';
-import { VerificationcodeDto } from './verification-code.dto';
+import { VerifyCodeRequestDto } from './verify-code-request.dto';
 
 export class RegisterRequestDto {
   @ValidateIf((dto) => dto.type === AuthMethod.EMAIL) // Se valida solo si type es 'email'
@@ -52,7 +52,7 @@ export class RegisterRequestDto {
   photo?: string;
 
   @ValidateNested()
-  @Type(() => VerificationcodeDto)
+  @Type(() => VerifyCodeRequestDto)
   @IsOptional()
-  verificationCode?: VerificationcodeDto;
+  verificationCode?: VerifyCodeRequestDto;
 }

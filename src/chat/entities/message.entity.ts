@@ -1,15 +1,15 @@
+import { UserEntity } from 'src/users/entities/user.entity';
 import {
-  Entity,
-  PrimaryGeneratedColumn,
   Column,
-  ManyToOne,
-  JoinColumn,
   CreateDateColumn,
-  UpdateDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
   OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { Chat } from './chat.entity';
-import { User } from 'src/users/entities/user.entity';
 import { MessageUser } from './message-user.entity';
 
 @Entity('messages')
@@ -20,9 +20,9 @@ export class Message {
   @Column('text', { nullable: true })
   content: string | null;
 
-  @ManyToOne(() => User, (user) => user.messages)
+  @ManyToOne(() => UserEntity, (user) => user.messages)
   @JoinColumn({ name: 'sender_id' })
-  sender: User;
+  sender: UserEntity;
 
   @ManyToOne(() => Chat, (chat) => chat.messages)
   @JoinColumn({ name: 'chat_id' })

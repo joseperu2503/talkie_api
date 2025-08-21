@@ -1,15 +1,15 @@
 import {
-  Entity,
-  PrimaryGeneratedColumn,
   Column,
+  CreateDateColumn,
+  Entity,
   JoinColumn,
   ManyToOne,
-  CreateDateColumn,
+  PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 
-import { User } from 'src/users/entities/user.entity';
 import { Chat } from 'src/chat/entities/chat.entity';
+import { UserEntity } from 'src/users/entities/user.entity';
 
 @Entity('contacts')
 export class Contact {
@@ -22,14 +22,14 @@ export class Contact {
   alias: string;
 
   // El usuario que está iniciando/agregando el contacto
-  @ManyToOne(() => User, (user) => user.initiatedContacts)
+  @ManyToOne(() => UserEntity, (user) => user.initiatedContacts)
   @JoinColumn({ name: 'user_id' })
-  ownerUser: User;
+  ownerUser: UserEntity;
 
   // El usuario que está siendo agregado como contacto
-  @ManyToOne(() => User, (user) => user.receivedContacts)
+  @ManyToOne(() => UserEntity, (user) => user.receivedContacts)
   @JoinColumn({ name: 'contact_id' })
-  targetContact: User;
+  targetContact: UserEntity;
 
   @ManyToOne(() => Chat, (chat) => chat.contacts)
   @JoinColumn({ name: 'chat_id' })

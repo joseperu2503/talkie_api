@@ -1,9 +1,9 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import * as bcrypt from 'bcrypt';
+import { VerifyCodeRequestDto } from 'src/auth/dto/verify-code-request.dto';
 import { Repository } from 'typeorm';
 import { VerificationCode } from '../entities/verification-code.entity';
-import * as bcrypt from 'bcrypt';
-import { VerificationcodeDto } from 'src/auth/dto/verification-code.dto';
 
 @Injectable()
 export class VerificationCodesService {
@@ -36,7 +36,7 @@ export class VerificationCodesService {
   }
 
   async verify(
-    verificationcodeDto: VerificationcodeDto,
+    verificationcodeDto: VerifyCodeRequestDto,
     checkVerified: boolean = true,
   ): Promise<VerificationCode | null> {
     let verificationCode = await this.verificationcodeRepository.findOne({
