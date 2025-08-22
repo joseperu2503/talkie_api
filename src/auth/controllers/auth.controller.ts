@@ -1,7 +1,8 @@
 import { Body, Controller, HttpCode, Post } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { AuthMethod } from 'src/core/models/auth-method';
 import { AuthResponseDto } from '../dto/auth-response.dto';
-import { AuthMethod, LoginRequestDto } from '../dto/login-request.dto';
+import { LoginRequestDto } from '../dto/login-request.dto';
 import { RegisterRequestDto } from '../dto/register-request.dto';
 import { SendVerificationCodeRequestDto } from '../dto/send-verification-code-request.dto';
 import { SendVerificationCodeResponseDto } from '../dto/send-verification-code-response.dto';

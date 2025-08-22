@@ -8,8 +8,8 @@ import {
 } from '@nestjs/swagger';
 import { Auth } from 'src/auth/decorators/auth.decorator';
 import { GetUser } from 'src/auth/decorators/get-user.decorator';
-import { AuthMethod } from 'src/auth/dto/login-request.dto';
 import { UserEntity } from 'src/auth/entities/user.entity';
+import { AuthMethod } from 'src/core/models/auth-method';
 import { AddContactRequestDto } from '../dto/add-contact-request.dto';
 import { AddContactResponseDto } from '../dto/add-contact-response.dto';
 import { ContactResponseDto } from '../dto/contact-response.dto';

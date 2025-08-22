@@ -1,36 +1,35 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import {
-  IsEmail,
-  IsEnum,
-  IsString,
-  ValidateIf,
-  ValidateNested,
-} from 'class-validator';
+import { IsEmail, IsEnum, IsString, ValidateNested } from 'class-validator';
+import { AuthMethod } from 'src/core/models/auth-method';
+import { IsNullableIf } from 'src/core/validators/is-nullable.validator';
+import { IsPresent } from 'src/core/validators/is-present.validator';
 import { PhoneRequestDto } from './phone-request.dto';
-
-export enum AuthMethod {
-  EMAIL = 'email',
-  PHONE = 'phone',
-}
 
 export class LoginRequestDto {
   @ApiProperty({
     description: 'The email address of the user',
+    type: String,
     example: 'test1@gmail.com',
+    nullable: true,
   })
-  @ValidateIf((dto) => dto.type === AuthMethod.EMAIL) // Se valida solo si type es 'email'
   @IsString()
+  @IsPresent()
+  @IsNullableIf((dto) => dto.type === AuthMethod.PHONE)
   @IsEmail()
-  email?: string;
+  email: string | null;
 
   @ApiProperty({
     description: 'The phone of the user',
+    type: PhoneRequestDto,
+
+    nullable: true,
   })
-  @ValidateIf((dto) => dto.type === AuthMethod.PHONE) // Se valida solo si type es 'phone'
+  @IsPresent()
+  @IsNullableIf((dto) => dto.type === AuthMethod.EMAIL)
   @ValidateNested()
   @Type(() => PhoneRequestDto)
-  phone?: PhoneRequestDto;
+  phone: PhoneRequestDto | null;
 
   @ApiProperty({
     description: 'The password of the user',

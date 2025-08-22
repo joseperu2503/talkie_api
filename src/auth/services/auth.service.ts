@@ -8,6 +8,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
+import { AuthMethod } from 'src/core/models/auth-method';
 import { Country } from 'src/countries/entities/country.entity';
 import { CountriesService } from 'src/countries/services/countries.service';
 import { MailService } from 'src/mail/services/mail.service';
@@ -15,7 +16,7 @@ import { TwilioService } from 'src/twilio/services/twilio.service';
 import { VerificationCodesService } from 'src/verification-codes/services/verification-codes.service';
 import { Repository } from 'typeorm';
 import { AuthResponseDto } from '../dto/auth-response.dto';
-import { AuthMethod, LoginRequestDto } from '../dto/login-request.dto';
+import { LoginRequestDto } from '../dto/login-request.dto';
 import { PhoneRequestDto } from '../dto/phone-request.dto';
 import { RegisterRequestDto } from '../dto/register-request.dto';
 import { SendVerificationCodeResponseDto } from '../dto/send-verification-code-response.dto';
@@ -185,9 +186,10 @@ export class AuthService {
       const { phone, type, email } = params;
       let accountExists = false;
 
-      if (type == AuthMethod.EMAIL) {
+      if (type == AuthMethod.EMAIL && email) {
         accountExists = await this.existsEmail(email!);
-      } else {
+      }
+      if (type == AuthMethod.PHONE && phone) {
         accountExists = await this.existsPhone(phone!);
       }
       return { accountExists };

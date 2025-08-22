@@ -1,6 +1,6 @@
-import { AuthMethod } from 'src/auth/dto/login-request.dto';
 import { RegisterRequestDto } from 'src/auth/dto/register-request.dto';
 import { AddContactRequestDto } from 'src/contacts/dto/add-contact-request.dto';
+import { AuthMethod } from 'src/core/models/auth-method';
 
 interface SeedData {
   users: RegisterRequestDto[];

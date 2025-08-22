@@ -10,30 +10,38 @@ import {
   Matches,
   MaxLength,
   MinLength,
-  ValidateIf,
-  ValidateNested,
+  ValidateNested
 } from 'class-validator';
-import { AuthMethod } from './login-request.dto';
+import { AuthMethod } from 'src/core/models/auth-method';
+import { IsNullableIf } from 'src/core/validators/is-nullable.validator';
+import { IsPresent } from 'src/core/validators/is-present.validator';
 import { PhoneRequestDto } from './phone-request.dto';
 import { VerifyCodeRequestDto } from './verify-code-request.dto';
 
 export class RegisterRequestDto {
   @ApiProperty({
     description: 'The email address of the user',
-    example: 'user@example.com',
+    type: String,
+    example: 'test1@gmail.com',
+    nullable: true,
   })
-  @ValidateIf((dto) => dto.type === AuthMethod.EMAIL) // Se valida solo si type es 'email'
   @IsString()
+  @IsPresent()
+  @IsNullableIf((dto) => dto.type === AuthMethod.PHONE)
   @IsEmail()
-  email?: string;
+  email: string | null;
 
   @ApiProperty({
     description: 'The phone of the user',
+    type: PhoneRequestDto,
+
+    nullable: true,
   })
-  @ValidateIf((dto) => dto.type === AuthMethod.PHONE) // Se valida solo si type es 'phone'
+  @IsPresent()
+  @IsNullableIf((dto) => dto.type === AuthMethod.EMAIL)
   @ValidateNested()
   @Type(() => PhoneRequestDto)
-  phone?: PhoneRequestDto;
+  phone: PhoneRequestDto | null;
 
   @ApiProperty({
     description: 'The type of authentication, either email or phone',

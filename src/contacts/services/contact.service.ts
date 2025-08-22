@@ -5,11 +5,11 @@ import {
 } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectRepository } from '@nestjs/typeorm';
-import { AuthMethod } from 'src/auth/dto/login-request.dto';
 import { UserEntity } from 'src/auth/entities/user.entity';
 import { ChatUser } from 'src/chat/entities/chat-user.entity';
 import { Chat } from 'src/chat/entities/chat.entity';
 import { ChatUpdatedEvent } from 'src/chat/events/chat-updated.event';
+import { AuthMethod } from 'src/core/models/auth-method';
 import { ArrayContains, Repository } from 'typeorm';
 import { AddContactRequestDto } from '../dto/add-contact-request.dto';
 import { ContactResponseDto } from '../dto/contact-response.dto';

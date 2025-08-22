@@ -7,8 +7,8 @@ import {
   ValidateIf,
   ValidateNested,
 } from 'class-validator';
-import { AuthMethod } from 'src/auth/dto/login-request.dto';
 import { PhoneRequestDto } from 'src/auth/dto/phone-request.dto';
+import { AuthMethod } from 'src/core/models/auth-method';
 
 export class AddContactRequestDto {
   @ApiProperty({
