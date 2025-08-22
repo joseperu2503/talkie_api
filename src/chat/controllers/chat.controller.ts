@@ -8,10 +8,16 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 import { Auth } from 'src/auth/decorators/auth.decorator';
 import { GetUser } from 'src/auth/decorators/get-user.decorator';
 import { UserEntity } from 'src/auth/entities/user.entity';
+import { ChatResponseDto } from '../dto/chat-response.dto';
 import { ChatService } from '../services/chat.service';
 
 @ApiTags('Chats')
@@ -19,6 +25,13 @@ import { ChatService } from '../services/chat.service';
 export class ChatController {
   constructor(private readonly chatService: ChatService) {}
 
+  @ApiOperation({ summary: 'Get all chats' })
+  @ApiOkResponse({
+    description: 'List of chats',
+    type: ChatResponseDto,
+    isArray: true,
+  })
+  @ApiBearerAuth()
   @Get()
   @Auth()
   async getAllChats(@GetUser() user: UserEntity) {

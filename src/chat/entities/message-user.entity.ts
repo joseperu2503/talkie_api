@@ -21,6 +21,9 @@ export class MessageUser {
   @JoinColumn({ name: 'user_id' })
   user: UserEntity;
 
+  @Column('int', { name: 'user_id' })
+  userId: number;
+
   // Fecha y hora de entrega
   @Column({ type: 'timestamp', nullable: true, name: 'delivered_at' })
   deliveredAt: Date | null;

@@ -21,7 +21,6 @@ export class MessageResource {
       sentAt,
       fileUrl,
       isSender: sender.id === this.userId,
-      isImage: isImageUrl(fileUrl),
       sender: {
         id: sender.id,
         name: sender.name,
@@ -31,22 +30,10 @@ export class MessageResource {
       },
       chatId: chat.id,
       temporalId: this.temporalId,
-      receivers: this.message.messageUsers.map((receiver) => {
-        const { deliveredAt: delivered_at, readAt: read_at } = receiver;
-        return { delivered_at, read_at };
+      receivers: this.message.messageUsers.map((messageUser) => {
+        const { deliveredAt, readAt } = messageUser;
+        return { id: messageUser.userId, deliveredAt, readAt };
       }),
     };
-  }
-}
-
-export function isImageUrl(url: string | null): boolean {
-  try {
-    if (!url) return false;
-
-    const parsedUrl = new URL(url);
-    const imageExtensions = /\.(jpg|jpeg|png|gif|bmp|svg|webp|tiff|tif)$/i;
-    return imageExtensions.test(parsedUrl.pathname);
-  } catch (error) {
-    return false; // Si la URL no es válida, devuelve false
   }
 }

@@ -3,7 +3,7 @@ import { Chat } from '../entities/chat.entity';
 import { MessageResource } from './message.resource';
 
 export const chatResource = (chat: Chat, userId: number) => {
-  const receiver: ContactResponseDto = chat.contacts
+  const receivers: ContactResponseDto[] = chat.contacts
     .filter((contact) => contact.targetContact.id !== userId)
     .map((contact) => {
       return {
@@ -17,7 +17,7 @@ export const chatResource = (chat: Chat, userId: number) => {
         lastConnection: contact.targetContact.lastConnection,
         chatId: chat.id,
       };
-    })[0];
+    });
 
   // Encontrar el ChatUser correspondiente al usuario actual
   const currentChatUser = chat.chatUsers.find(
@@ -29,7 +29,7 @@ export const chatResource = (chat: Chat, userId: number) => {
     lastMessage: chat.lastMessage
       ? new MessageResource(chat.lastMessage, userId).response
       : null,
-    receiver: receiver,
+    receivers: receivers,
     unreadMessagesCount: currentChatUser
       ? currentChatUser.unreadMessagesCount
       : 0,
