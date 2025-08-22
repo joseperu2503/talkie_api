@@ -55,7 +55,7 @@ button {
 
   .swagger-ui,
   .swagger-ui section h3 {
-    color: #FAFAFA;
+    color: #fafafa;
   }
 
   .swagger-ui a {
@@ -1033,7 +1033,7 @@ button {
 
   .swagger-ui .opblock-tag {
     border-bottom: 1px solid #6b6b6b;
-    color: #FAFAFA;
+    color: #fafafa;
     transition: all 0.2s ease 0s;
   }
 
@@ -1255,7 +1255,7 @@ button {
     background: 0 0;
     border: 2px solid gray;
     box-shadow: rgba(0, 0, 0, 0.1) 0 1px 2px;
-    color: #FAFAFA;
+    color: #fafafa;
   }
 
   .swagger-ui .btn:hover {
@@ -1343,7 +1343,7 @@ button {
 
   .swagger-ui textarea {
     background: rgba(28, 28, 33, 0.8);
-    color: #FAFAFA;
+    color: #fafafa;
   }
 
   .swagger-ui input[disabled],
@@ -1431,7 +1431,7 @@ button {
   .swagger-ui table thead tr td,
   .swagger-ui table thead tr th {
     border-bottom: 1px solid rgba(58, 64, 80, 0.2);
-    color: #FAFAFA;
+    color: #fafafa;
   }
 
   .swagger-ui .parameter__name.required::after {
@@ -1457,7 +1457,7 @@ button {
 
   .swagger-ui .auth-container .errors {
     background-color: #350d0d;
-    color: #FAFAFA;
+    color: #fafafa;
   }
 
   .swagger-ui .errors-wrapper {
@@ -1677,11 +1677,11 @@ button {
   .swagger-ui label,
   .swagger-ui select,
   .swagger-ui table.headers td {
-    color: #FAFAFA;
+    color: #fafafa;
   }
 
   .swagger-ui .opblock .opblock-summary-description {
-    color: #D6D6D6;
+    color: #d6d6d6;
   }
 
   .swagger-ui .download-url-wrapper .failed,
@@ -1781,6 +1781,12 @@ button {
 }
 
 .models-control {
+  svg {
+    fill: #ffffff;
+  }
+}
+
+.close-modal {
   svg {
     fill: #ffffff;
   }

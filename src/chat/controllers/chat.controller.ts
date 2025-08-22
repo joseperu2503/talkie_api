@@ -10,6 +10,8 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
   ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
@@ -18,6 +20,7 @@ import { Auth } from 'src/auth/decorators/auth.decorator';
 import { GetUser } from 'src/auth/decorators/get-user.decorator';
 import { UserEntity } from 'src/auth/entities/user.entity';
 import { ChatResponseDto } from '../dto/chat-response.dto';
+import { UploadFileResponseDto } from '../dto/upload-file-response.dto';
 import { ChatService } from '../services/chat.service';
 
 @ApiTags('Chats')
@@ -37,7 +40,24 @@ export class ChatController {
     return this.chatService.getAllChats(user);
   }
 
+  @ApiOperation({ summary: 'Upload a file' })
+  @ApiConsumes('multipart/form-data')
   @Post('/upload-file')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  @ApiOkResponse({
+    type: UploadFileResponseDto,
+  })
+  @ApiBearerAuth()
   @UseInterceptors(FileInterceptor('file'))
   @Auth()
   async uploadFile(@UploadedFile() file: Express.Multer.File) {

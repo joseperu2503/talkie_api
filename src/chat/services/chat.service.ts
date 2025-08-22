@@ -14,6 +14,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { MessageDeliveredRequestDto } from '../dto/message-delivered-request.dto';
 import { ReadChatRequestDto } from '../dto/read-chat-request.dto';
 import { SendMessageRequestDto } from '../dto/send-message-request.dto';
+import { UploadFileResponseDto } from '../dto/upload-file-response.dto';
 import { ChatUser } from '../entities/chat-user.entity';
 import { Chat } from '../entities/chat.entity';
 import { MessageUser } from '../entities/message-user.entity';
@@ -110,7 +111,7 @@ export class ChatService {
     }
   }
 
-  async uploadFile(file: Express.Multer.File) {
+  async uploadFile(file: Express.Multer.File): Promise<UploadFileResponseDto> {
     const bucket = admin.storage().bucket();
     const fileExtension = extname(file.originalname);
     const fileName = uuidv4() + fileExtension;
@@ -126,7 +127,9 @@ export class ChatService {
 
     await fileUpload.makePublic();
 
-    return fileUpload.publicUrl();
+    return {
+      fileUrl: fileUpload.publicUrl(),
+    };
   }
 
   async sendMessage(params: SendMessageRequestDto, sender: UserEntity) {

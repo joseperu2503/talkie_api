@@ -59,7 +59,6 @@ export class AuthController {
   @ApiResponse({
     type: AuthResponseDto,
     status: 200,
-    description: 'User registered successfully.',
   })
   @Post('register')
   register(@Body() request: RegisterRequestDto) {
@@ -96,7 +95,6 @@ export class AuthController {
   @ApiResponse({
     type: AuthResponseDto,
     status: 200,
-    description: 'User logged in successfully.',
   })
   @Post('login')
   login(@Body() request: LoginRequestDto) {
@@ -131,7 +129,6 @@ export class AuthController {
   @ApiResponse({
     type: SendVerificationCodeResponseDto,
     status: 200,
-    description: 'Verification code sent successfully.',
   })
   @HttpCode(200)
   @Post('send-verification-code')
@@ -146,7 +143,6 @@ export class AuthController {
   @ApiResponse({
     type: VerifyCodeResponseDto,
     status: 200,
-    description: 'Verification code verified successfully.',
   })
   @HttpCode(200)
   @Post('verify-code')
@@ -182,7 +178,6 @@ export class AuthController {
   @ApiResponse({
     type: VerifyAccountResponseDto,
     status: 200,
-    description: 'Account verified successfully.',
     example: { accountExists: true },
   })
   @HttpCode(200)
