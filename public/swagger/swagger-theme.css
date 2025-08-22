@@ -1483,7 +1483,8 @@ button {
   }
 
   #unlocked,
-  .unlocked {
+  .unlocked,
+  .locked {
     fill: #fff;
   }
 
