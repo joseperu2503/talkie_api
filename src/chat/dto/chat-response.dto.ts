@@ -18,7 +18,7 @@ export class ChatResponseDto {
     type: ContactResponseDto,
     isArray: true,
   })
-  receivers: ContactResponseDto[];
+  members: ContactResponseDto[];
 
   @ApiProperty({
     example: 0,

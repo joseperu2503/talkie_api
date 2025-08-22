@@ -1,8 +1,9 @@
 import { ContactResponseDto } from 'src/contacts/dto/contact-response.dto';
+import { ChatResponseDto } from '../dto/chat-response.dto';
 import { Chat } from '../entities/chat.entity';
 import { MessageResource } from './message.resource';
 
-export const chatResource = (chat: Chat, userId: number) => {
+export const chatResource = (chat: Chat, userId: number): ChatResponseDto => {
   const receivers: ContactResponseDto[] = chat.contacts
     .filter((contact) => contact.targetContact.id !== userId)
     .map((contact) => {
@@ -29,7 +30,7 @@ export const chatResource = (chat: Chat, userId: number) => {
     lastMessage: chat.lastMessage
       ? new MessageResource(chat.lastMessage, userId).response
       : null,
-    receivers: receivers,
+    members: receivers,
     unreadMessagesCount: currentChatUser
       ? currentChatUser.unreadMessagesCount
       : 0,
