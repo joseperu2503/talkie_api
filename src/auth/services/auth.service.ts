@@ -20,6 +20,7 @@ import { PhoneRequestDto } from '../dto/phone-request.dto';
 import { RegisterRequestDto } from '../dto/register-request.dto';
 import { SendVerificationCodeResponseDto } from '../dto/send-verification-code-response.dto';
 import { VerifyAccountRequestDto } from '../dto/verify-account-request.dto';
+import { VerifyAccountResponseDto } from '../dto/verify-account-response.dto';
 import { VerifyCodeRequestDto } from '../dto/verify-code-request.dto';
 import { UserEntity } from '../entities/user.entity';
 import { JwtPayload } from '../interfaces/jwt-payload.interfaces';
@@ -29,15 +30,10 @@ export class AuthService {
   constructor(
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
-
     private readonly jwtService: JwtService,
-
     private readonly countriesService: CountriesService,
-
     private readonly twilioService: TwilioService,
-
     private readonly mailService: MailService,
-
     private readonly verificationCodesService: VerificationCodesService,
   ) {}
 
@@ -52,18 +48,25 @@ export class AuthService {
         password: bcrypt.hashSync(password, 10),
       });
 
+      const verifyAccountRes = await this.verifyAccount(params);
+
+      if (verifyAccountRes.accountExists) {
+        if (type == AuthMethod.EMAIL && email) {
+          throw new BadRequestException('The email is already in use.');
+        }
+        if (type == AuthMethod.PHONE && phone) {
+          throw new BadRequestException('The phone is already in use.');
+        }
+      }
+
       //** Aignar email o telefono */
-      if (type == AuthMethod.EMAIL) {
-        //** Validar si existe el email */
-        await this._findEmail(email!, true);
+      if (type == AuthMethod.EMAIL && email) {
+        user.email = email;
+      }
 
-        user.email = email!;
-      } else {
-        //** Validar si existe el phone */
-        const result = await this._findPhone(params.phone!, true);
-
-        user.phone = result.phone;
-        user.phoneCountry = result.country;
+      if (type == AuthMethod.PHONE && phone) {
+        user.phone = phone.number;
+        user.phoneCountryId = phone.countryId;
       }
 
       //** verificar codigo 4 digitos */
@@ -89,19 +92,18 @@ export class AuthService {
     let user: UserEntity | null = null;
 
     // Buscar usuario por email o (phone y phoneCountry)
-    if (type == AuthMethod.EMAIL) {
+    if (type == AuthMethod.EMAIL && email) {
       user = await this.userRepository.findOne({
         where: { email },
       });
-    } else {
-      const phoneProcessed = phone!.number.replaceAll(' ', '');
+    }
 
+    if (type == AuthMethod.PHONE && phone) {
       user = await this.userRepository.findOne({
         where: {
-          phone: phoneProcessed,
-          phoneCountry: { id: phone!.countryId },
+          phone: phone.number,
+          phoneCountryId: phone.countryId,
         },
-        relations: ['phoneCountry'], // Asegurar que se cargue la relación
       });
     }
 
@@ -176,66 +178,47 @@ export class AuthService {
     }
   }
 
-  async verifyAccount(params: VerifyAccountRequestDto) {
+  async verifyAccount(
+    params: VerifyAccountRequestDto,
+  ): Promise<VerifyAccountResponseDto> {
     try {
       const { phone, type, email } = params;
-      let result: any;
-      if (type == AuthMethod.EMAIL) {
-        result = await this._findEmail(email!);
-      } else {
-        result = await this._findPhone(phone!);
-      }
+      let accountExists = false;
 
-      return result.exist;
-    } catch (error) {
-      if (!(error instanceof HttpException)) {
-        throw new InternalServerErrorException(
-          'Failed to verify user by phone and country',
-        );
+      if (type == AuthMethod.EMAIL) {
+        accountExists = await this.existsEmail(email!);
+      } else {
+        accountExists = await this.existsPhone(phone!);
       }
-      throw error;
+      return { accountExists };
+    } catch (error) {
+      throw new InternalServerErrorException('Failed to verify account');
     }
   }
 
-  private async _findEmail(email: string, throwErrorIfExist = false) {
+  private async existsEmail(email: string) {
     const user = await this.userRepository.findOne({
       where: { email },
     });
 
-    if (user && throwErrorIfExist) {
-      throw new BadRequestException(`The email ${email} is already in use.`);
-    }
-
-    return { exist: !!user, email: email };
+    return !!user;
   }
 
-  private async _findPhone(phone: PhoneRequestDto, throwErrorIfExist = false) {
-    try {
-      const phoneProcessed = phone!.number.replaceAll(' ', '');
+  private async existsPhone(phone: PhoneRequestDto) {
+    const phoneProcessed = phone!.number.replaceAll(' ', '');
 
-      //** Validar si existe el country */
-      const country: Country = await this.countriesService.findOneWithExeption(
-        phone.countryId,
-      );
+    const country: Country = await this.countriesService.findOneWithExeption(
+      phone.countryId,
+    );
 
-      const phoneExists = await this.userRepository.findOne({
-        where: {
-          phone: phoneProcessed,
-          phoneCountry: { id: phone.countryId },
-        },
-        relations: ['phoneCountry'], // Asegurar que las relaciones se carguen para la consulta
-      });
+    const phoneExists = await this.userRepository.findOne({
+      where: {
+        phone: phoneProcessed,
+        phoneCountryId: country.id,
+      },
+    });
 
-      if (throwErrorIfExist && phoneExists) {
-        throw new BadRequestException(
-          `The phone number ${country.dialCode} ${phone!.number} is already in use.`,
-        );
-      }
-
-      return { exist: !!phoneExists, country: country, phone: phoneProcessed };
-    } catch (error) {
-      throw error;
-    }
+    return !!phoneExists;
   }
 
   private getJwt(payload: JwtPayload) {

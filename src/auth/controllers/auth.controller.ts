@@ -6,6 +6,7 @@ import { RegisterRequestDto } from '../dto/register-request.dto';
 import { SendVerificationCodeRequestDto } from '../dto/send-verification-code-request.dto';
 import { SendVerificationCodeResponseDto } from '../dto/send-verification-code-response.dto';
 import { VerifyAccountRequestDto } from '../dto/verify-account-request.dto';
+import { VerifyAccountResponseDto } from '../dto/verify-account-response.dto';
 import { VerifyCodeRequestDto } from '../dto/verify-code-request.dto';
 import { VerifyCodeResponseDto } from '../dto/verify-code-response.dto';
 import { AuthService } from '../services/auth.service';
@@ -178,10 +179,10 @@ export class AuthController {
     },
   })
   @ApiResponse({
-    type: Boolean,
+    type: VerifyAccountResponseDto,
     status: 200,
     description: 'Account verified successfully.',
-    example: true,
+    example: { accountExists: true },
   })
   @HttpCode(200)
   @Post('verify-account')
