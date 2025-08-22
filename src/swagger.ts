@@ -16,6 +16,6 @@ export function setupSwagger(app: INestApplication): void {
     customCssUrl: 'swagger/swagger-theme.css',
     customSiteTitle: 'Talkie API',
     customfavIcon:
-      'https://files.joseperezgil.com/images/portfolio/talkie/logo.png',
+      'swagger/favicon.svg',
   });
 }
