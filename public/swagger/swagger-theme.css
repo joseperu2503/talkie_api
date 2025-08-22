@@ -1,5 +1,5 @@
 .swagger-ui .topbar {
-  background-color: #0F1828;
+  background-color: #0f1828;
 }
 
 button {
@@ -55,7 +55,7 @@ button {
 
   .swagger-ui,
   .swagger-ui section h3 {
-    color: #f7f7fc;
+    color: #FAFAFA;
   }
 
   .swagger-ui a {
@@ -1033,7 +1033,7 @@ button {
 
   .swagger-ui .opblock-tag {
     border-bottom: 1px solid #6b6b6b;
-    color: #f7f7fc;
+    color: #FAFAFA;
     transition: all 0.2s ease 0s;
   }
 
@@ -1255,7 +1255,7 @@ button {
     background: 0 0;
     border: 2px solid gray;
     box-shadow: rgba(0, 0, 0, 0.1) 0 1px 2px;
-    color: #f7f7fc;
+    color: #FAFAFA;
   }
 
   .swagger-ui .btn:hover {
@@ -1343,7 +1343,7 @@ button {
 
   .swagger-ui textarea {
     background: rgba(28, 28, 33, 0.8);
-    color: #f7f7fc;
+    color: #FAFAFA;
   }
 
   .swagger-ui input[disabled],
@@ -1431,7 +1431,7 @@ button {
   .swagger-ui table thead tr td,
   .swagger-ui table thead tr th {
     border-bottom: 1px solid rgba(58, 64, 80, 0.2);
-    color: #f7f7fc;
+    color: #FAFAFA;
   }
 
   .swagger-ui .parameter__name.required::after {
@@ -1457,7 +1457,7 @@ button {
 
   .swagger-ui .auth-container .errors {
     background-color: #350d0d;
-    color: #f7f7fc;
+    color: #FAFAFA;
   }
 
   .swagger-ui .errors-wrapper {
@@ -1482,7 +1482,8 @@ button {
     fill: #fff;
   }
 
-  #unlocked {
+  #unlocked,
+  .unlocked {
     fill: #fff;
   }
 
@@ -1649,7 +1650,6 @@ button {
   .swagger-ui .model,
   .swagger-ui .opblock .opblock-section-header h4,
   .swagger-ui .opblock .opblock-section-header > label,
-  .swagger-ui .opblock .opblock-summary-description,
   .swagger-ui .opblock .opblock-summary-operation-id,
   .swagger-ui .opblock .opblock-summary-path,
   .swagger-ui .opblock .opblock-summary-path__deprecated,
@@ -1676,7 +1676,11 @@ button {
   .swagger-ui label,
   .swagger-ui select,
   .swagger-ui table.headers td {
-    color: #f7f7fc;
+    color: #FAFAFA;
+  }
+
+  .swagger-ui .opblock .opblock-summary-description {
+    color: #D6D6D6;
   }
 
   .swagger-ui .download-url-wrapper .failed,

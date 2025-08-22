@@ -1,10 +1,10 @@
 import { AuthMethod } from 'src/auth/dto/login-request.dto';
 import { RegisterRequestDto } from 'src/auth/dto/register-request.dto';
-import { AddContactDto } from 'src/contacts/dto/add-contact.dto';
+import { AddContactRequestDto } from 'src/contacts/dto/add-contact-request.dto';
 
 interface SeedData {
   users: RegisterRequestDto[];
-  contacts: AddContactDto[];
+  contacts: AddContactRequestDto[];
 }
 
 export const initialData: SeedData = {

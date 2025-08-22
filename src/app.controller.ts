@@ -1,7 +1,7 @@
 import { Controller, Get } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiExcludeController } from '@nestjs/swagger';
 
-@ApiTags('App')
+@ApiExcludeController()
 @Controller()
 export class AppController {
   constructor() {}

@@ -6,7 +6,7 @@ export function setupSwagger(app: INestApplication): void {
     .setTitle('Talkie API')
     .addBearerAuth()
     .setDescription(
-      'API for managing the FoodDash food delivery system. It provides endpoints for order management, real-time tracking, user and restaurant management, and other features related to the food delivery process.',
+      'API for real-time chat messaging application. It provides endpoints for user authentication, contact management, instant messaging with WebSocket support, push notifications, and secure communication features.',
     )
     .setVersion('1.0')
     .build();
@@ -15,7 +15,6 @@ export function setupSwagger(app: INestApplication): void {
   SwaggerModule.setup('/', app, document, {
     customCssUrl: 'swagger/swagger-theme.css',
     customSiteTitle: 'Talkie API',
-    customfavIcon:
-      'swagger/favicon.svg',
+    customfavIcon: 'swagger/favicon.svg',
   });
 }

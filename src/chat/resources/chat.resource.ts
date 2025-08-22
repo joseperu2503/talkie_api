@@ -1,9 +1,9 @@
-import { ContactResourceDto } from 'src/contacts/dto/contact-resource.dto';
+import { ContactResponseDto } from 'src/contacts/dto/contact-response.dto';
 import { Chat } from '../entities/chat.entity';
 import { MessageResource } from './message.resource';
 
 export const chatResource = (chat: Chat, userId: number) => {
-  const receiver: ContactResourceDto = chat.contacts
+  const receiver: ContactResponseDto = chat.contacts
     .filter((contact) => contact.targetContact.id !== userId)
     .map((contact) => {
       return {

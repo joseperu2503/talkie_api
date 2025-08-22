@@ -11,8 +11,8 @@ import { ChatUser } from 'src/chat/entities/chat-user.entity';
 import { Chat } from 'src/chat/entities/chat.entity';
 import { ChatUpdatedEvent } from 'src/chat/events/chat-updated.event';
 import { ArrayContains, Repository } from 'typeorm';
-import { AddContactDto } from '../dto/add-contact.dto';
-import { ContactResourceDto } from '../dto/contact-resource.dto';
+import { AddContactRequestDto } from '../dto/add-contact-request.dto';
+import { ContactResponseDto } from '../dto/contact-response.dto';
 import { Contact } from '../entities/contact.entity';
 
 @Injectable()
@@ -34,7 +34,7 @@ export class ContactService {
   ) {}
 
   async addContact(
-    addContactDto: AddContactDto,
+    addContactDto: AddContactRequestDto,
     user: UserEntity,
     withSocket: boolean = true,
   ) {
@@ -42,22 +42,24 @@ export class ContactService {
 
     let contactUser: UserEntity | null = null;
 
-    if (type == AuthMethod.EMAIL) {
+    if (type == AuthMethod.EMAIL && email) {
       // Buscar el usuario con el email proporcionado
       contactUser = await this.userRepository.findOne({
         where: {
           email: email,
         },
       });
-    } else {
+    }
+
+    if (type == AuthMethod.PHONE && phone) {
       // Buscar el usuario con el phone proporcionado
 
-      const phoneProcessed = phone!.number.replaceAll(' ', '');
+      const phoneProcessed = phone.number.replaceAll(' ', '');
 
       contactUser = await this.userRepository.findOne({
         where: {
           phone: phoneProcessed,
-          phoneCountry: { id: phone!.countryId },
+          phoneCountry: { id: phone.countryId },
         },
       });
     }
@@ -163,7 +165,7 @@ export class ContactService {
     return { message: 'Contact added successfully' };
   }
 
-  async getContacts(user: UserEntity): Promise<ContactResourceDto[]> {
+  async getContacts(user: UserEntity): Promise<ContactResponseDto[]> {
     const contacts = await this.contactRepository.find({
       where: {
         ownerUser: {

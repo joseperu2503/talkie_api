@@ -13,7 +13,7 @@ import { Server, Socket } from 'socket.io';
 import { UserEntity } from 'src/auth/entities/user.entity';
 import { WsJwtGuard } from 'src/auth/guards/ws-jwt.guard';
 import { JwtPayload } from 'src/auth/interfaces/jwt-payload.interfaces';
-import { ContactResourceDto } from 'src/contacts/dto/contact-resource.dto';
+import { ContactResponseDto } from 'src/contacts/dto/contact-response.dto';
 import { UsersService } from 'src/users/services/users.service';
 import { Repository } from 'typeorm';
 import { MessageDeliveredRequestDto } from '../dto/message-delivered-request.dto';
@@ -130,7 +130,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     for (let contact of event.contacts) {
       const room = `user-${contact.targetContact.id}-connected`;
 
-      const contactUpdated: ContactResourceDto = {
+      const contactUpdated: ContactResponseDto = {
         id: user.id,
         name: user.name,
         surname: user.surname,
