@@ -1,10 +1,12 @@
 import { Body, Controller, Get, Put } from '@nestjs/common';
+import { ApiExcludeController } from '@nestjs/swagger';
 import { Auth } from 'src/auth/decorators/auth.decorator';
 import { GetUser } from 'src/auth/decorators/get-user.decorator';
 import { UpdateProfileRequestDto } from 'src/users/dto/update-profile-request.dto';
 import { UserEntity } from '../../auth/entities/user.entity';
 import { UsersService } from '../services/users.service';
 
+@ApiExcludeController()
 @Controller('user')
 @Auth()
 export class UsersController {

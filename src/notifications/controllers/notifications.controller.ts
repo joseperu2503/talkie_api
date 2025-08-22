@@ -1,4 +1,5 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
+import { ApiExcludeController } from '@nestjs/swagger';
 import { Auth } from 'src/auth/decorators/auth.decorator';
 import { GetUser } from 'src/auth/decorators/get-user.decorator';
 import { UserEntity } from 'src/auth/entities/user.entity';
@@ -6,6 +7,7 @@ import { CreateFcmTokenDto } from '../dto/create-fcm-token.dto';
 import { FirebaseService } from '../services/firebase.service';
 import { NotificationsService } from '../services/notifications.service';
 
+@ApiExcludeController()
 @Controller('notifications')
 @Auth()
 export class NotificationsController {

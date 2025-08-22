@@ -1,10 +1,12 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { Auth } from 'src/auth/decorators/auth.decorator';
 import { GetUser } from 'src/auth/decorators/get-user.decorator';
 import { UserEntity } from 'src/auth/entities/user.entity';
 import { AddContactDto } from '../dto/add-contact.dto';
 import { ContactService } from '../services/contact.service';
 
+@ApiTags('Contacts')
 @Controller('contacts')
 @Auth()
 export class ContactController {
