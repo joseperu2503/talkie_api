@@ -16,8 +16,9 @@ import { VerificationCodesService } from 'src/verification-codes/services/verifi
 import { Repository } from 'typeorm';
 import { AuthResponseDto } from '../dto/auth-response.dto';
 import { AuthMethod, LoginRequestDto } from '../dto/login-request.dto';
-import { PhoneDto } from '../dto/phone.dto';
+import { PhoneRequestDto } from '../dto/phone-request.dto';
 import { RegisterRequestDto } from '../dto/register-request.dto';
+import { SendVerificationCodeResponseDto } from '../dto/send-verification-code-response.dto';
 import { VerifyAccountRequestDto } from '../dto/verify-account-request.dto';
 import { VerifyCodeRequestDto } from '../dto/verify-code-request.dto';
 import { UserEntity } from '../entities/user.entity';
@@ -117,7 +118,9 @@ export class AuthService {
     return this.buildAuthResponse(user);
   }
 
-  async sendVerificationCode(params: VerifyAccountRequestDto) {
+  async sendVerificationCode(
+    params: VerifyAccountRequestDto,
+  ): Promise<SendVerificationCodeResponseDto> {
     try {
       const { phone, type, email } = params;
 
@@ -145,11 +148,7 @@ export class AuthService {
       }
 
       return {
-        success: true,
-        message: 'Verification code sent',
-        data: {
-          verificationCodeId: verificationCode.id,
-        },
+        verificationCodeId: verificationCode.id,
       };
     } catch (error) {
       if (!(error instanceof HttpException)) {
@@ -166,11 +165,11 @@ export class AuthService {
     try {
       await this.verificationCodesService.verify(params);
 
-      return { success: true, message: 'Code verified successfully' };
+      return { message: 'Code verified successfully.' };
     } catch (error) {
       if (!(error instanceof HttpException)) {
         throw new InternalServerErrorException(
-          'Failed to check verification code',
+          'Failed to check verification code.',
         );
       }
       throw error;
@@ -187,7 +186,7 @@ export class AuthService {
         result = await this._findPhone(phone!);
       }
 
-      return { success: true, exists: result.exist };
+      return result.exist;
     } catch (error) {
       if (!(error instanceof HttpException)) {
         throw new InternalServerErrorException(
@@ -210,7 +209,7 @@ export class AuthService {
     return { exist: !!user, email: email };
   }
 
-  private async _findPhone(phone: PhoneDto, throwErrorIfExist = false) {
+  private async _findPhone(phone: PhoneRequestDto, throwErrorIfExist = false) {
     try {
       const phoneProcessed = phone!.number.replaceAll(' ', '');
 
@@ -246,12 +245,6 @@ export class AuthService {
 
   private buildAuthResponse(user: UserEntity): AuthResponseDto {
     return {
-      user: {
-        id: user.id,
-        email: user.email,
-        phone: user.phone,
-        name: user.name,
-      },
       token: this.getJwt({ id: user.id }),
     };
   }

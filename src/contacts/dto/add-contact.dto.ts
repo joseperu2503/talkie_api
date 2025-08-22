@@ -7,7 +7,7 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { AuthMethod } from 'src/auth/dto/login-request.dto';
-import { PhoneDto } from 'src/auth/dto/phone.dto';
+import { PhoneRequestDto } from 'src/auth/dto/phone-request.dto';
 
 export class AddContactDto {
   @ValidateIf((dto) => dto.type === AuthMethod.EMAIL) // Se valida solo si type es 'email'
@@ -17,8 +17,8 @@ export class AddContactDto {
 
   @ValidateIf((dto) => dto.type === AuthMethod.PHONE) // Se valida solo si type es 'phone'
   @ValidateNested()
-  @Type(() => PhoneDto)
-  phone?: PhoneDto;
+  @Type(() => PhoneRequestDto)
+  phone?: PhoneRequestDto;
 
   @IsEnum(AuthMethod)
   type: AuthMethod;

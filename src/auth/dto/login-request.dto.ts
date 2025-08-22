@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
   IsEmail,
@@ -6,7 +7,7 @@ import {
   ValidateIf,
   ValidateNested,
 } from 'class-validator';
-import { PhoneDto } from './phone.dto';
+import { PhoneRequestDto } from './phone-request.dto';
 
 export enum AuthMethod {
   EMAIL = 'email',
@@ -14,19 +15,35 @@ export enum AuthMethod {
 }
 
 export class LoginRequestDto {
+  @ApiProperty({
+    description: 'The email address of the user',
+    example: 'test1@gmail.com',
+  })
   @ValidateIf((dto) => dto.type === AuthMethod.EMAIL) // Se valida solo si type es 'email'
   @IsString()
   @IsEmail()
-  email?: string; // Obligatorio si type es 'email'
+  email?: string;
 
+  @ApiProperty({
+    description: 'The phone of the user',
+  })
   @ValidateIf((dto) => dto.type === AuthMethod.PHONE) // Se valida solo si type es 'phone'
   @ValidateNested()
-  @Type(() => PhoneDto)
-  phone?: PhoneDto;
+  @Type(() => PhoneRequestDto)
+  phone?: PhoneRequestDto;
 
+  @ApiProperty({
+    description: 'The password of the user',
+    example: 'Abc123',
+  })
   @IsString()
-  password: string; // Siempre obligatorio
+  password: string;
 
+  @ApiProperty({
+    description: 'The type of authentication, either email or phone',
+    enum: AuthMethod,
+    example: AuthMethod.EMAIL,
+  })
   @IsEnum(AuthMethod)
   type: AuthMethod;
 }
