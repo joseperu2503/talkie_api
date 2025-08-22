@@ -10,7 +10,7 @@ import {
   Matches,
   MaxLength,
   MinLength,
-  ValidateNested
+  ValidateNested,
 } from 'class-validator';
 import { AuthMethod } from 'src/core/models/auth-method';
 import { IsNullableIf } from 'src/core/validators/is-nullable.validator';
