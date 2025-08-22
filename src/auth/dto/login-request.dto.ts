@@ -8,7 +8,6 @@ import { PhoneRequestDto } from './phone-request.dto';
 
 export class LoginRequestDto {
   @ApiProperty({
-    description: 'The email address of the user',
     type: String,
     example: 'test1@gmail.com',
     nullable: true,
@@ -20,7 +19,6 @@ export class LoginRequestDto {
   email: string | null;
 
   @ApiProperty({
-    description: 'The phone of the user',
     type: PhoneRequestDto,
 
     nullable: true,
@@ -32,14 +30,12 @@ export class LoginRequestDto {
   phone: PhoneRequestDto | null;
 
   @ApiProperty({
-    description: 'The password of the user',
     example: 'Abc123',
   })
   @IsString()
   password: string;
 
   @ApiProperty({
-    description: 'The type of authentication, either email or phone',
     enum: AuthMethod,
     example: AuthMethod.EMAIL,
   })

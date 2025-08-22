@@ -10,7 +10,6 @@ export class CountriesController {
 
   @ApiOperation({ summary: 'Get all countries' })
   @ApiOkResponse({
-    description: 'List of countries',
     type: CountryResponseDto,
     isArray: true,
   })

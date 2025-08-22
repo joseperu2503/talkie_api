@@ -1,24 +1,23 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CountryResponseDto {
-  @ApiProperty({ example: 1, description: 'Unique identifier of the country' })
+  @ApiProperty({ example: 1 })
   id: number;
 
-  @ApiProperty({ example: 'Afghanistan', description: 'Country name' })
+  @ApiProperty({ example: 'Afghanistan' })
   name: string;
 
-  @ApiProperty({ example: '🇦🇫', description: 'Emoji flag of the country' })
+  @ApiProperty({ example: '🇦🇫' })
   flag: string;
 
-  @ApiProperty({ example: 'AF', description: 'ISO country code' })
+  @ApiProperty({ example: 'AF' })
   code: string;
 
-  @ApiProperty({ example: '+93', description: 'Dialing code of the country' })
+  @ApiProperty({ example: '+93' })
   dialCode: string;
 
   @ApiProperty({
     example: '999 999 9999',
-    description: 'Phone number mask for the country',
   })
   mask: string;
 }

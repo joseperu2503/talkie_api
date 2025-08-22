@@ -4,7 +4,6 @@ import { IsNotEmpty, IsNumber, IsPositive, IsString } from 'class-validator';
 
 export class PhoneRequestDto {
   @ApiProperty({
-    description: 'The phone country id',
     example: 1,
   })
   @IsPositive()
@@ -12,7 +11,6 @@ export class PhoneRequestDto {
   countryId: number;
 
   @ApiProperty({
-    description: 'The phone number',
     example: '34567890',
   })
   @IsString()

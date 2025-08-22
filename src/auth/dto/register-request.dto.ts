@@ -20,7 +20,6 @@ import { VerifyCodeRequestDto } from './verify-code-request.dto';
 
 export class RegisterRequestDto {
   @ApiProperty({
-    description: 'The email address of the user',
     type: String,
     example: 'test1@gmail.com',
     nullable: true,
@@ -32,7 +31,6 @@ export class RegisterRequestDto {
   email: string | null;
 
   @ApiProperty({
-    description: 'The phone of the user',
     type: PhoneRequestDto,
 
     nullable: true,
@@ -44,7 +42,6 @@ export class RegisterRequestDto {
   phone: PhoneRequestDto | null;
 
   @ApiProperty({
-    description: 'The type of authentication, either email or phone',
     enum: AuthMethod,
     example: AuthMethod.EMAIL,
   })
@@ -52,8 +49,6 @@ export class RegisterRequestDto {
   type: AuthMethod;
 
   @ApiProperty({
-    description:
-      'The password of the user, The password must have a Uppercase, lowercase letter and a number',
     example: 'password123',
   })
   @IsString()
@@ -66,7 +61,6 @@ export class RegisterRequestDto {
   password: string;
 
   @ApiProperty({
-    description: 'The name of the user',
     example: 'John',
   })
   @IsString()
@@ -74,7 +68,6 @@ export class RegisterRequestDto {
   name: string;
 
   @ApiProperty({
-    description: 'The surname of the user',
     example: 'Doe',
   })
   @IsString()
@@ -86,7 +79,6 @@ export class RegisterRequestDto {
   photo?: string;
 
   @ApiProperty({
-    description: 'The verification code for the user',
     example: '123456',
   })
   @ValidateNested()

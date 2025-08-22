@@ -47,7 +47,6 @@ export class ContactController {
     },
   })
   @ApiOkResponse({
-    description: 'Contact added successfully',
     type: AddContactResponseDto,
   })
   @ApiBearerAuth()
@@ -61,7 +60,6 @@ export class ContactController {
 
   @ApiOperation({ summary: 'Get contacts' })
   @ApiOkResponse({
-    description: 'List of contacts',
     type: ContactResponseDto,
     isArray: true,
   })

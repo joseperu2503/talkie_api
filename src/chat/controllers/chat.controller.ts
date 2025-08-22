@@ -27,7 +27,6 @@ export class ChatController {
 
   @ApiOperation({ summary: 'Get all chats' })
   @ApiOkResponse({
-    description: 'List of chats',
     type: ChatResponseDto,
     isArray: true,
   })

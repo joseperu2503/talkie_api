@@ -165,30 +165,37 @@ export const initialData: SeedData = {
   contacts: [
     {
       email: 'test2@gmail.com',
+      phone: null,
       type: AuthMethod.EMAIL,
     },
     {
       email: 'test3@gmail.com',
+      phone: null,
       type: AuthMethod.EMAIL,
     },
     {
       email: 'test4@gmail.com',
+      phone: null,
       type: AuthMethod.EMAIL,
     },
     {
       email: 'test5@gmail.com',
+      phone: null,
       type: AuthMethod.EMAIL,
     },
     {
       email: 'test6@gmail.com',
+      phone: null,
       type: AuthMethod.EMAIL,
     },
     {
       email: 'test7@gmail.com',
+      phone: null,
       type: AuthMethod.EMAIL,
     },
     {
       email: 'test8@gmail.com',
+      phone: null,
       type: AuthMethod.EMAIL,
     },
   ],
