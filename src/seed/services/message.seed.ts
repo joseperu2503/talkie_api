@@ -177,11 +177,13 @@ export class MessageSeed {
       },
     });
 
+    console.log(chat);
+
     if (!chat) {
       return;
     }
 
-    // Crear y guardar el mensaje
+    // // Crear y guardar el mensaje
     const message = this.messageRepository.create({
       content,
       sender,
@@ -192,8 +194,7 @@ export class MessageSeed {
 
     await this.messageRepository.save(message);
 
-    chat.lastMessage = message;
-    await this.chatRepository.save(chat);
+    await this.chatRepository.update(chat.id, { lastMessage: message });
 
     // Incrementar los mensajes no leídos en los chatUsers (excepto para el remitente)
     const chatUsersToUpdate = chat.chatUsers.filter(

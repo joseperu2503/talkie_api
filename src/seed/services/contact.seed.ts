@@ -56,7 +56,7 @@ export class ContactSeed {
     );
 
     if (!user) return;
-    for (const contact of contacts) {
+    for (const contact of contacts) { 
       await this.contactService.addContact(contact, user, false);
     }
   }
