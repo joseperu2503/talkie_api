@@ -1,17 +1,17 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { Chat } from './entities/chat.entity';
-import { Message } from './entities/message.entity';
-import { AuthModule } from 'src/auth/auth.module';
-import { ChatService } from './services/chat.service';
-import { ChatController } from './controllers/chat.controller';
-import { ChatGateway } from './gateways/chat.gateway';
-import { ChatUser } from './entities/chat-user.entity';
 import { MulterModule } from '@nestjs/platform-express';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import * as multer from 'multer';
+import { AuthModule } from 'src/auth/auth.module';
 import { NotificationsModule } from 'src/notifications/notifications.module';
-import { MessageUser } from './entities/message-user.entity';
 import { UsersModule } from 'src/users/users.module';
+import { ChatController } from './controllers/chat.controller';
+import { ChatUser } from './entities/chat-user.entity';
+import { Chat } from './entities/chat.entity';
+import { MessageUser } from './entities/message-user.entity';
+import { Message } from './entities/message.entity';
+import { ChatGateway } from './gateways/chat.gateway';
+import { ChatService } from './services/chat.service';
 
 @Module({
   imports: [
@@ -25,6 +25,6 @@ import { UsersModule } from 'src/users/users.module';
   ],
   controllers: [ChatController],
   providers: [ChatService, ChatGateway],
-  exports: [ChatService],
+  exports: [ChatService, TypeOrmModule],
 })
 export class ChatModule {}
