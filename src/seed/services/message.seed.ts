@@ -177,8 +177,6 @@ export class MessageSeed {
       },
     });
 
-    console.log(chat);
-
     if (!chat) {
       return;
     }
