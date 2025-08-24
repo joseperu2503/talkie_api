@@ -4,7 +4,7 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
-  PrimaryGeneratedColumn,
+  PrimaryColumn,
   UpdateDateColumn,
 } from 'typeorm';
 
@@ -13,22 +13,27 @@ import { Chat } from 'src/chat/entities/chat.entity';
 
 @Entity('contacts')
 export class Contact {
-  @PrimaryGeneratedColumn()
-  id: number;
-
   @Column('text', {
     nullable: true,
   })
   alias: string;
 
+  // 🔑 Parte de la clave primaria (usuario que agrega)
+  @PrimaryColumn({ name: 'owner_user_id' })
+  ownerUserId: number;
+
+  // 🔑 Parte de la clave primaria (usuario agregado)
+  @PrimaryColumn({ name: 'target_user_id' })
+  tartgetUserId: number;
+
   // El usuario que está iniciando/agregando el contacto
   @ManyToOne(() => UserEntity, (user) => user.initiatedContacts)
-  @JoinColumn({ name: 'user_id' })
+  @JoinColumn({ name: 'owner_user_id' })
   ownerUser: UserEntity;
 
   // El usuario que está siendo agregado como contacto
   @ManyToOne(() => UserEntity, (user) => user.receivedContacts)
-  @JoinColumn({ name: 'contact_id' })
+  @JoinColumn({ name: 'target_user_id' })
   targetContact: UserEntity;
 
   @ManyToOne(() => Chat, (chat) => chat.contacts)

@@ -1,10 +1,9 @@
 import {
-  Column,
   CreateDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
-  PrimaryGeneratedColumn,
+  PrimaryColumn,
   UpdateDateColumn,
 } from 'typeorm';
 
@@ -12,10 +11,7 @@ import { UserEntity } from 'src/auth/entities/user.entity';
 
 @Entity('fcm_tokens')
 export class FcmToken {
-  @PrimaryGeneratedColumn()
-  id: number;
-
-  @Column('text')
+  @PrimaryColumn('text')
   token: string;
 
   @ManyToOne(() => UserEntity, (user) => user.fcmTokens)

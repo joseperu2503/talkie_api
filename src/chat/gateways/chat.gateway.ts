@@ -207,7 +207,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
 
-  private async _verifyClientsInRoom(userId: number) {
+  private async _verifyClientsInRoom(userId: string) {
     const room = `user-${userId}-connected`;
 
     // Verificar si hay clientes en el canal de conectados

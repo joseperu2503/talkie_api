@@ -4,7 +4,7 @@ export class SenderResponseDto {
   @ApiProperty({
     example: 7,
   })
-  id: number;
+  id: string;
 
   @ApiProperty({
     example: 'James',

@@ -3,7 +3,7 @@ import { ChatResponseDto } from '../dto/chat-response.dto';
 import { Chat } from '../entities/chat.entity';
 import { MessageResource } from './message.resource';
 
-export const chatResource = (chat: Chat, userId: number): ChatResponseDto => {
+export const chatResource = (chat: Chat, userId: string): ChatResponseDto => {
   const receivers: ContactResponseDto[] = chat.contacts
     .filter((contact) => contact.targetContact.id !== userId)
     .map((contact) => {

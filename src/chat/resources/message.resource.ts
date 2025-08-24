@@ -3,10 +3,10 @@ import { Message } from '../entities/message.entity';
 
 export class MessageResource {
   readonly message: Message;
-  readonly userId: number;
+  readonly userId: string;
   readonly temporalId?: string;
 
-  constructor(message: Message, userId: number, temporalId?: string) {
+  constructor(message: Message, userId: string, temporalId?: string) {
     this.message = message;
     this.userId = userId;
     this.temporalId = temporalId;

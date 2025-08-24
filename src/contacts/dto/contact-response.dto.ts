@@ -4,7 +4,7 @@ export class ContactResponseDto {
   @ApiProperty({
     example: 1,
   })
-  id: number;
+  id: string;
 
   @ApiProperty({
     example: 'John',

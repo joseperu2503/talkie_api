@@ -1,16 +1,16 @@
+import { Contact } from 'src/contacts/entities/contact.entity';
 import {
-  Entity,
-  PrimaryGeneratedColumn,
-  OneToMany,
-  OneToOne,
-  JoinColumn,
   Column,
   CreateDateColumn,
+  Entity,
+  JoinColumn,
+  OneToMany,
+  OneToOne,
+  PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Message } from './message.entity';
-import { Contact } from 'src/contacts/entities/contact.entity';
 import { ChatUser } from './chat-user.entity';
+import { Message } from './message.entity';
 
 @Entity('chats')
 export class Chat {
@@ -24,8 +24,8 @@ export class Chat {
   @JoinColumn({ name: 'last_message' })
   lastMessage: Message;
 
-  @Column('int', { array: true, name: 'users_id' })
-  usersId: number[];
+  @Column('uuid', { array: true, name: 'users_id' })
+  usersId: string[];
 
   @OneToMany(() => Contact, (contact) => contact.chat)
   contacts: Contact[];

@@ -18,8 +18,8 @@ import {
 @Entity('users')
 @Unique(['phoneCountry', 'phone']) // Define la restricción única compuesta
 export class UserEntity {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column('text', {
     unique: true,
@@ -49,21 +49,6 @@ export class UserEntity {
   @Column('text', { nullable: true })
   photo: string | null;
 
-  @CreateDateColumn({
-    type: 'timestamptz',
-    name: 'created_at',
-    default: () => 'CURRENT_TIMESTAMP',
-  })
-  createdAt: Date;
-
-  @UpdateDateColumn({
-    type: 'timestamptz',
-    name: 'updated_at',
-    default: () => 'CURRENT_TIMESTAMP',
-    onUpdate: 'CURRENT_TIMESTAMP',
-  })
-  updatedAt: Date;
-
   @OneToMany(() => Message, (message) => message.sender)
   messages: Message[];
 
@@ -90,4 +75,19 @@ export class UserEntity {
 
   @OneToMany(() => FcmToken, (fcmToken) => fcmToken.user)
   fcmTokens: FcmToken[];
+
+  @CreateDateColumn({
+    type: 'timestamptz',
+    name: 'created_at',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  createdAt: Date;
+
+  @UpdateDateColumn({
+    type: 'timestamptz',
+    name: 'updated_at',
+    default: () => 'CURRENT_TIMESTAMP',
+    onUpdate: 'CURRENT_TIMESTAMP',
+  })
+  updatedAt: Date;
 }

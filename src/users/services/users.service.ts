@@ -26,7 +26,7 @@ export class UsersService {
     private readonly countriesService: CountriesService,
   ) {}
 
-  async profile(userId: number) {
+  async profile(userId: string) {
     const user = await this.userRepository.findOne({
       where: {
         id: userId,
@@ -54,7 +54,10 @@ export class UsersService {
     };
   }
 
-  async updateProfile(user: UserEntity, updateAuthDto: UpdateProfileRequestDto) {
+  async updateProfile(
+    user: UserEntity,
+    updateAuthDto: UpdateProfileRequestDto,
+  ) {
     try {
       const { email, phone, password, ...otherUpdates } = updateAuthDto;
 
@@ -117,12 +120,15 @@ export class UsersService {
     }
   }
 
-  async findOne(userId: number): Promise<UserEntity | null> {
+  async findOne(userId: string): Promise<UserEntity | null> {
     const user = await this.userRepository.findOneBy({ id: userId });
     return user;
   }
 
-  async updateStatus(user: UserEntity, updateUserStatusDto: UpdateUserStatusRequestDto) {
+  async updateStatus(
+    user: UserEntity,
+    updateUserStatusDto: UpdateUserStatusRequestDto,
+  ) {
     // Actualizar el estado de conexión del usuario
     user.isConnected = updateUserStatusDto.isConnected;
     if (!updateUserStatusDto.isConnected) {
@@ -140,7 +146,7 @@ export class UsersService {
     this.eventEmitter.emit('contact.updated', contactUpdatedEvent);
   }
 
-  async getContacts(userId: number) {
+  async getContacts(userId: string) {
     const user = await this.userRepository.findOne({
       where: { id: userId },
       relations: {
