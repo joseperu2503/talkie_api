@@ -171,6 +171,7 @@ export class ChatService {
 
     await this.messageRepository.save(message);
 
+    chat.lastMessage = message;
     await this.chatRepository.update(chat.id, { lastMessage: message });
 
     // Incrementar los mensajes no leídos en los chatUsers (excepto para el remitente)
