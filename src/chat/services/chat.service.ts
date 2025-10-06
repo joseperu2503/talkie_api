@@ -209,7 +209,7 @@ export class ChatService {
     chatUpdatedEvent.chat = chat;
     this.eventEmitter.emit('chat.updated', chatUpdatedEvent);
 
-    return new MessageResource(message, sender.id, temporalId).response;
+    // return new MessageResource(message, sender.id, temporalId).response;
   }
 
   async readChat(readChatDto: ReadChatRequestDto, user: UserEntity) {
