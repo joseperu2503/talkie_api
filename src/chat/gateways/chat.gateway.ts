@@ -20,6 +20,7 @@ import { MessageDeliveredRequestDto } from '../dto/message-delivered-request.dto
 import { ReadChatRequestDto } from '../dto/read-chat-request.dto';
 import { SendMessageRequestDto } from '../dto/send-message-request.dto';
 import { UpdateUserStatusRequestDto } from '../dto/update-user-status-request.dto';
+import { UserTypingRequestDto } from '../dto/user-typing-request.dto';
 import { ChatUpdatedEvent } from '../events/chat-updated.event';
 import { ContactUpdatedEvent } from '../events/contact-updated.event';
 import { chatResource } from '../resources/chat.resource';
@@ -164,6 +165,25 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const receiver: UserEntity = client['user'];
 
     return await this.chatService.messageDelivered(payload, receiver);
+  }
+
+  @UseGuards(WsJwtGuard)
+  @SubscribeMessage('userTyping')
+  async handleUserTyping(client: Socket, payload: UserTypingRequestDto) {
+    const user: UserEntity = client['user'];
+    const { chatId, isTyping } = payload;
+    this.server
+      .to(`chat-${chatId}`)
+      .emit('userTyping', { chatId, isTyping, userId: user.id });
+  }
+
+  @UseGuards(WsJwtGuard)
+  @SubscribeMessage('joinToChat')
+  async handleJoinToChat(client: Socket, payload: UserTypingRequestDto) {
+    const user: UserEntity = client['user'];
+    const chatId = payload.chatId;
+    await client.join(`chat-${chatId}`);
+    console.log(`${user.name} ${user.surname} joined chat ${chatId}`);
   }
 
   @UseGuards(WsJwtGuard)
