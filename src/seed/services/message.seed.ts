@@ -212,6 +212,16 @@ export class MessageSeed {
 
       message.messageUsers.push(messageUser);
     }
+
+    // Resetear contador de no leídos para el remitente
+    const senderChatUser = chat.chatUsers.find(
+      (chatUser) => chatUser.user.id === sender.id,
+    );
+
+    if (senderChatUser) {
+      senderChatUser.unreadMessagesCount = 0;
+      await this.chatUserRepository.save(senderChatUser);
+    }
   }
 }
 

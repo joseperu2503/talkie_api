@@ -1,18 +1,20 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { SeedModule } from './seed/seed.module';
-import { AuthModule } from './auth/auth.module';
-import { AppController } from './app.controller';
-import { SeedCommand } from './seed/commands/seed.command';
-import { ChatModule } from './chat/chat.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { ScheduleModule } from '@nestjs/schedule';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { AppController } from './app.controller';
+import { AuthModule } from './auth/auth.module';
+import { ChatModule } from './chat/chat.module';
 import { ContactsModule } from './contacts/contacts.module';
-import { NotificationsModule } from './notifications/notifications.module';
 import { CountriesModule } from './countries/countries.module';
+import { MailModule } from './mail/mail.module';
+import { NotificationsModule } from './notifications/notifications.module';
+import { SeedCommand } from './seed/commands/seed.command';
+import { SeedModule } from './seed/seed.module';
 import { UsersModule } from './users/users.module';
 import { VerificationCodesModule } from './verification-codes/verification-codes.module';
-import { MailModule } from './mail/mail.module';
+import { CronModule } from './cron/cron.module';
 
 @Module({
   controllers: [AppController],
@@ -32,12 +34,14 @@ import { MailModule } from './mail/mail.module';
     AuthModule,
     ChatModule,
     EventEmitterModule.forRoot(),
+    ScheduleModule.forRoot(),
     ContactsModule,
     NotificationsModule,
     CountriesModule,
     UsersModule,
     VerificationCodesModule,
     MailModule,
+    CronModule,
   ],
   providers: [SeedCommand],
 })
