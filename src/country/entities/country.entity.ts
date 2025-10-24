@@ -1,4 +1,4 @@
-import { UserEntity } from 'src/auth/entities/user.entity';
+import { User } from 'src/auth/entities/user.entity';
 import {
   Column,
   Entity,
@@ -26,6 +26,6 @@ export class Country {
   @Column('text')
   mask: string;
 
-  @OneToMany(() => UserEntity, (user) => user.phoneCountry)
-  users: UserEntity[];
+  @OneToMany(() => User, (user) => user.phoneCountry)
+  users: User[];
 }

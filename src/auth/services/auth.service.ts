@@ -23,14 +23,14 @@ import { SendVerificationCodeResponseDto } from '../dto/send-verification-code-r
 import { VerifyAccountRequestDto } from '../dto/verify-account-request.dto';
 import { VerifyAccountResponseDto } from '../dto/verify-account-response.dto';
 import { VerifyCodeRequestDto } from '../dto/verify-code-request.dto';
-import { UserEntity } from '../entities/user.entity';
+import { User } from '../entities/user.entity';
 import { JwtPayload } from '../interfaces/jwt-payload.interfaces';
 
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectRepository(UserEntity)
-    private readonly userRepository: Repository<UserEntity>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
     private readonly jwtService: JwtService,
     private readonly countriesService: CountryService,
     private readonly twilioService: TwilioService,
@@ -90,7 +90,7 @@ export class AuthService {
   async login(params: LoginRequestDto): Promise<AuthResponseDto> {
     const { password, email, phone, type } = params;
 
-    let user: UserEntity | null = null;
+    let user: User | null = null;
 
     // Buscar usuario por email o (phone y phoneCountry)
     if (type == AuthMethod.EMAIL && email) {
@@ -228,7 +228,7 @@ export class AuthService {
     return token;
   }
 
-  private buildAuthResponse(user: UserEntity): AuthResponseDto {
+  private buildAuthResponse(user: User): AuthResponseDto {
     return {
       token: this.getJwt({ id: user.id }),
     };

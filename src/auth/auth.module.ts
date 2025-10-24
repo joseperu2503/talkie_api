@@ -8,7 +8,7 @@ import { TwilioService } from 'src/twilio/services/twilio.service';
 import { VerificationCode } from 'src/verification-codes/entities/verification-code.entity';
 import { VerificationCodesService } from 'src/verification-codes/services/verification-codes.service';
 import { AuthController } from './controllers/auth.controller';
-import { UserEntity } from './entities/user.entity';
+import { User } from './entities/user.entity';
 import { AuthService } from './services/auth.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
 
@@ -21,7 +21,7 @@ import { JwtStrategy } from './strategies/jwt.strategy';
     VerificationCodesService,
   ],
   imports: [
-    TypeOrmModule.forFeature([UserEntity, VerificationCode]),
+    TypeOrmModule.forFeature([User, VerificationCode]),
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
       useFactory: () => {

@@ -13,13 +13,13 @@ import { Country } from 'src/country/entities/country.entity';
 import { CountryService } from 'src/country/services/country.service';
 import { UpdateProfileRequestDto } from 'src/user/dto/update-profile-request.dto';
 import { Not, Repository } from 'typeorm';
-import { UserEntity } from '../../auth/entities/user.entity';
+import { User } from '../../auth/entities/user.entity';
 
 @Injectable()
 export class UserService {
   constructor(
-    @InjectRepository(UserEntity)
-    private readonly userRepository: Repository<UserEntity>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
 
     private eventEmitter: EventEmitter2,
 
@@ -55,7 +55,7 @@ export class UserService {
   }
 
   async updateProfile(
-    user: UserEntity,
+    user: User,
     updateAuthDto: UpdateProfileRequestDto,
   ) {
     try {
@@ -121,13 +121,13 @@ export class UserService {
     }
   }
 
-  async findOne(userId: string): Promise<UserEntity | null> {
+  async findOne(userId: string): Promise<User | null> {
     const user = await this.userRepository.findOneBy({ id: userId });
     return user;
   }
 
   async updateStatus(
-    user: UserEntity,
+    user: User,
     updateUserStatusDto: UpdateUserStatusRequestDto,
   ) {
     // Actualizar el estado de conexión del usuario

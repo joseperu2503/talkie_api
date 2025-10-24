@@ -3,7 +3,7 @@ import { ApiExcludeController } from '@nestjs/swagger';
 import { Auth } from 'src/auth/decorators/auth.decorator';
 import { GetUser } from 'src/auth/decorators/get-user.decorator';
 import { UpdateProfileRequestDto } from 'src/user/dto/update-profile-request.dto';
-import { UserEntity } from '../../auth/entities/user.entity';
+import { User } from '../../auth/entities/user.entity';
 import { UserService } from '../services/user.service';
 
 @ApiExcludeController()
@@ -14,14 +14,14 @@ export class UserController {
 
   @Put('profile')
   updateProfile(
-    @GetUser() user: UserEntity,
+    @GetUser() user: User,
     @Body() request: UpdateProfileRequestDto,
   ) {
     return this.userService.updateProfile(user, request);
   }
 
   @Get('profile')
-  profile(@GetUser() user: UserEntity) {
+  profile(@GetUser() user: User) {
     return this.userService.profile(user.id);
   }
 }

@@ -2,27 +2,20 @@ import {
   Controller,
   Get,
   Param,
-  Post,
-  Query,
-  UploadedFile,
-  UseInterceptors,
+  Query
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
 import {
   ApiBearerAuth,
-  ApiBody,
-  ApiConsumes,
   ApiOkResponse,
   ApiOperation,
   ApiParam,
-  ApiTags,
+  ApiTags
 } from '@nestjs/swagger';
 import { Auth } from 'src/auth/decorators/auth.decorator';
 import { GetUser } from 'src/auth/decorators/get-user.decorator';
-import { UserEntity } from 'src/auth/entities/user.entity';
+import { User } from 'src/auth/entities/user.entity';
 import { ChatResponseDto } from '../dto/chat-response.dto';
 import { MessageResponseDto } from '../dto/message-response.dto';
-import { UploadFileResponseDto } from '../dto/upload-file-response.dto';
 import { ChatService } from '../services/chat.service';
 
 @ApiTags('Chats')
@@ -38,32 +31,8 @@ export class ChatController {
   @ApiBearerAuth()
   @Get()
   @Auth()
-  async getAllChats(@GetUser() user: UserEntity) {
+  async getAllChats(@GetUser() user: User) {
     return this.chatService.getAllChats(user);
-  }
-
-  @ApiOperation({ summary: 'Upload a file' })
-  @ApiConsumes('multipart/form-data')
-  @Post('/upload-file')
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        file: {
-          type: 'string',
-          format: 'binary',
-        },
-      },
-    },
-  })
-  @ApiOkResponse({
-    type: UploadFileResponseDto,
-  })
-  @ApiBearerAuth()
-  @UseInterceptors(FileInterceptor('file'))
-  @Auth()
-  async uploadFile(@UploadedFile() file: Express.Multer.File) {
-    return this.chatService.uploadFile(file);
   }
 
   @ApiOperation({ summary: 'Get messages' })
@@ -90,7 +59,7 @@ export class ChatController {
   @Get(':chatId/messages')
   @Auth()
   async getMessages(
-    @GetUser() user: UserEntity,
+    @GetUser() user: User,
     @Param('chatId') chatId: string,
     @Query('limit') limit: number = 20, // Cantidad de mensajes por página
     @Query('lastMessageId') lastMessageId?: string, // ID del último mensaje cargado

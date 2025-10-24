@@ -8,7 +8,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-import { UserEntity } from 'src/auth/entities/user.entity';
+import { User } from 'src/auth/entities/user.entity';
 import { Chat } from 'src/chat/entities/chat.entity';
 
 @Entity('contacts')
@@ -27,14 +27,14 @@ export class Contact {
   tartgetUserId: number;
 
   // El usuario que está iniciando/agregando el contacto
-  @ManyToOne(() => UserEntity, (user) => user.initiatedContacts)
+  @ManyToOne(() => User, (user) => user.initiatedContacts)
   @JoinColumn({ name: 'owner_user_id' })
-  ownerUser: UserEntity;
+  ownerUser: User;
 
   // El usuario que está siendo agregado como contacto
-  @ManyToOne(() => UserEntity, (user) => user.receivedContacts)
+  @ManyToOne(() => User, (user) => user.receivedContacts)
   @JoinColumn({ name: 'target_user_id' })
-  targetContact: UserEntity;
+  targetContact: User;
 
   @ManyToOne(() => Chat, (chat) => chat.contacts)
   @JoinColumn({ name: 'chat_id' })

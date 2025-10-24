@@ -1,30 +1,27 @@
-import { User } from 'src/auth/entities/user.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
-  JoinColumn,
-  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Chat } from './chat.entity';
 
-@Entity('chat_users')
-export class ChatUser {
+@Entity('files')
+export class File {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => Chat, (chat) => chat.chatUsers)
-  @JoinColumn({ name: 'chat_id' })
-  chat: Chat;
+  @Column({ type: 'text', name: 'name' })
+  name: string;
 
-  @ManyToOne(() => User, (user) => user.chatUsers)
-  @JoinColumn({ name: 'user_id' })
-  user: User;
+  @Column({ type: 'text', name: 'mime_type' })
+  mimetype: string;
 
-  @Column({ type: 'int', default: 0, name: 'unread_messages_count' })
-  unreadMessagesCount: number;
+  @Column({ type: 'int', name: 'size' })
+  size: number;
+
+  @Column({ type: 'text', name: 'url' })
+  url: string;
 
   @CreateDateColumn({
     type: 'timestamptz',

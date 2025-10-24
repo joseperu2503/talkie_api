@@ -15,6 +15,7 @@ import { SeedCommand } from './seed/commands/seed.command';
 import { SeedModule } from './seed/seed.module';
 import { UserModule } from './user/user.module';
 import { VerificationCodesModule } from './verification-codes/verification-codes.module';
+import { FileModule } from './file/file.module';
 
 @Module({
   controllers: [AppController],
@@ -42,6 +43,7 @@ import { VerificationCodesModule } from './verification-codes/verification-codes
     VerificationCodesModule,
     MailModule,
     CronModule,
+    FileModule,
   ],
   providers: [SeedCommand],
 })

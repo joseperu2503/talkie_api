@@ -8,7 +8,7 @@ import {
 } from '@nestjs/swagger';
 import { Auth } from 'src/auth/decorators/auth.decorator';
 import { GetUser } from 'src/auth/decorators/get-user.decorator';
-import { UserEntity } from 'src/auth/entities/user.entity';
+import { User } from 'src/auth/entities/user.entity';
 import { AuthMethod } from 'src/core/models/auth-method';
 import { AddContactRequestDto } from '../dto/add-contact-request.dto';
 import { AddContactResponseDto } from '../dto/add-contact-response.dto';
@@ -53,7 +53,7 @@ export class ContactController {
   @Post('/')
   async addContact(
     @Body() addContactDto: AddContactRequestDto,
-    @GetUser() sender: UserEntity,
+    @GetUser() sender: User,
   ) {
     return this.contactService.addContact(addContactDto, sender);
   }
@@ -65,7 +65,7 @@ export class ContactController {
   })
   @ApiBearerAuth()
   @Get('/')
-  async getContacts(@GetUser() user: UserEntity) {
+  async getContacts(@GetUser() user: User) {
     return this.contactService.getContacts(user);
   }
 }

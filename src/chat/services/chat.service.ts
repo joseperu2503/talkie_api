@@ -5,16 +5,12 @@ import {
 } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectRepository } from '@nestjs/typeorm';
-import * as admin from 'firebase-admin';
-import { extname } from 'path';
-import { UserEntity } from 'src/auth/entities/user.entity';
+import { User } from 'src/auth/entities/user.entity';
 import { NotificationService } from 'src/notification/services/notification.service';
 import { ArrayContains, IsNull, Repository } from 'typeorm';
-import { v4 as uuidv4 } from 'uuid';
 import { MessageDeliveredRequestDto } from '../dto/message-delivered-request.dto';
 import { ReadChatRequestDto } from '../dto/read-chat-request.dto';
 import { SendMessageRequestDto } from '../dto/send-message-request.dto';
-import { UploadFileResponseDto } from '../dto/upload-file-response.dto';
 import { ChatUser } from '../entities/chat-user.entity';
 import { Chat } from '../entities/chat.entity';
 import { MessageUser } from '../entities/message-user.entity';
@@ -43,7 +39,7 @@ export class ChatService {
     private messageUserRepository: Repository<MessageUser>,
   ) {}
 
-  async getAllChats(user: UserEntity) {
+  async getAllChats(user: User) {
     const chats = await this.chatRepository.find({
       where: {
         usersId: ArrayContains([user.id]), // Verifica si el ID del usuario está contenido en el arreglo de usersId
@@ -75,7 +71,7 @@ export class ChatService {
     });
   }
 
-  async markAllMessagesAsDelivered(user: UserEntity) {
+  async markAllMessagesAsDelivered(user: User) {
     const messageUsers = await this.messageUserRepository.find({
       where: {
         user: {
@@ -111,28 +107,7 @@ export class ChatService {
     }
   }
 
-  async uploadFile(file: Express.Multer.File): Promise<UploadFileResponseDto> {
-    const bucket = admin.storage().bucket();
-    const fileExtension = extname(file.originalname);
-    const fileName = uuidv4() + fileExtension;
-
-    const fileUpload = bucket.file(fileName);
-
-    await fileUpload.save(file.buffer, {
-      contentType: file.mimetype,
-      metadata: {
-        contentType: file.mimetype,
-      },
-    });
-
-    await fileUpload.makePublic();
-
-    return {
-      fileUrl: fileUpload.publicUrl(),
-    };
-  }
-
-  async sendMessage(params: SendMessageRequestDto, sender: UserEntity) {
+  async sendMessage(params: SendMessageRequestDto, sender: User) {
     const { chatId, content, fileUrl, temporalId } = params;
 
     const chat = await this.chatRepository.findOne({
@@ -212,7 +187,7 @@ export class ChatService {
     // return new MessageResource(message, sender.id, temporalId).response;
   }
 
-  async readChat(readChatDto: ReadChatRequestDto, user: UserEntity) {
+  async readChat(readChatDto: ReadChatRequestDto, user: User) {
     // Obtener el chat con las relaciones necesarias
     const chat = await this.chatRepository.findOne({
       where: {
@@ -262,7 +237,7 @@ export class ChatService {
 
   async getMessages(
     chatId: string,
-    user: UserEntity,
+    user: User,
     limit: number,
     lastMessageId?: string,
   ) {
@@ -300,7 +275,7 @@ export class ChatService {
     });
   }
 
-  async readMessages(user: UserEntity, chat: Chat) {
+  async readMessages(user: User, chat: Chat) {
     // Lisar los mensajes no leídos
     const messageUsers = await this.messageUserRepository.find({
       where: {
@@ -341,7 +316,7 @@ export class ChatService {
 
   async messageDelivered(
     messageResource: MessageDeliveredRequestDto,
-    receiver: UserEntity,
+    receiver: User,
   ) {
     // Actualizar el messageUser del usuario que recibe el mensaje
     const messageUser = await this.messageUserRepository.findOne({

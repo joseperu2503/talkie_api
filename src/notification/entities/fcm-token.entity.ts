@@ -7,16 +7,16 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-import { UserEntity } from 'src/auth/entities/user.entity';
+import { User } from 'src/auth/entities/user.entity';
 
 @Entity('fcm_tokens')
 export class FcmToken {
   @PrimaryColumn('text')
   token: string;
 
-  @ManyToOne(() => UserEntity, (user) => user.fcmTokens)
+  @ManyToOne(() => User, (user) => user.fcmTokens)
   @JoinColumn({ name: 'user_id' })
-  user: UserEntity;
+  user: User;
 
   @CreateDateColumn({
     type: 'timestamptz',

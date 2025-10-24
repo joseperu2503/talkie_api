@@ -8,15 +8,15 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Socket } from 'socket.io';
 import { Repository } from 'typeorm';
-import { UserEntity } from '../entities/user.entity';
+import { User } from '../entities/user.entity';
 
 @Injectable()
 export class WsJwtGuard implements CanActivate {
   constructor(
     private readonly jwtService: JwtService,
 
-    @InjectRepository(UserEntity)
-    private readonly userRepository: Repository<UserEntity>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
   ) {}
 
   async canActivate(context: ExecutionContext) {
@@ -30,6 +30,7 @@ export class WsJwtGuard implements CanActivate {
     try {
       const payload = this.jwtService.verify(token);
       const user = await this.userRepository.findOneBy({ id: payload.id });
+
       client['user'] = user;
     } catch {
       throw new UnauthorizedException('Invalid token');

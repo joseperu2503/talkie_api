@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { UserEntity } from 'src/auth/entities/user.entity';
+import { User } from 'src/auth/entities/user.entity';
 import { ContactService } from 'src/contact/services/contact.service';
 import { AuthMethod } from 'src/core/models/auth-method';
 import { UserService } from 'src/user/services/user.service';
@@ -51,7 +51,7 @@ export class ContactSeed {
 
   async run() {
     const contacts = this.contacts;
-    const user: UserEntity | null = await this.usersService.findOne(
+    const user: User | null = await this.usersService.findOne(
       '578414e1-f1cd-490b-a92b-767899a0d780',
     );
 

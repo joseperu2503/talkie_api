@@ -1,4 +1,4 @@
-import { UserEntity } from 'src/auth/entities/user.entity';
+import { User } from 'src/auth/entities/user.entity';
 import {
   Column,
   CreateDateColumn,
@@ -20,9 +20,9 @@ export class Message {
   @Column('text', { nullable: true })
   content: string | null;
 
-  @ManyToOne(() => UserEntity, (user) => user.messages)
+  @ManyToOne(() => User, (user) => user.messages)
   @JoinColumn({ name: 'sender_id' })
-  sender: UserEntity;
+  sender: User;
 
   @ManyToOne(() => Chat, (chat) => chat.messages)
   @JoinColumn({ name: 'chat_id' })

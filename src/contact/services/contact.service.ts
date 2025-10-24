@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectRepository } from '@nestjs/typeorm';
-import { UserEntity } from 'src/auth/entities/user.entity';
+import { User } from 'src/auth/entities/user.entity';
 import { ChatUser } from 'src/chat/entities/chat-user.entity';
 import { Chat } from 'src/chat/entities/chat.entity';
 import { ChatUpdatedEvent } from 'src/chat/events/chat-updated.event';
@@ -18,8 +18,8 @@ import { Contact } from '../entities/contact.entity';
 @Injectable()
 export class ContactService {
   constructor(
-    @InjectRepository(UserEntity)
-    private userRepository: Repository<UserEntity>,
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
 
     @InjectRepository(Chat)
     private chatRepository: Repository<Chat>,
@@ -35,12 +35,12 @@ export class ContactService {
 
   async addContact(
     addContactDto: AddContactRequestDto,
-    user: UserEntity,
+    user: User,
     withSocket: boolean = true,
   ) {
     const { email, phone, type } = addContactDto;
 
-    let contactUser: UserEntity | null = null;
+    let contactUser: User | null = null;
 
     if (type == AuthMethod.EMAIL && email) {
       // Buscar el usuario con el email proporcionado
@@ -165,7 +165,7 @@ export class ContactService {
     return { message: 'Contact added successfully' };
   }
 
-  async getContacts(user: UserEntity): Promise<ContactResponseDto[]> {
+  async getContacts(user: User): Promise<ContactResponseDto[]> {
     const contacts = await this.contactRepository.find({
       where: {
         ownerUser: {

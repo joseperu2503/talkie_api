@@ -17,7 +17,7 @@ import {
 
 @Entity('users')
 @Unique(['phoneCountry', 'phone']) // Define la restricción única compuesta
-export class UserEntity {
+export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
