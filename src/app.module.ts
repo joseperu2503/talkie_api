@@ -16,6 +16,7 @@ import { SeedModule } from './seed/seed.module';
 import { UserModule } from './user/user.module';
 import { VerificationCodesModule } from './verification-codes/verification-codes.module';
 import { FileModule } from './file/file.module';
+import { AccountModule } from './account/account.module';
 
 @Module({
   controllers: [AppController],
@@ -44,6 +45,7 @@ import { FileModule } from './file/file.module';
     MailModule,
     CronModule,
     FileModule,
+    AccountModule,
   ],
   providers: [SeedCommand],
 })
