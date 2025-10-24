@@ -5,6 +5,7 @@ import { ChatUser } from 'src/chat/entities/chat-user.entity';
 import { Chat } from 'src/chat/entities/chat.entity';
 import { MessageUser } from 'src/chat/entities/message-user.entity';
 import { Message } from 'src/chat/entities/message.entity';
+import { File } from 'src/file/entities/files.entity';
 import { ArrayContains, Repository } from 'typeorm';
 
 @Injectable()
@@ -24,6 +25,9 @@ export class MessageSeed {
 
     @InjectRepository(MessageUser)
     private messageUserRepository: Repository<MessageUser>,
+
+    @InjectRepository(File)
+    private fileRepository: Repository<File>,
   ) {}
 
   messages: MessageSeedData[] = [
@@ -181,12 +185,23 @@ export class MessageSeed {
       return;
     }
 
+    let file: File | null = null;
+
+    if (fileUrl) {
+      file = await this.fileRepository.save({
+        name: fileUrl.split('/').pop()!,
+        mimetype: 'image/jpeg',
+        url: fileUrl,
+        size: 198045,
+      });
+    }
+
     // // Crear y guardar el mensaje
     const message = this.messageRepository.create({
       content,
       sender,
       chat,
-      fileUrl,
+      fileId: file?.id ?? null,
       messageUsers: [],
     });
 

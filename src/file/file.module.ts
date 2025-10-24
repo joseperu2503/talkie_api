@@ -7,7 +7,7 @@ import { FileService } from './services/file.service';
 
 @Module({
   providers: [FileService],
-  exports: [FileService],
+  exports: [FileService, TypeOrmModule],
   imports: [TypeOrmModule.forFeature([File]), AuthModule],
   controllers: [FileController],
 })

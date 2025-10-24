@@ -2,8 +2,7 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
-  IsUrl,
-  IsUUID,
+  IsUUID
 } from 'class-validator';
 
 export class SendMessageRequestDto {
@@ -15,9 +14,9 @@ export class SendMessageRequestDto {
   @IsNotEmpty()
   readonly chatId: string;
 
-  @IsUrl()
+  @IsUUID()
   @IsOptional()
-  readonly fileUrl: string | null;
+  readonly fileId: string | null;
 
   @IsUUID()
   @IsNotEmpty()

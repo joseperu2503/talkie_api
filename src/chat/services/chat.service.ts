@@ -108,7 +108,7 @@ export class ChatService {
   }
 
   async sendMessage(params: SendMessageRequestDto, sender: User) {
-    const { chatId, content, fileUrl, temporalId } = params;
+    const { chatId, content, fileId, temporalId } = params;
 
     const chat = await this.chatRepository.findOne({
       where: {
@@ -140,7 +140,7 @@ export class ChatService {
       content,
       sender,
       chat,
-      fileUrl,
+      fileId,
       messageUsers: [],
     });
 

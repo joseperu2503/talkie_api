@@ -13,13 +13,13 @@ export class MessageResource {
   }
 
   get response(): MessageResponseDto {
-    const { id, content, sentAt, sender, fileUrl, chat } = this.message;
+    const { id, content, sentAt, sender, file, chat } = this.message;
 
     return {
       id,
       content,
       sentAt,
-      fileUrl,
+      fileUrl: file ? file.url : null,
       isSender: sender.id === this.userId,
       sender: {
         id: sender.id,

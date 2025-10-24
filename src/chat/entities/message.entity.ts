@@ -1,4 +1,5 @@
 import { User } from 'src/auth/entities/user.entity';
+import { File } from 'src/file/entities/files.entity';
 import {
   Column,
   CreateDateColumn,
@@ -35,8 +36,12 @@ export class Message {
   })
   sentAt: Date;
 
-  @Column({ type: 'text', name: 'file_url', nullable: true })
-  fileUrl: string | null;
+  @Column({ type: 'text', name: 'file_id', nullable: true })
+  fileId: string | null;
+
+  @ManyToOne(() => File)
+  @JoinColumn({ name: 'file_id' })
+  file: File;
 
   @CreateDateColumn({
     type: 'timestamptz',
