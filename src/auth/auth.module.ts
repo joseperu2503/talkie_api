@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { CountriesModule } from 'src/countries/countries.module';
+import { CountryModule } from 'src/country/country.module';
 import { MailModule } from 'src/mail/mail.module';
 import { TwilioService } from 'src/twilio/services/twilio.service';
 import { VerificationCode } from 'src/verification-codes/entities/verification-code.entity';
@@ -33,7 +33,7 @@ import { JwtStrategy } from './strategies/jwt.strategy';
         };
       },
     }),
-    CountriesModule,
+    CountryModule,
     MailModule,
   ],
   exports: [TypeOrmModule, JwtStrategy, PassportModule, JwtModule, AuthService],

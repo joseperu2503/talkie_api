@@ -8,11 +8,11 @@ import { CreateFcmTokenDto } from '../dto/create-fcm-token.dto';
 import { FcmToken } from '../entities/fcm-token.entity';
 
 @Injectable()
-export class NotificationsService {
+export class NotificationService {
   constructor(
     @InjectRepository(FcmToken)
     private fcmTokenRepository: Repository<FcmToken>,
-  ) { }
+  ) {}
 
   async createFcmToken(createFcmTokenDto: CreateFcmTokenDto, user: UserEntity) {
     // Verificar si el token ya existe

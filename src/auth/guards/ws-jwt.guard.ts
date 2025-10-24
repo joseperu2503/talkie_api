@@ -37,7 +37,6 @@ export class WsJwtGuard implements CanActivate {
     return true;
   }
 
-  // Cambiar para extraer el token desde la query string
   private extractTokenFromQuery(client: Socket): string {
     const token = client.handshake.query.token as string;
     return token;

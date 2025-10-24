@@ -3,8 +3,8 @@ import { MulterModule } from '@nestjs/platform-express';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as multer from 'multer';
 import { AuthModule } from 'src/auth/auth.module';
-import { NotificationsModule } from 'src/notifications/notifications.module';
-import { UsersModule } from 'src/users/users.module';
+import { NotificationsModule } from 'src/notification/notification.module';
+import { UserModule } from 'src/user/user.module';
 import { ChatController } from './controllers/chat.controller';
 import { ChatUser } from './entities/chat-user.entity';
 import { Chat } from './entities/chat.entity';
@@ -21,7 +21,7 @@ import { ChatService } from './services/chat.service';
       storage: multer.memoryStorage(),
     }),
     NotificationsModule,
-    UsersModule,
+    UserModule,
   ],
   controllers: [ChatController],
   providers: [ChatService, ChatGateway],

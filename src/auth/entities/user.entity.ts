@@ -1,8 +1,8 @@
 import { ChatUser } from 'src/chat/entities/chat-user.entity';
 import { Message } from 'src/chat/entities/message.entity';
-import { Contact } from 'src/contacts/entities/contact.entity';
-import { Country } from 'src/countries/entities/country.entity';
-import { FcmToken } from 'src/notifications/entities/fcm-token.entity';
+import { Contact } from 'src/contact/entities/contact.entity';
+import { Country } from 'src/country/entities/country.entity';
+import { FcmToken } from 'src/notification/entities/fcm-token.entity';
 import {
   Column,
   CreateDateColumn,

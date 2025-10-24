@@ -9,8 +9,8 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { AuthMethod } from 'src/core/models/auth-method';
-import { Country } from 'src/countries/entities/country.entity';
-import { CountriesService } from 'src/countries/services/countries.service';
+import { Country } from 'src/country/entities/country.entity';
+import { CountryService } from 'src/country/services/country.service';
 import { MailService } from 'src/mail/services/mail.service';
 import { TwilioService } from 'src/twilio/services/twilio.service';
 import { VerificationCodesService } from 'src/verification-codes/services/verification-codes.service';
@@ -32,7 +32,7 @@ export class AuthService {
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
     private readonly jwtService: JwtService,
-    private readonly countriesService: CountriesService,
+    private readonly countriesService: CountryService,
     private readonly twilioService: TwilioService,
     private readonly mailService: MailService,
     private readonly verificationCodesService: VerificationCodesService,

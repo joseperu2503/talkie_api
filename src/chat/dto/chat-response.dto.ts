@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { ContactResponseDto } from 'src/contacts/dto/contact-response.dto';
+import { ContactResponseDto } from 'src/contact/dto/contact-response.dto';
 import { MessageResponseDto } from './message-response.dto';
 
 export class ChatResponseDto {

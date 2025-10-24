@@ -9,21 +9,21 @@ import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { UpdateUserStatusRequestDto } from 'src/chat/dto/update-user-status-request.dto';
 import { ContactUpdatedEvent } from 'src/chat/events/contact-updated.event';
-import { Country } from 'src/countries/entities/country.entity';
-import { CountriesService } from 'src/countries/services/countries.service';
-import { UpdateProfileRequestDto } from 'src/users/dto/update-profile-request.dto';
+import { Country } from 'src/country/entities/country.entity';
+import { CountryService } from 'src/country/services/country.service';
+import { UpdateProfileRequestDto } from 'src/user/dto/update-profile-request.dto';
 import { Not, Repository } from 'typeorm';
 import { UserEntity } from '../../auth/entities/user.entity';
 
 @Injectable()
-export class UsersService {
+export class UserService {
   constructor(
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
 
     private eventEmitter: EventEmitter2,
 
-    private readonly countriesService: CountriesService,
+    private readonly countryService: CountryService,
   ) {}
 
   async profile(userId: string) {
@@ -76,8 +76,9 @@ export class UsersService {
       // Validar combinación de phone y phoneCountry duplicada
       if (phone) {
         //** Validar si existe el country */
-        const country: Country =
-          await this.countriesService.findOneWithExeption(phone!.countryId);
+        const country: Country = await this.countryService.findOneWithExeption(
+          phone!.countryId,
+        );
 
         //** Validar si la combinación phone + phoneCountry ya existe */
         const phoneCombinationExists = await this.userRepository.findOne({

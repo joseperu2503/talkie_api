@@ -6,20 +6,22 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AuthModule } from './auth/auth.module';
 import { ChatModule } from './chat/chat.module';
-import { ContactsModule } from './contacts/contacts.module';
-import { CountriesModule } from './countries/countries.module';
+import { ContactModule } from './contact/contact.module';
+import { CountryModule } from './country/country.module';
+import { CronModule } from './cron/cron.module';
 import { MailModule } from './mail/mail.module';
-import { NotificationsModule } from './notifications/notifications.module';
+import { NotificationsModule } from './notification/notification.module';
 import { SeedCommand } from './seed/commands/seed.command';
 import { SeedModule } from './seed/seed.module';
-import { UsersModule } from './users/users.module';
+import { UserModule } from './user/user.module';
 import { VerificationCodesModule } from './verification-codes/verification-codes.module';
-import { CronModule } from './cron/cron.module';
 
 @Module({
   controllers: [AppController],
   imports: [
     ConfigModule.forRoot(),
+    EventEmitterModule.forRoot(),
+    ScheduleModule.forRoot(),
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.DB_HOST,
@@ -33,12 +35,10 @@ import { CronModule } from './cron/cron.module';
     SeedModule,
     AuthModule,
     ChatModule,
-    EventEmitterModule.forRoot(),
-    ScheduleModule.forRoot(),
-    ContactsModule,
+    ContactModule,
     NotificationsModule,
-    CountriesModule,
-    UsersModule,
+    CountryModule,
+    UserModule,
     VerificationCodesModule,
     MailModule,
     CronModule,

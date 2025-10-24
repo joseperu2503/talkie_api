@@ -1,4 +1,4 @@
-import { Contact } from 'src/contacts/entities/contact.entity';
+import { Contact } from 'src/contact/entities/contact.entity';
 import {
   Column,
   CreateDateColumn,

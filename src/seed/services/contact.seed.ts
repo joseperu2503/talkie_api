@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { UserEntity } from 'src/auth/entities/user.entity';
-import { ContactService } from 'src/contacts/services/contact.service';
+import { ContactService } from 'src/contact/services/contact.service';
 import { AuthMethod } from 'src/core/models/auth-method';
-import { UsersService } from 'src/users/services/users.service';
+import { UserService } from 'src/user/services/user.service';
 
 @Injectable()
 export class ContactSeed {
   constructor(
     private readonly contactService: ContactService,
-    private readonly usersService: UsersService,
+    private readonly usersService: UserService,
   ) {}
 
   contacts: ContactSeedData[] = [

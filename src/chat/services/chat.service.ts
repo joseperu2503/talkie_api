@@ -8,7 +8,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import * as admin from 'firebase-admin';
 import { extname } from 'path';
 import { UserEntity } from 'src/auth/entities/user.entity';
-import { NotificationsService } from 'src/notifications/services/notifications.service';
+import { NotificationService } from 'src/notification/services/notification.service';
 import { ArrayContains, IsNull, Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import { MessageDeliveredRequestDto } from '../dto/message-delivered-request.dto';
@@ -37,7 +37,7 @@ export class ChatService {
     @InjectRepository(ChatUser)
     private chatUserRepository: Repository<ChatUser>,
 
-    private notificationsService: NotificationsService,
+    private notificationsService: NotificationService,
 
     @InjectRepository(MessageUser)
     private messageUserRepository: Repository<MessageUser>,

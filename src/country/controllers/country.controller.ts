@@ -1,12 +1,12 @@
 import { Controller, Get } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CountryResponseDto } from '../dto/country-response.dto';
-import { CountriesService } from '../services/countries.service';
+import { CountryService } from '../services/country.service';
 
 @ApiTags('Countries')
 @Controller('countries')
-export class CountriesController {
-  constructor(private readonly countriesService: CountriesService) {}
+export class CountryController {
+  constructor(private readonly countryService: CountryService) {}
 
   @ApiOperation({ summary: 'Get all countries' })
   @ApiOkResponse({
@@ -15,6 +15,6 @@ export class CountriesController {
   })
   @Get()
   async getAllCountries() {
-    return this.countriesService.getAllCountries();
+    return this.countryService.getAllCountries();
   }
 }

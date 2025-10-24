@@ -5,14 +5,14 @@ import { GetUser } from 'src/auth/decorators/get-user.decorator';
 import { UserEntity } from 'src/auth/entities/user.entity';
 import { CreateFcmTokenDto } from '../dto/create-fcm-token.dto';
 import { FirebaseService } from '../services/firebase.service';
-import { NotificationsService } from '../services/notifications.service';
+import { NotificationService } from '../services/notification.service';
 
 @ApiExcludeController()
 @Controller('notifications')
 @Auth()
-export class NotificationsController {
+export class NotificationController {
   constructor(
-    private readonly notificationsService: NotificationsService,
+    private readonly notificationService: NotificationService,
     private readonly firebaseService: FirebaseService,
   ) {}
 
@@ -21,7 +21,7 @@ export class NotificationsController {
     @Body() createFcmTokenDto: CreateFcmTokenDto,
     @GetUser() user: UserEntity,
   ) {
-    return this.notificationsService.createFcmToken(createFcmTokenDto, user);
+    return this.notificationService.createFcmToken(createFcmTokenDto, user);
   }
 
   //Solo para ejemplo no se usa en el proyecto

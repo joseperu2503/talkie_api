@@ -13,8 +13,8 @@ import { Server, Socket } from 'socket.io';
 import { UserEntity } from 'src/auth/entities/user.entity';
 import { WsJwtGuard } from 'src/auth/guards/ws-jwt.guard';
 import { JwtPayload } from 'src/auth/interfaces/jwt-payload.interfaces';
-import { ContactResponseDto } from 'src/contacts/dto/contact-response.dto';
-import { UsersService } from 'src/users/services/users.service';
+import { ContactResponseDto } from 'src/contact/dto/contact-response.dto';
+import { UserService } from 'src/user/services/user.service';
 import { Repository } from 'typeorm';
 import { MessageDeliveredRequestDto } from '../dto/message-delivered-request.dto';
 import { ReadChatRequestDto } from '../dto/read-chat-request.dto';
@@ -33,7 +33,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   server: Server;
 
   constructor(
-    private readonly usersService: UsersService,
+    private readonly usersService: UserService,
 
     private readonly chatService: ChatService,
 

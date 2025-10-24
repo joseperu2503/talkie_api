@@ -1,4 +1,4 @@
-import { ContactResponseDto } from 'src/contacts/dto/contact-response.dto';
+import { ContactResponseDto } from 'src/contact/dto/contact-response.dto';
 import { ChatResponseDto } from '../dto/chat-response.dto';
 import { Chat } from '../entities/chat.entity';
 import { MessageResource } from './message.resource';
