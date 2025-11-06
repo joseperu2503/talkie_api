@@ -9,9 +9,9 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { AuthMethod } from 'src/core/models/auth-method';
-import { Country } from 'src/country/entities/country.entity';
 import { CountryService } from 'src/country/services/country.service';
 import { MailService } from 'src/mail/services/mail.service';
+import { OtpService } from 'src/otp/services/otp.service';
 import { PhoneService } from 'src/phone/services/phone.service';
 import { TwilioService } from 'src/twilio/services/twilio.service';
 import { VerificationCodesService } from 'src/verification-codes/services/verification-codes.service';
@@ -38,6 +38,7 @@ export class AuthService {
     private readonly mailService: MailService,
     private readonly verificationCodesService: VerificationCodesService,
     private readonly phoneService: PhoneService,
+    private readonly otpService: OtpService,
   ) {}
 
   async register(params: RegisterRequestDto): Promise<AuthResponseDto> {
@@ -132,28 +133,30 @@ export class AuthService {
     try {
       const { phone, type, email } = params;
 
-      const verificationCode = await this.verificationCodesService.create();
+      // const verificationCode = await this.verificationCodesService.create();
+      const verificationCode = await this.otpService.generateOtp();
+      console.log(verificationCode);
 
-      if (type == AuthMethod.EMAIL) {
-        await this.mailService.sendVerificationCode(
-          email!,
-          verificationCode.code,
-        );
-      } else {
-        //** Validar si existe el country */
-        const country: Country =
-          await this.countriesService.findOneWithExeption(phone!.countryId);
+      // if (type == AuthMethod.EMAIL) {
+      //   await this.mailService.sendVerificationCode(
+      //     email!,
+      //     verificationCode.otp,
+      //   );
+      // } else {
+      //   //** Validar si existe el country */
+      //   const country: Country =
+      //     await this.countriesService.findOneWithExeption(phone!.countryId);
 
-        const phoneString: string = `${country.dialCode}${phone!.number}`;
+      //   const phoneString: string = `${country.dialCode}${phone!.number}`;
 
-        //** Enviar sms con Twilio */
-        if (process.env.TWILIO_ENABLED) {
-          await this.twilioService.sendVerificationCode(
-            phoneString,
-            verificationCode.code,
-          );
-        }
-      }
+      //   //** Enviar sms con Twilio */
+      //   if (process.env.TWILIO_ENABLED) {
+      //     await this.twilioService.sendVerificationCode(
+      //       phoneString,
+      //       verificationCode.otp,
+      //     );
+      //   }
+      // }
 
       return {
         verificationCodeId: verificationCode.id,
@@ -170,8 +173,13 @@ export class AuthService {
 
   // Método para verificar el código ingresado por el usuario
   async verifyCode(params: VerifyCodeRequestDto) {
+    const { id, code } = params;
     try {
-      await this.verificationCodesService.verify(params);
+      const isValid = await this.otpService.verifyOtp(id, code);
+
+      if (!isValid) {
+        throw new BadRequestException('Invalid code');
+      }
 
       return { message: 'Code verified successfully.' };
     } catch (error) {

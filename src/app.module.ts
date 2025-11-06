@@ -13,6 +13,8 @@ import { CronModule } from './cron/cron.module';
 import { FileModule } from './file/file.module';
 import { MailModule } from './mail/mail.module';
 import { NotificationsModule } from './notification/notification.module';
+import { OtpModule } from './otp/otp.module';
+import { RedisModule } from './redis/redis.module';
 import { SeedCommand } from './seed/commands/seed.command';
 import { SeedModule } from './seed/seed.module';
 import { UserModule } from './user/user.module';
@@ -46,6 +48,8 @@ import { VerificationCodesModule } from './verification-codes/verification-codes
     CronModule,
     FileModule,
     AccountModule,
+    RedisModule,
+    OtpModule,
   ],
   providers: [SeedCommand],
 })
