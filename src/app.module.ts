@@ -18,7 +18,6 @@ import { RedisModule } from './redis/redis.module';
 import { SeedCommand } from './seed/commands/seed.command';
 import { SeedModule } from './seed/seed.module';
 import { UserModule } from './user/user.module';
-import { VerificationCodesModule } from './verification-codes/verification-codes.module';
 
 @Module({
   controllers: [AppController],
@@ -43,7 +42,6 @@ import { VerificationCodesModule } from './verification-codes/verification-codes
     NotificationsModule,
     CountryModule,
     UserModule,
-    VerificationCodesModule,
     MailModule,
     CronModule,
     FileModule,

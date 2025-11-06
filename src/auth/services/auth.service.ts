@@ -9,12 +9,12 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { AuthMethod } from 'src/core/models/auth-method';
+import { Country } from 'src/country/entities/country.entity';
 import { CountryService } from 'src/country/services/country.service';
 import { MailService } from 'src/mail/services/mail.service';
 import { OtpService } from 'src/otp/services/otp.service';
 import { PhoneService } from 'src/phone/services/phone.service';
 import { TwilioService } from 'src/twilio/services/twilio.service';
-import { VerificationCodesService } from 'src/verification-codes/services/verification-codes.service';
 import { Repository } from 'typeorm';
 import { AuthResponseDto } from '../dto/auth-response.dto';
 import { CheckAccountRequestDto } from '../dto/check-account-request.dto';
@@ -36,7 +36,6 @@ export class AuthService {
     private readonly countriesService: CountryService,
     private readonly twilioService: TwilioService,
     private readonly mailService: MailService,
-    private readonly verificationCodesService: VerificationCodesService,
     private readonly phoneService: PhoneService,
     private readonly otpService: OtpService,
   ) {}
@@ -79,7 +78,10 @@ export class AuthService {
 
       //** verificar codigo 4 digitos */
       if (verificationCode) {
-        await this.verificationCodesService.verify(verificationCode, false);
+        await this.otpService.verifyOtp(
+          verificationCode.id,
+          verificationCode.code,
+        );
       }
 
       //** Guardar el usuario */
@@ -135,28 +137,27 @@ export class AuthService {
 
       // const verificationCode = await this.verificationCodesService.create();
       const verificationCode = await this.otpService.generateOtp();
-      console.log(verificationCode);
 
-      // if (type == AuthMethod.EMAIL) {
-      //   await this.mailService.sendVerificationCode(
-      //     email!,
-      //     verificationCode.otp,
-      //   );
-      // } else {
-      //   //** Validar si existe el country */
-      //   const country: Country =
-      //     await this.countriesService.findOneWithExeption(phone!.countryId);
+      if (type == AuthMethod.EMAIL) {
+        await this.mailService.sendVerificationCode(
+          email!,
+          verificationCode.value,
+        );
+      } else {
+        //** Validar si existe el country */
+        const country: Country =
+          await this.countriesService.findOneWithExeption(phone!.countryId);
 
-      //   const phoneString: string = `${country.dialCode}${phone!.number}`;
+        const phoneString: string = `${country.dialCode}${phone!.number}`;
 
-      //   //** Enviar sms con Twilio */
-      //   if (process.env.TWILIO_ENABLED) {
-      //     await this.twilioService.sendVerificationCode(
-      //       phoneString,
-      //       verificationCode.otp,
-      //     );
-      //   }
-      // }
+        //** Enviar sms con Twilio */
+        if (process.env.TWILIO_ENABLED) {
+          await this.twilioService.sendVerificationCode(
+            phoneString,
+            verificationCode.value,
+          );
+        }
+      }
 
       return {
         verificationCodeId: verificationCode.id,

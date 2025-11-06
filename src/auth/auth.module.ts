@@ -7,8 +7,6 @@ import { MailModule } from 'src/mail/mail.module';
 import { OtpModule } from 'src/otp/otp.module';
 import { PhoneModule } from 'src/phone/phone.module';
 import { TwilioService } from 'src/twilio/services/twilio.service';
-import { VerificationCode } from 'src/verification-codes/entities/verification-code.entity';
-import { VerificationCodesService } from 'src/verification-codes/services/verification-codes.service';
 import { AuthController } from './controllers/auth.controller';
 import { User } from './entities/user.entity';
 import { AuthService } from './services/auth.service';
@@ -16,14 +14,9 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 
 @Module({
   controllers: [AuthController],
-  providers: [
-    AuthService,
-    JwtStrategy,
-    TwilioService,
-    VerificationCodesService,
-  ],
+  providers: [AuthService, JwtStrategy, TwilioService],
   imports: [
-    TypeOrmModule.forFeature([User, VerificationCode]),
+    TypeOrmModule.forFeature([User]),
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
       useFactory: () => {
