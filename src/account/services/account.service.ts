@@ -8,6 +8,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { Country } from 'src/country/entities/country.entity';
 import { CountryService } from 'src/country/services/country.service';
+import { PhoneService } from 'src/phone/services/phone.service';
 import { Not, Repository } from 'typeorm';
 import { User } from '../../auth/entities/user.entity';
 import { UpdateProfileRequestDto } from '../dto/update-profile-request.dto';
@@ -19,6 +20,8 @@ export class AccountService {
     private readonly userRepository: Repository<User>,
 
     private readonly countryService: CountryService,
+
+    private readonly phoneService: PhoneService,
   ) {}
 
   async profile(userId: string) {
@@ -27,24 +30,23 @@ export class AccountService {
         id: userId,
       },
       relations: {
-        phoneCountry: true,
+        phone: true,
       },
     });
 
-    const { id, name, email, surname, phone, phoneCountry, photo } = user!;
+    const { id, name, email, surname, phone, photo } = user!;
 
     return {
       id,
       email,
       name,
       surname,
-      phone:
-        phone && phoneCountry
-          ? {
-              number: phone,
-              country: phoneCountry,
-            }
-          : null,
+      phone: phone
+        ? {
+            number: phone.number,
+            countryId: phone.countryId,
+          }
+        : null,
       photo,
     };
   }
@@ -75,20 +77,24 @@ export class AccountService {
         //** Validar si la combinación phone + phoneCountry ya existe */
         const phoneCombinationExists = await this.userRepository.findOne({
           where: {
-            phone: phone.number,
-            phoneCountry: { id: phone.countryId },
+            phone: { number: phone.number, countryId: phone.countryId },
             id: Not(user.id), // Excluir al usuario actual
           },
           relations: ['phoneCountry'], // Asegúrate de incluir la relación
         });
+
         if (phoneCombinationExists) {
           throw new BadRequestException(
             'Phone and country combination is already in use.',
           );
         }
 
-        user.phone = phone.number;
-        user.phoneCountry = country;
+        const newPhone = await this.phoneService.findOrCreate(
+          phone.number,
+          phone.countryId,
+        );
+
+        user.phone = newPhone;
       }
 
       // Encriptar la nueva contraseña si se envía

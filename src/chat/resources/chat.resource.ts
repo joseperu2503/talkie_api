@@ -6,16 +6,17 @@ import { MessageResource } from './message.resource';
 export const chatResource = (chat: Chat, userId: string): ChatResponseDto => {
   const receivers: ContactResponseDto[] = chat.contacts
     .filter((contact) => contact.targetContact.id !== userId)
-    .map((contact) => {
+    .map((contact): ContactResponseDto => {
+      const targetContact = contact.targetContact;
       return {
-        id: contact.targetContact.id,
-        name: contact.targetContact.name,
-        surname: contact.targetContact.surname,
-        email: contact.targetContact.email,
-        photo: contact.targetContact.photo,
-        phone: contact.targetContact.phone,
-        isConnected: contact.targetContact.isConnected,
-        lastConnection: contact.targetContact.lastConnection,
+        id: targetContact.id,
+        name: targetContact.name,
+        surname: targetContact.surname,
+        email: targetContact.email,
+        photo: targetContact.photo,
+        phone: targetContact.phone?.number ?? null,
+        isConnected: targetContact.isConnected,
+        lastConnection: targetContact.lastConnection,
         chatId: chat.id,
       };
     });

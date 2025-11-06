@@ -12,6 +12,7 @@ import { AuthMethod } from 'src/core/models/auth-method';
 import { Country } from 'src/country/entities/country.entity';
 import { CountryService } from 'src/country/services/country.service';
 import { MailService } from 'src/mail/services/mail.service';
+import { PhoneService } from 'src/phone/services/phone.service';
 import { TwilioService } from 'src/twilio/services/twilio.service';
 import { VerificationCodesService } from 'src/verification-codes/services/verification-codes.service';
 import { Repository } from 'typeorm';
@@ -36,6 +37,7 @@ export class AuthService {
     private readonly twilioService: TwilioService,
     private readonly mailService: MailService,
     private readonly verificationCodesService: VerificationCodesService,
+    private readonly phoneService: PhoneService,
   ) {}
 
   async register(params: RegisterRequestDto): Promise<AuthResponseDto> {
@@ -66,8 +68,12 @@ export class AuthService {
       }
 
       if (type == AuthMethod.PHONE && phone) {
-        user.phone = phone.number;
-        user.phoneCountryId = phone.countryId;
+        const newPhone = await this.phoneService.findOrCreate(
+          phone.number,
+          phone.countryId,
+        );
+
+        user.phone = newPhone;
       }
 
       //** verificar codigo 4 digitos */
@@ -102,8 +108,7 @@ export class AuthService {
     if (type == AuthMethod.PHONE && phone) {
       user = await this.userRepository.findOne({
         where: {
-          phone: phone.number,
-          phoneCountryId: phone.countryId,
+          phone: { number: phone.number, countryId: phone.countryId },
         },
       });
     }
@@ -187,10 +192,10 @@ export class AuthService {
       let accountExists = false;
 
       if (type == AuthMethod.EMAIL && email) {
-        accountExists = await this.existsEmail(email!);
+        accountExists = (await this.checkEmail(email)).exists;
       }
       if (type == AuthMethod.PHONE && phone) {
-        accountExists = await this.existsPhone(phone!);
+        accountExists = (await this.checkPhone(phone)).exists;
       }
       return { accountExists };
     } catch (error) {
@@ -198,29 +203,23 @@ export class AuthService {
     }
   }
 
-  private async existsEmail(email: string) {
+  private async checkEmail(email: string) {
     const user = await this.userRepository.findOne({
       where: { email },
     });
 
-    return !!user;
+    return { exists: !!user };
   }
+  ƒƒ;
 
-  private async existsPhone(phone: PhoneRequestDto) {
-    const phoneProcessed = phone!.number.replaceAll(' ', '');
-
-    const country: Country = await this.countriesService.findOneWithExeption(
-      phone.countryId,
-    );
-
+  private async checkPhone(phone: PhoneRequestDto) {
     const phoneExists = await this.userRepository.findOne({
       where: {
-        phone: phoneProcessed,
-        phoneCountryId: country.id,
+        phone: { number: phone.number, countryId: phone.countryId },
       },
     });
 
-    return !!phoneExists;
+    return { exists: !!phoneExists };
   }
 
   private getJwt(payload: JwtPayload) {

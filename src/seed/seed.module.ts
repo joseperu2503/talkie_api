@@ -4,6 +4,7 @@ import { ChatModule } from 'src/chat/chat.module';
 import { ContactModule } from 'src/contact/contact.module';
 import { CountryModule } from 'src/country/country.module';
 import { FileModule } from 'src/file/file.module';
+import { PhoneModule } from 'src/phone/phone.module';
 import { UserModule } from 'src/user/user.module';
 import { ContactSeed } from './services/contact.seed';
 import { CountrySeed } from './services/country.seed';
@@ -20,6 +21,8 @@ import { UserSeed } from './services/user.seed';
     UserModule,
     ChatModule,
     FileModule,
+    PhoneModule,
+    PhoneModule,
   ],
   exports: [SeedService],
 })

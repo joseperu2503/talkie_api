@@ -3,20 +3,20 @@ import { ConfigModule } from '@nestjs/config';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AccountModule } from './account/account.module';
 import { AppController } from './app.controller';
 import { AuthModule } from './auth/auth.module';
 import { ChatModule } from './chat/chat.module';
 import { ContactModule } from './contact/contact.module';
 import { CountryModule } from './country/country.module';
 import { CronModule } from './cron/cron.module';
+import { FileModule } from './file/file.module';
 import { MailModule } from './mail/mail.module';
 import { NotificationsModule } from './notification/notification.module';
 import { SeedCommand } from './seed/commands/seed.command';
 import { SeedModule } from './seed/seed.module';
 import { UserModule } from './user/user.module';
 import { VerificationCodesModule } from './verification-codes/verification-codes.module';
-import { FileModule } from './file/file.module';
-import { AccountModule } from './account/account.module';
 
 @Module({
   controllers: [AppController],

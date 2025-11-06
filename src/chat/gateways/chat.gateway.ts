@@ -137,7 +137,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         surname: user.surname,
         email: user.email,
         photo: user.photo,
-        phone: user.phone,
+        phone: user.phone?.number ?? null,
         isConnected: user.isConnected,
         lastConnection: user.lastConnection,
         chatId: contact.chat.id,

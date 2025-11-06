@@ -1,10 +1,4 @@
-import { User } from 'src/auth/entities/user.entity';
-import {
-  Column,
-  Entity,
-  OneToMany,
-  PrimaryGeneratedColumn
-} from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('countries')
 export class Country {
@@ -25,7 +19,4 @@ export class Country {
 
   @Column('text')
   mask: string;
-
-  @OneToMany(() => User, (user) => user.phoneCountry)
-  users: User[];
 }

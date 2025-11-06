@@ -58,8 +58,10 @@ export class ContactService {
 
       contactUser = await this.userRepository.findOne({
         where: {
-          phone: phoneProcessed,
-          phoneCountry: { id: phone.countryId },
+          phone: {
+            number: phoneProcessed,
+            countryId: phone.countryId,
+          },
         },
       });
     }
@@ -173,21 +175,25 @@ export class ContactService {
         },
       },
       relations: {
-        targetContact: true,
+        targetContact: {
+          phone: true,
+        },
         chat: true,
       },
     });
 
-    return contacts.map((contact) => {
+    return contacts.map((contact): ContactResponseDto => {
+      const targetContact = contact.targetContact;
+
       return {
-        id: contact.targetContact.id,
-        name: contact.targetContact.name,
-        surname: contact.targetContact.surname,
-        photo: contact.targetContact.photo,
-        phone: contact.targetContact.phone,
-        email: contact.targetContact.email,
-        isConnected: contact.targetContact.isConnected,
-        lastConnection: contact.targetContact.lastConnection,
+        id: targetContact.id,
+        name: targetContact.name,
+        surname: targetContact.surname,
+        photo: targetContact.photo,
+        phone: targetContact.phone?.number ?? null,
+        email: targetContact.email,
+        isConnected: targetContact.isConnected,
+        lastConnection: targetContact.lastConnection,
         chatId: contact.chat.id,
       };
     });

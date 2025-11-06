@@ -17,9 +17,9 @@ export class SeedService {
 
   async runSeed() {
     await this.dropAllTables();
+    await this.countrySeed.run();
     await this.userSeed.run();
     await this.contactSeed.run();
-    await this.countrySeed.run();
     await this.messageSeed.run();
   }
 

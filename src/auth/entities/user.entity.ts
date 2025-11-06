@@ -1,8 +1,8 @@
 import { ChatUser } from 'src/chat/entities/chat-user.entity';
 import { Message } from 'src/chat/entities/message.entity';
 import { Contact } from 'src/contact/entities/contact.entity';
-import { Country } from 'src/country/entities/country.entity';
 import { FcmToken } from 'src/notification/entities/fcm-token.entity';
+import { Phone } from 'src/phone/entities/phone.entity';
 import {
   Column,
   CreateDateColumn,
@@ -11,12 +11,10 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
-  Unique,
-  UpdateDateColumn,
+  UpdateDateColumn
 } from 'typeorm';
 
 @Entity('users')
-@Unique(['phoneCountry', 'phone']) // Define la restricción única compuesta
 export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -36,15 +34,12 @@ export class User {
   @Column('text')
   surname: string;
 
-  @ManyToOne(() => Country, (country) => country.users, { nullable: true })
-  @JoinColumn({ name: 'phone_country_id' })
-  phoneCountry: Country | null;
+  @ManyToOne(() => Phone, { nullable: true })
+  @JoinColumn({ name: 'phone_id' })
+  phone: Phone | null;
 
-  @Column('number', { nullable: true, name: 'phone_country_id' })
-  phoneCountryId: number | null;
-
-  @Column('text', { nullable: true })
-  phone: string | null;
+  @Column('text', { nullable: true, name: 'phone_id', unique: true })
+  phoneId: string | null;
 
   @Column('text', { nullable: true })
   photo: string | null;
