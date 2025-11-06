@@ -80,7 +80,6 @@ export class AccountService {
             phone: { number: phone.number, countryId: phone.countryId },
             id: Not(user.id), // Excluir al usuario actual
           },
-          relations: ['phoneCountry'], // Asegúrate de incluir la relación
         });
 
         if (phoneCombinationExists) {
