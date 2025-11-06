@@ -1,3 +1,3 @@
-import { VerifyAccountRequestDto } from './verify-account-request.dto';
+import { CheckAccountRequestDto } from './check-account-request.dto';
 
-export class SendVerificationCodeRequestDto extends VerifyAccountRequestDto {}
+export class SendVerificationCodeRequestDto extends CheckAccountRequestDto {}

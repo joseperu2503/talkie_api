@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class VerifyAccountResponseDto {
+export class CheckAccountResponseDto {
   @ApiProperty({
     example: true,
   })

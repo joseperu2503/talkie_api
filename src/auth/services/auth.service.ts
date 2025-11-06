@@ -16,12 +16,12 @@ import { TwilioService } from 'src/twilio/services/twilio.service';
 import { VerificationCodesService } from 'src/verification-codes/services/verification-codes.service';
 import { Repository } from 'typeorm';
 import { AuthResponseDto } from '../dto/auth-response.dto';
+import { CheckAccountRequestDto } from '../dto/check-account-request.dto';
+import { CheckAccountResponseDto } from '../dto/check-account-response.dto';
 import { LoginRequestDto } from '../dto/login-request.dto';
 import { PhoneRequestDto } from '../dto/phone-request.dto';
 import { RegisterRequestDto } from '../dto/register-request.dto';
 import { SendVerificationCodeResponseDto } from '../dto/send-verification-code-response.dto';
-import { VerifyAccountRequestDto } from '../dto/verify-account-request.dto';
-import { VerifyAccountResponseDto } from '../dto/verify-account-response.dto';
 import { VerifyCodeRequestDto } from '../dto/verify-code-request.dto';
 import { User } from '../entities/user.entity';
 import { JwtPayload } from '../interfaces/jwt-payload.interfaces';
@@ -122,7 +122,7 @@ export class AuthService {
   }
 
   async sendVerificationCode(
-    params: VerifyAccountRequestDto,
+    params: CheckAccountRequestDto,
   ): Promise<SendVerificationCodeResponseDto> {
     try {
       const { phone, type, email } = params;
@@ -180,8 +180,8 @@ export class AuthService {
   }
 
   async verifyAccount(
-    params: VerifyAccountRequestDto,
-  ): Promise<VerifyAccountResponseDto> {
+    params: CheckAccountRequestDto,
+  ): Promise<CheckAccountResponseDto> {
     try {
       const { phone, type, email } = params;
       let accountExists = false;

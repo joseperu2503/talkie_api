@@ -2,12 +2,12 @@ import { Body, Controller, HttpCode, Post } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthMethod } from 'src/core/models/auth-method';
 import { AuthResponseDto } from '../dto/auth-response.dto';
+import { CheckAccountRequestDto } from '../dto/check-account-request.dto';
+import { CheckAccountResponseDto } from '../dto/check-account-response.dto';
 import { LoginRequestDto } from '../dto/login-request.dto';
 import { RegisterRequestDto } from '../dto/register-request.dto';
 import { SendVerificationCodeRequestDto } from '../dto/send-verification-code-request.dto';
 import { SendVerificationCodeResponseDto } from '../dto/send-verification-code-response.dto';
-import { VerifyAccountRequestDto } from '../dto/verify-account-request.dto';
-import { VerifyAccountResponseDto } from '../dto/verify-account-response.dto';
 import { VerifyCodeRequestDto } from '../dto/verify-code-request.dto';
 import { VerifyCodeResponseDto } from '../dto/verify-code-response.dto';
 import { AuthService } from '../services/auth.service';
@@ -132,7 +132,7 @@ export class AuthController {
   })
   @HttpCode(200)
   @Post('send-verification-code')
-  async sendVerificationCode(@Body() request: VerifyAccountRequestDto) {
+  async sendVerificationCode(@Body() request: CheckAccountRequestDto) {
     return this.authService.sendVerificationCode(request);
   }
 
@@ -152,7 +152,7 @@ export class AuthController {
 
   @ApiOperation({ summary: 'Verify if the account exists' })
   @ApiBody({
-    type: VerifyAccountRequestDto,
+    type: CheckAccountRequestDto,
     examples: {
       emailExample: {
         summary: 'Verify account with email',
@@ -176,13 +176,13 @@ export class AuthController {
     },
   })
   @ApiResponse({
-    type: VerifyAccountResponseDto,
+    type: CheckAccountResponseDto,
     status: 200,
     example: { accountExists: true },
   })
   @HttpCode(200)
-  @Post('verify-account')
-  async verifyAccount(@Body() request: VerifyAccountRequestDto) {
+  @Post('check-account')
+  async checkAccount(@Body() request: CheckAccountRequestDto) {
     return this.authService.verifyAccount(request);
   }
 }
