@@ -6,10 +6,10 @@ import { CheckAccountRequestDto } from '../dto/check-account-request.dto';
 import { CheckAccountResponseDto } from '../dto/check-account-response.dto';
 import { LoginRequestDto } from '../dto/login-request.dto';
 import { RegisterRequestDto } from '../dto/register-request.dto';
-import { SendVerificationCodeRequestDto } from '../dto/send-verification-code-request.dto';
-import { SendVerificationCodeResponseDto } from '../dto/send-verification-code-response.dto';
-import { VerifyCodeRequestDto } from '../dto/verify-code-request.dto';
-import { VerifyCodeResponseDto } from '../dto/verify-code-response.dto';
+import { SendOtpRequestDto } from '../dto/send-otp-request.dto';
+import { SendOtpResponseDto } from '../dto/send-otp-response.dto';
+import { VerifyOtpRequestDto } from '../dto/verify-otp-request.dto';
+import { VerifyOtpResponseDto } from '../dto/verify-otp-response.dto';
 import { AuthService } from '../services/auth.service';
 
 @ApiTags('Authentication')
@@ -101,12 +101,12 @@ export class AuthController {
     return this.authService.login(request);
   }
 
-  @ApiOperation({ summary: 'Send verification code' })
+  @ApiOperation({ summary: 'Send otp' })
   @ApiBody({
-    type: SendVerificationCodeRequestDto,
+    type: SendOtpRequestDto,
     examples: {
       emailExample: {
-        summary: 'Send verification code with email',
+        summary: 'Send otp with email',
         value: {
           type: AuthMethod.EMAIL,
           email: 'test1@gmail.com',
@@ -114,7 +114,7 @@ export class AuthController {
         },
       },
       phoneExample: {
-        summary: 'Send verification code with phone',
+        summary: 'Send otp with phone',
         value: {
           type: AuthMethod.PHONE,
           email: null,
@@ -127,35 +127,35 @@ export class AuthController {
     },
   })
   @ApiResponse({
-    type: SendVerificationCodeResponseDto,
+    type: SendOtpResponseDto,
     status: 200,
   })
   @HttpCode(200)
-  @Post('send-verification-code')
-  async sendVerificationCode(@Body() request: CheckAccountRequestDto) {
-    return this.authService.sendVerificationCode(request);
+  @Post('send-otp')
+  async sendOtp(@Body() request: CheckAccountRequestDto) {
+    return this.authService.sendOtp(request);
   }
 
-  @ApiOperation({ summary: 'Verify verification code' })
+  @ApiOperation({ summary: 'Verify OTP' })
   @ApiBody({
-    type: VerifyCodeRequestDto,
+    type: VerifyOtpRequestDto,
   })
   @ApiResponse({
-    type: VerifyCodeResponseDto,
+    type: VerifyOtpResponseDto,
     status: 200,
   })
   @HttpCode(200)
-  @Post('verify-code')
-  async verifyCode(@Body() request: VerifyCodeRequestDto) {
-    return this.authService.verifyCode(request);
+  @Post('verify-otp')
+  async verifyOtp(@Body() request: VerifyOtpRequestDto) {
+    return this.authService.verifyOtp(request);
   }
 
-  @ApiOperation({ summary: 'Verify if the account exists' })
+  @ApiOperation({ summary: 'Check if the account exists' })
   @ApiBody({
     type: CheckAccountRequestDto,
     examples: {
       emailExample: {
-        summary: 'Verify account with email',
+        summary: 'Check account with email',
         value: {
           type: AuthMethod.EMAIL,
           email: 'test1@gmail.com',
@@ -163,7 +163,7 @@ export class AuthController {
         },
       },
       phoneExample: {
-        summary: 'Verify account with phone',
+        summary: 'Check account with phone',
         value: {
           type: AuthMethod.PHONE,
           email: null,

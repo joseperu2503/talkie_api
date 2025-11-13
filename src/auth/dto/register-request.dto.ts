@@ -16,7 +16,7 @@ import { AuthMethod } from 'src/core/models/auth-method';
 import { IsNullableIf } from 'src/core/validators/is-nullable.validator';
 import { IsPresent } from 'src/core/validators/is-present.validator';
 import { PhoneRequestDto } from './phone-request.dto';
-import { VerifyCodeRequestDto } from './verify-code-request.dto';
+import { VerifyOtpRequestDto } from './verify-otp-request.dto';
 
 export class RegisterRequestDto {
   @ApiProperty({
@@ -82,7 +82,7 @@ export class RegisterRequestDto {
     example: '123456',
   })
   @ValidateNested()
-  @Type(() => VerifyCodeRequestDto)
+  @Type(() => VerifyOtpRequestDto)
   @IsOptional()
-  verificationCode?: VerifyCodeRequestDto;
+  otp?: VerifyOtpRequestDto;
 }

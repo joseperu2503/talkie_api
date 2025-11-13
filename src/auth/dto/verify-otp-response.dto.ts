@@ -1,8 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class VerifyCodeResponseDto {
+export class VerifyOtpResponseDto {
   @ApiProperty({
-    example: 'Code verified successfully.',
+    example: 'OTP verified successfully.',
   })
   message: string;
 }

@@ -22,8 +22,8 @@ import { CheckAccountResponseDto } from '../dto/check-account-response.dto';
 import { LoginRequestDto } from '../dto/login-request.dto';
 import { PhoneRequestDto } from '../dto/phone-request.dto';
 import { RegisterRequestDto } from '../dto/register-request.dto';
-import { SendVerificationCodeResponseDto } from '../dto/send-verification-code-response.dto';
-import { VerifyCodeRequestDto } from '../dto/verify-code-request.dto';
+import { SendOtpResponseDto } from '../dto/send-otp-response.dto';
+import { VerifyOtpRequestDto } from '../dto/verify-otp-request.dto';
 import { User } from '../entities/user.entity';
 import { JwtPayload } from '../interfaces/jwt-payload.interfaces';
 
@@ -42,8 +42,7 @@ export class AuthService {
 
   async register(params: RegisterRequestDto): Promise<AuthResponseDto> {
     try {
-      const { password, email, phone, type, verificationCode, ...userData } =
-        params;
+      const { password, email, phone, type, otp, ...userData } = params;
 
       //** Crear el usuario */
       const user = this.userRepository.create({
@@ -77,11 +76,14 @@ export class AuthService {
       }
 
       //** verificar codigo 4 digitos */
-      if (verificationCode) {
-        await this.otpService.verifyOtp(
-          verificationCode.id,
-          verificationCode.code,
-        );
+      if (otp) {
+        const isValid = await this.otpService.verify(otp.id, otp.code);
+
+        if (!isValid) {
+          throw new BadRequestException('Invalid code');
+        }
+
+        await this.otpService.delete(otp.id);
       }
 
       //** Guardar el usuario */
@@ -129,14 +131,12 @@ export class AuthService {
     return this.buildAuthResponse(user);
   }
 
-  async sendVerificationCode(
-    params: CheckAccountRequestDto,
-  ): Promise<SendVerificationCodeResponseDto> {
+  async sendOtp(params: CheckAccountRequestDto): Promise<SendOtpResponseDto> {
     try {
       const { phone, type, email } = params;
 
       // const verificationCode = await this.verificationCodesService.create();
-      const verificationCode = await this.otpService.generateOtp();
+      const verificationCode = await this.otpService.generate();
 
       if (type == AuthMethod.EMAIL) {
         await this.mailService.sendVerificationCode(
@@ -160,7 +160,7 @@ export class AuthService {
       }
 
       return {
-        verificationCodeId: verificationCode.id,
+        id: verificationCode.id,
       };
     } catch (error) {
       if (!(error instanceof HttpException)) {
@@ -173,10 +173,10 @@ export class AuthService {
   }
 
   // Método para verificar el código ingresado por el usuario
-  async verifyCode(params: VerifyCodeRequestDto) {
+  async verifyOtp(params: VerifyOtpRequestDto) {
     const { id, code } = params;
     try {
-      const isValid = await this.otpService.verifyOtp(id, code);
+      const isValid = await this.otpService.verify(id, code);
 
       if (!isValid) {
         throw new BadRequestException('Invalid code');

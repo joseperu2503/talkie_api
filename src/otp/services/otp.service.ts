@@ -8,7 +8,7 @@ export class OtpService {
 
   constructor(private readonly redisService: RedisService) {}
 
-  async generateOtp(): Promise<{ id: string; value: string }> {
+  async generate(): Promise<{ id: string; value: string }> {
     const id = randomUUID();
     const value = Math.floor(1000 + Math.random() * 9000).toString();
 
@@ -17,16 +17,16 @@ export class OtpService {
     return { id, value };
   }
 
-  async verifyOtp(id: string, value: string): Promise<boolean> {
+  async verify(id: string, value: string): Promise<boolean> {
     const storedOtp = await this.redisService.get(`otp:${id}`);
 
     if (!storedOtp) return false;
     const isValid = storedOtp === value;
 
-    if (isValid) {
-      await this.redisService.del(`otp:${id}`);
-    }
-
     return isValid;
+  }
+
+  async delete(id: string) {
+    await this.redisService.del(`otp:${id}`);
   }
 }
