@@ -245,6 +245,7 @@ export class ChatService {
       .createQueryBuilder('message')
       .leftJoinAndSelect('message.sender', 'sender') // Incluir la relación con el sender
       .leftJoinAndSelect('message.chat', 'chat') // Incluir la relación con el chat
+      .leftJoinAndSelect('message.file', 'file') // Incluir la relación con el file
       .leftJoinAndSelect('message.messageUsers', 'messageUser') // Incluir la relación con MessageUser
       .where('message.chat_id = :id', { id: chatId })
       .orderBy('message.sentAt', 'DESC')
@@ -270,6 +271,7 @@ export class ChatService {
     }
 
     const messages = await query.getMany();
+
     return messages.map((message) => {
       return new MessageResource(message, user.id).response;
     });
